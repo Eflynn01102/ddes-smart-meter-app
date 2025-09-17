@@ -25,6 +25,7 @@ repositories {
 }
 
 dependencies {
+	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-amqp")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
@@ -32,16 +33,17 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
+	implementation("org.springframework.boot:spring-boot-starter-webflux") 
+  	implementation("io.github.resilience4j:resilience4j-spring-boot3:2.2.0") 
+  	implementation("com.github.ben-manes.caffeine:caffeine:3.1.8") 
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.springframework.boot:spring-boot-testcontainers")
 	testImplementation("org.springframework.amqp:spring-rabbit-test")
 	testImplementation("org.springframework.security:spring-security-test")
-	testImplementation("org.testcontainers:junit-jupiter")
-	testImplementation("org.testcontainers:rabbitmq")
 	testImplementation("org.awaitility:awaitility:4.2.1")
+	testImplementation("com.github.tomakehurst:wiremock-jre8:2.35.0")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
