@@ -1,0 +1,38 @@
+# syntax=docker/dockerfile:1.7
+
+##########
+# Build #
+##########
+FROM gradle:8.9.0-jdk21-alpine AS build
+WORKDIR /workspace
+
+# Better layer caching: copy only build scripts first
+COPY gradle gradle
+COPY gradlew .
+COPY settings.gradle.kts .
+COPY build.gradle.kts .
+
+# Warm Gradle caches (no sources yet)
+RUN --mount=type=cache,target=/home/gradle/.gradle/caches \
+    --mount=type=cache,target=/home/gradle/.gradle/wrapper \
+    ./gradlew --version
+
+# Now copy sources and build
+COPY src src
+RUN --mount=type=cache,target=/home/gradle/.gradle/caches \
+    --mount=type=cache,target=/home/gradle/.gradle/wrapper \
+    ./gradlew clean bootJar -x test
+
+###########
+# Runtime #
+###########
+FROM eclipse-temurin:21-jre AS runtime
+ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom" \
+    SPRING_PROFILES_ACTIVE=prod
+WORKDIR /app
+
+# Copy the fat jar produced by Spring Boot
+COPY --from=build /workspace/build/libs/*.jar /app/app.jar
+
+EXPOSE 8080
+ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar /app/app.jar"]

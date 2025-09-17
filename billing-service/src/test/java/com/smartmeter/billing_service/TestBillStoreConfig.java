@@ -24,4 +24,14 @@ public class TestBillStoreConfig {
             }
         };
     }
+
+        @Bean
+        public com.smartmeter.billing_service.domain.ports.TariffResolver tariffResolver() {
+            return at -> null; // Return null or dummy Tariff for testing
+        }
+
+    @Bean
+    public com.smartmeter.billing_service.domain.ports.Deduper deduper() {
+        return (account, readingId) -> true; // Always mark as new for testing
+    }
 }
