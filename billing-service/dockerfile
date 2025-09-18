@@ -3,7 +3,19 @@
 ##########
 # Build #
 ##########
-FROM gradle:8.9.0-jdk21-alpine AS build
+FROM arm64v8/eclipse-temurin:21-jdk AS build
+ENV GRADLE_VERSION=8.8
+ENV GRADLE_HOME=/opt/gradle
+ENV PATH=$PATH:$GRADLE_HOME/bin
+
+# Install Gradle manually
+RUN apt-get update && \
+    apt-get install -y wget unzip && \
+    wget https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -O /tmp/gradle.zip && \
+    mkdir -p /opt/gradle && \
+    unzip /tmp/gradle.zip -d /opt/gradle && \
+    mv /opt/gradle/gradle-${GRADLE_VERSION}/* /opt/gradle/ && \
+    rm -rf /tmp/gradle.zip /opt/gradle/gradle-${GRADLE_VERSION}
 WORKDIR /workspace
 
 # Better layer caching: copy only build scripts first
@@ -26,7 +38,7 @@ RUN --mount=type=cache,target=/home/gradle/.gradle/caches \
 ###########
 # Runtime #
 ###########
-FROM eclipse-temurin:21-jre AS runtime
+FROM arm64v8/eclipse-temurin:21-jre AS runtime
 ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom" \
     SPRING_PROFILES_ACTIVE=prod
 WORKDIR /app
