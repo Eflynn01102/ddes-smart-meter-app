@@ -1,10 +1,11 @@
 package com.smartmeter.billing_service.config;
 
-import com.smartmeter.billing_service.domain.service.BillingCalculator;
+import java.time.ZoneId;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.time.ZoneId;
+import com.smartmeter.billing_service.domain.service.BillingCalculator;
 
 @Configuration
 public class CoreConfig {
@@ -18,5 +19,19 @@ public class CoreConfig {
   @Bean
   BillingCalculator billingCalculator(ZoneId zoneId) {
     return new BillingCalculator(zoneId);
+  }
+  @Bean
+  public com.smartmeter.billing_service.domain.ports.BillStore billStore() {
+    return new com.smartmeter.billing_service.domain.ports.BillStore() {
+      @Override
+      public com.smartmeter.billing_service.domain.model.Bill load(com.smartmeter.billing_service.domain.value.Ids.AccountId id) {
+        // Dummy implementation for production context
+        return null;
+      }
+      @Override
+      public void save(com.smartmeter.billing_service.domain.value.Ids.AccountId id, com.smartmeter.billing_service.domain.model.Bill bill) {
+        // No-op
+      }
+    };
   }
 }
