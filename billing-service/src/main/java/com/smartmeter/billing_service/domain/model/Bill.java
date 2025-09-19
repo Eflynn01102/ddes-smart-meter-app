@@ -65,12 +65,27 @@ public final class Bill {
   public void closePeriod(Instant end) { this.periodEnd = end; }
 
   // Getters
+    public AccountId getAccountId() { return accountId; }
+    public Instant getPeriodStart() { return periodStart; }
+    public Instant getPeriodEnd() { return periodEnd; }
+    public String getCurrency() { return currency; }
+    public java.util.List<BillLineItem> getLineItems() { return lineItems; }
+    public java.math.BigDecimal getConsumedKwh() { return consumedKwh; }
+    public Money getEnergyCost() { return energyCost; }
+    public Money getStandingCharge() { return standingCharge; }
+    public Money getTax() { return tax; }
+    public Money getAmountDue() { return amountDue; }
+    public ReadingId getLastReadingId() { return lastReadingId; }
+    public ReadingPointer getPointer() { return pointer; }
+    public int getStandingAccruedDays() { return standingAccruedDays; }
+
+  // Legacy-style accessors for backward compatibility
   public AccountId accountId() { return accountId; }
   public Instant periodStart() { return periodStart; }
   public Instant periodEnd() { return periodEnd; }
   public String currency() { return currency; }
-  public List<BillLineItem> lineItems() { return List.copyOf(lineItems); }
-  public BigDecimal consumedKwh() { return consumedKwh; }
+  public java.util.List<BillLineItem> lineItems() { return java.util.List.copyOf(lineItems); }
+  public java.math.BigDecimal consumedKwh() { return consumedKwh; }
   public Money energyCost() { return energyCost; }
   public Money standingCharge() { return standingCharge; }
   public Money tax() { return tax; }
