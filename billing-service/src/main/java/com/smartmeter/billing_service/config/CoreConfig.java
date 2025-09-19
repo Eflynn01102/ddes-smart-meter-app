@@ -20,6 +20,7 @@ public class CoreConfig {
   BillingCalculator billingCalculator(ZoneId zoneId) {
     return new BillingCalculator(zoneId);
   }
+
   @Bean
   public com.smartmeter.billing_service.domain.ports.BillStore billStore() {
     return new com.smartmeter.billing_service.domain.ports.BillStore() {
@@ -33,5 +34,15 @@ public class CoreConfig {
         // No-op
       }
     };
+  }
+
+  @Bean
+  public com.smartmeter.billing_service.domain.ports.TariffResolver tariffResolver() {
+    return accountId -> null; // Dummy implementation for production context
+  }
+
+  @Bean
+  public com.smartmeter.billing_service.domain.ports.Deduper deduper() {
+    return (account, readingId) -> true; // Dummy implementation for production context
   }
 }
