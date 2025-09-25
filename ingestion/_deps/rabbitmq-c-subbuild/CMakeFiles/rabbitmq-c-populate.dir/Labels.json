@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/louie/ingestion/ddes-smart-meter-app/ingestion/_deps/rabbitmq-c-subbuild/CMakeFiles/rabbitmq-c-populate"
+		},
+		{
+			"file" : "/home/louie/ingestion/ddes-smart-meter-app/ingestion/_deps/rabbitmq-c-subbuild/CMakeFiles/rabbitmq-c-populate.rule"
+		},
+		{
+			"file" : "/home/louie/ingestion/ddes-smart-meter-app/ingestion/_deps/rabbitmq-c-subbuild/CMakeFiles/rabbitmq-c-populate-complete.rule"
+		},
+		{
+			"file" : "/home/louie/ingestion/ddes-smart-meter-app/ingestion/_deps/rabbitmq-c-subbuild/rabbitmq-c-populate-prefix/src/rabbitmq-c-populate-stamp/rabbitmq-c-populate-build.rule"
+		},
+		{
+			"file" : "/home/louie/ingestion/ddes-smart-meter-app/ingestion/_deps/rabbitmq-c-subbuild/rabbitmq-c-populate-prefix/src/rabbitmq-c-populate-stamp/rabbitmq-c-populate-configure.rule"
+		},
+		{
+			"file" : "/home/louie/ingestion/ddes-smart-meter-app/ingestion/_deps/rabbitmq-c-subbuild/rabbitmq-c-populate-prefix/src/rabbitmq-c-populate-stamp/rabbitmq-c-populate-download.rule"
+		},
+		{
+			"file" : "/home/louie/ingestion/ddes-smart-meter-app/ingestion/_deps/rabbitmq-c-subbuild/rabbitmq-c-populate-prefix/src/rabbitmq-c-populate-stamp/rabbitmq-c-populate-install.rule"
+		},
+		{
+			"file" : "/home/louie/ingestion/ddes-smart-meter-app/ingestion/_deps/rabbitmq-c-subbuild/rabbitmq-c-populate-prefix/src/rabbitmq-c-populate-stamp/rabbitmq-c-populate-mkdir.rule"
+		},
+		{
+			"file" : "/home/louie/ingestion/ddes-smart-meter-app/ingestion/_deps/rabbitmq-c-subbuild/rabbitmq-c-populate-prefix/src/rabbitmq-c-populate-stamp/rabbitmq-c-populate-patch.rule"
+		},
+		{
+			"file" : "/home/louie/ingestion/ddes-smart-meter-app/ingestion/_deps/rabbitmq-c-subbuild/rabbitmq-c-populate-prefix/src/rabbitmq-c-populate-stamp/rabbitmq-c-populate-test.rule"
+		},
+		{
+			"file" : "/home/louie/ingestion/ddes-smart-meter-app/ingestion/_deps/rabbitmq-c-subbuild/rabbitmq-c-populate-prefix/src/rabbitmq-c-populate-stamp/rabbitmq-c-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"rabbitmq-c-populate"
+		],
+		"name" : "rabbitmq-c-populate"
+	}
+}

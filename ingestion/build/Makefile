@@ -57,7 +57,7 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/louie/ingestion/ddes-smart-meter-app/ingestion/src
+CMAKE_SOURCE_DIR = /home/louie/ingestion/ddes-smart-meter-app/ingestion
 
 # The top-level build directory on which CMake was run.
 CMAKE_BINARY_DIR = /home/louie/ingestion/ddes-smart-meter-app/ingestion/build
@@ -84,6 +84,51 @@ rebuild_cache:
 # Special rule for the target rebuild_cache
 rebuild_cache/fast: rebuild_cache
 .PHONY : rebuild_cache/fast
+
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\" \"rabbitmq-c-development\" \"rabbitmq-c-runtime\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+.PHONY : list_install_components/fast
+
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install
+
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
+
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
+
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
+
+# Special rule for the target install/strip
+install/strip/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -129,29 +174,55 @@ ingestion/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ingestion.dir/build.make CMakeFiles/ingestion.dir/build
 .PHONY : ingestion/fast
 
-ingestion.o: ingestion.c.o
-.PHONY : ingestion.o
+#=============================================================================
+# Target rules for targets named rabbitmq
+
+# Build rule for target.
+rabbitmq: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 rabbitmq
+.PHONY : rabbitmq
+
+# fast build rule for target.
+rabbitmq/fast:
+	$(MAKE) $(MAKESILENT) -f _deps/rabbitmq-c-build/librabbitmq/CMakeFiles/rabbitmq.dir/build.make _deps/rabbitmq-c-build/librabbitmq/CMakeFiles/rabbitmq.dir/build
+.PHONY : rabbitmq/fast
+
+#=============================================================================
+# Target rules for targets named rabbitmq-static
+
+# Build rule for target.
+rabbitmq-static: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 rabbitmq-static
+.PHONY : rabbitmq-static
+
+# fast build rule for target.
+rabbitmq-static/fast:
+	$(MAKE) $(MAKESILENT) -f _deps/rabbitmq-c-build/librabbitmq/CMakeFiles/rabbitmq-static.dir/build.make _deps/rabbitmq-c-build/librabbitmq/CMakeFiles/rabbitmq-static.dir/build
+.PHONY : rabbitmq-static/fast
+
+src/ingestion.o: src/ingestion.c.o
+.PHONY : src/ingestion.o
 
 # target to build an object file
-ingestion.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ingestion.dir/build.make CMakeFiles/ingestion.dir/ingestion.c.o
-.PHONY : ingestion.c.o
+src/ingestion.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ingestion.dir/build.make CMakeFiles/ingestion.dir/src/ingestion.c.o
+.PHONY : src/ingestion.c.o
 
-ingestion.i: ingestion.c.i
-.PHONY : ingestion.i
+src/ingestion.i: src/ingestion.c.i
+.PHONY : src/ingestion.i
 
 # target to preprocess a source file
-ingestion.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ingestion.dir/build.make CMakeFiles/ingestion.dir/ingestion.c.i
-.PHONY : ingestion.c.i
+src/ingestion.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ingestion.dir/build.make CMakeFiles/ingestion.dir/src/ingestion.c.i
+.PHONY : src/ingestion.c.i
 
-ingestion.s: ingestion.c.s
-.PHONY : ingestion.s
+src/ingestion.s: src/ingestion.c.s
+.PHONY : src/ingestion.s
 
 # target to generate assembly for a file
-ingestion.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ingestion.dir/build.make CMakeFiles/ingestion.dir/ingestion.c.s
-.PHONY : ingestion.c.s
+src/ingestion.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ingestion.dir/build.make CMakeFiles/ingestion.dir/src/ingestion.c.s
+.PHONY : src/ingestion.c.s
 
 # Help Target
 help:
@@ -160,11 +231,17 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
+	@echo "... install"
+	@echo "... install/local"
+	@echo "... install/strip"
+	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... ingestion"
-	@echo "... ingestion.o"
-	@echo "... ingestion.i"
-	@echo "... ingestion.s"
+	@echo "... rabbitmq"
+	@echo "... rabbitmq-static"
+	@echo "... src/ingestion.o"
+	@echo "... src/ingestion.i"
+	@echo "... src/ingestion.s"
 .PHONY : help
 
 

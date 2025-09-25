@@ -1,4 +1,4 @@
-CMakeFiles/ingestion.dir/ingestion.c.o: \
+CMakeFiles/ingestion.dir/src/ingestion.c.o: \
  /home/louie/ingestion/ddes-smart-meter-app/ingestion/src/ingestion.c \
  /usr/include/stdc-predef.h \
  /home/louie/ingestion/ddes-smart-meter-app/ingestion/src/ingestion.h \
@@ -25,9 +25,17 @@ CMakeFiles/ingestion.dir/ingestion.c.o: \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
  /usr/include/x86_64-linux-gnu/bits/floatn.h \
  /usr/include/x86_64-linux-gnu/bits/floatn-common.h \
- /home/louie/ingestion/ddes-smart-meter-app/ingestion/src/types.h \
- /usr/include/inttypes.h \
+ /usr/include/x86_64-linux-gnu/bits/stdio.h \
+ /usr/include/x86_64-linux-gnu/bits/stdio2.h \
+ /home/louie/ingestion/ddes-smart-meter-app/ingestion/_deps/rabbitmq-c-src/librabbitmq/../include/amqp.h \
+ /home/louie/ingestion/ddes-smart-meter-app/ingestion/_deps/rabbitmq-c-src/librabbitmq/../include/rabbitmq-c/amqp.h \
+ /home/louie/ingestion/ddes-smart-meter-app/ingestion/_deps/rabbitmq-c-build/librabbitmq/../include/rabbitmq-c/export.h \
  /usr/lib/gcc/x86_64-linux-gnu/11/include/stdint.h /usr/include/stdint.h \
  /usr/include/x86_64-linux-gnu/bits/wchar.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
- /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h
+ /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
+ /home/louie/ingestion/ddes-smart-meter-app/ingestion/_deps/rabbitmq-c-src/librabbitmq/../include/rabbitmq-c/framing.h \
+ /home/louie/ingestion/ddes-smart-meter-app/ingestion/_deps/rabbitmq-c-src/librabbitmq/../include/amqp_tcp_socket.h \
+ /home/louie/ingestion/ddes-smart-meter-app/ingestion/_deps/rabbitmq-c-src/librabbitmq/../include/rabbitmq-c/tcp_socket.h \
+ /home/louie/ingestion/ddes-smart-meter-app/ingestion/src/types.h \
+ /usr/include/inttypes.h

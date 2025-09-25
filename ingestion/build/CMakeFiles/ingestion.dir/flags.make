@@ -4,7 +4,7 @@
 # compile C with /usr/bin/cc
 C_DEFINES = 
 
-C_INCLUDES = 
+C_INCLUDES = -I/home/louie/ingestion/ddes-smart-meter-app/ingestion/build/_deps/rabbitmq-c-build/librabbitmq/../include -I/home/louie/ingestion/ddes-smart-meter-app/ingestion/build/_deps/rabbitmq-c-src/librabbitmq/../include
 
-C_FLAGS = 
+C_FLAGS = -O3 -DNDEBUG
 

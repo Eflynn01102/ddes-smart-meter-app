@@ -1,0 +1,16 @@
+Performing C SOURCE FILE Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY failed with the following output:
+Change Dir: /home/louie/ingestion/ddes-smart-meter-app/ingestion/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_06904/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_06904.dir/build.make CMakeFiles/cmTC_06904.dir/build
+gmake[1]: Entering directory '/home/louie/ingestion/ddes-smart-meter-app/ingestion/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_06904.dir/src.c.o
+/usr/bin/cc -DCOMPILER_HAS_HIDDEN_INLINE_VISIBILITY  -fvisibility-inlines-hidden -std=gnu99 -o CMakeFiles/cmTC_06904.dir/src.c.o -c /home/louie/ingestion/ddes-smart-meter-app/ingestion/CMakeFiles/CMakeTmp/src.c
+cc1: warning: command-line option '-fvisibility-inlines-hidden' is valid for C++/ObjC++ but not for C
+Linking C executable cmTC_06904
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_06904.dir/link.txt --verbose=1
+/usr/bin/cc CMakeFiles/cmTC_06904.dir/src.c.o -o cmTC_06904 
+gmake[1]: Leaving directory '/home/louie/ingestion/ddes-smart-meter-app/ingestion/CMakeFiles/CMakeTmp'
+
+
+Source file was:
+int main(void) { return 0; }

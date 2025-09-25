@@ -53,7 +53,7 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/louie/ingestion/ddes-smart-meter-app/ingestion/src
+CMAKE_SOURCE_DIR = /home/louie/ingestion/ddes-smart-meter-app/ingestion
 
 # The top-level build directory on which CMake was run.
 CMAKE_BINARY_DIR = /home/louie/ingestion/ddes-smart-meter-app/ingestion/build
@@ -69,29 +69,30 @@ include CMakeFiles/ingestion.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/ingestion.dir/flags.make
 
-CMakeFiles/ingestion.dir/ingestion.c.o: CMakeFiles/ingestion.dir/flags.make
-CMakeFiles/ingestion.dir/ingestion.c.o: /home/louie/ingestion/ddes-smart-meter-app/ingestion/src/ingestion.c
-CMakeFiles/ingestion.dir/ingestion.c.o: CMakeFiles/ingestion.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/louie/ingestion/ddes-smart-meter-app/ingestion/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/ingestion.dir/ingestion.c.o"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/ingestion.dir/ingestion.c.o -MF CMakeFiles/ingestion.dir/ingestion.c.o.d -o CMakeFiles/ingestion.dir/ingestion.c.o -c /home/louie/ingestion/ddes-smart-meter-app/ingestion/src/ingestion.c
+CMakeFiles/ingestion.dir/src/ingestion.c.o: CMakeFiles/ingestion.dir/flags.make
+CMakeFiles/ingestion.dir/src/ingestion.c.o: ../src/ingestion.c
+CMakeFiles/ingestion.dir/src/ingestion.c.o: CMakeFiles/ingestion.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/louie/ingestion/ddes-smart-meter-app/ingestion/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/ingestion.dir/src/ingestion.c.o"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/ingestion.dir/src/ingestion.c.o -MF CMakeFiles/ingestion.dir/src/ingestion.c.o.d -o CMakeFiles/ingestion.dir/src/ingestion.c.o -c /home/louie/ingestion/ddes-smart-meter-app/ingestion/src/ingestion.c
 
-CMakeFiles/ingestion.dir/ingestion.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/ingestion.dir/ingestion.c.i"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/louie/ingestion/ddes-smart-meter-app/ingestion/src/ingestion.c > CMakeFiles/ingestion.dir/ingestion.c.i
+CMakeFiles/ingestion.dir/src/ingestion.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/ingestion.dir/src/ingestion.c.i"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/louie/ingestion/ddes-smart-meter-app/ingestion/src/ingestion.c > CMakeFiles/ingestion.dir/src/ingestion.c.i
 
-CMakeFiles/ingestion.dir/ingestion.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/ingestion.dir/ingestion.c.s"
-	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/louie/ingestion/ddes-smart-meter-app/ingestion/src/ingestion.c -o CMakeFiles/ingestion.dir/ingestion.c.s
+CMakeFiles/ingestion.dir/src/ingestion.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/ingestion.dir/src/ingestion.c.s"
+	/usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/louie/ingestion/ddes-smart-meter-app/ingestion/src/ingestion.c -o CMakeFiles/ingestion.dir/src/ingestion.c.s
 
 # Object files for target ingestion
 ingestion_OBJECTS = \
-"CMakeFiles/ingestion.dir/ingestion.c.o"
+"CMakeFiles/ingestion.dir/src/ingestion.c.o"
 
 # External object files for target ingestion
 ingestion_EXTERNAL_OBJECTS =
 
-ingestion: CMakeFiles/ingestion.dir/ingestion.c.o
+ingestion: CMakeFiles/ingestion.dir/src/ingestion.c.o
 ingestion: CMakeFiles/ingestion.dir/build.make
+ingestion: _deps/rabbitmq-c-build/librabbitmq/librabbitmq.so.0.16.0
 ingestion: CMakeFiles/ingestion.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/louie/ingestion/ddes-smart-meter-app/ingestion/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking C executable ingestion"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ingestion.dir/link.txt --verbose=$(VERBOSE)
@@ -105,6 +106,6 @@ CMakeFiles/ingestion.dir/clean:
 .PHONY : CMakeFiles/ingestion.dir/clean
 
 CMakeFiles/ingestion.dir/depend:
-	cd /home/louie/ingestion/ddes-smart-meter-app/ingestion/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/louie/ingestion/ddes-smart-meter-app/ingestion/src /home/louie/ingestion/ddes-smart-meter-app/ingestion/src /home/louie/ingestion/ddes-smart-meter-app/ingestion/build /home/louie/ingestion/ddes-smart-meter-app/ingestion/build /home/louie/ingestion/ddes-smart-meter-app/ingestion/build/CMakeFiles/ingestion.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/louie/ingestion/ddes-smart-meter-app/ingestion/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/louie/ingestion/ddes-smart-meter-app/ingestion /home/louie/ingestion/ddes-smart-meter-app/ingestion /home/louie/ingestion/ddes-smart-meter-app/ingestion/build /home/louie/ingestion/ddes-smart-meter-app/ingestion/build /home/louie/ingestion/ddes-smart-meter-app/ingestion/build/CMakeFiles/ingestion.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/ingestion.dir/depend
 

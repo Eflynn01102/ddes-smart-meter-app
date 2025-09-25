@@ -1,1 +1,1 @@
-/usr/bin/cc CMakeFiles/ingestion.dir/ingestion.c.o -o ingestion 
+/usr/bin/cc -O3 -DNDEBUG CMakeFiles/ingestion.dir/src/ingestion.c.o -o ingestion  -Wl,-rpath,/home/louie/ingestion/ddes-smart-meter-app/ingestion/build/_deps/rabbitmq-c-build/librabbitmq _deps/rabbitmq-c-build/librabbitmq/librabbitmq.so.0.16.0 

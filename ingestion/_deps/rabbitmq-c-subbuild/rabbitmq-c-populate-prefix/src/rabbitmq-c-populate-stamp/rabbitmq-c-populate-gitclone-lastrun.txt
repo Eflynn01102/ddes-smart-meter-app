@@ -1,0 +1,3 @@
+repository='https://github.com/alanxz/rabbitmq-c.git'
+module=''
+tag='origin'
