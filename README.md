@@ -26,6 +26,14 @@
 
  Initialize each client with existing readings on startup.
 
+## Alerts
+
+Need to add the documentation for this bit.
+
+## Ingestion
+
+Need to add the documentation for this bit.
+
 ## Project & submission
 
  GitHub repo with visible contributions from all members; build/run instructions.
