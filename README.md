@@ -1,5 +1,6 @@
 # ddes-smart-meter-app
-# Client
+
+## Client
 
  Auth over TLS (mTLS or token).
 
@@ -11,7 +12,7 @@
 
  Detect & display comms errors; retry with backoff.
 
-# Server
+## Server
 
  Handle ≥12 concurrent clients.
 
@@ -25,7 +26,15 @@
 
  Initialize each client with existing readings on startup.
 
-# Project & submission
+## Alerts
+
+Need to add the documentation for this bit.
+
+## Ingestion
+
+Need to add the documentation for this bit.
+
+## Project & submission
 
  GitHub repo with visible contributions from all members; build/run instructions.
 
