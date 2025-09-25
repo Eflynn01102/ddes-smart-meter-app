@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/ingestion.dir/ingestion.c.o -o ingestion 
