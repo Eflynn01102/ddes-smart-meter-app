@@ -12,4 +12,4 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(rabbitmq-c)
 add_executable(ingestion src/ingestion.c)
-target_link_libraries(ingestion PRIVATE rabbitmq)
+target_link_libraries(ingestion PRIVATE rabbitmq::rabbitmq)
