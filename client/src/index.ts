@@ -4,8 +4,8 @@ console.log("Connecting to RabbitMQ...");
 const client  = await rabbit.connect({
   hostname: "localhost",
   port: 5552,
-  username: "guest",
-  password: "guest",
+  username: "kalo",
+  password: "kalo",
   vhost: "/",
 })
 
