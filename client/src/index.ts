@@ -1,20 +1,26 @@
-import amqplib from "amqplib/callback_api";
+import rabbit from "rabbitmq-stream-js-client";
 
-amqplib.connect("amqp:localhost", (error0, connection) => {
-  if (error0) {
-    throw error0;
+console.log("Connecting to RabbitMQ...");
+const client  = await rabbit.connect({
+  hostname: "localhost",
+  port: 5552,
+  username: "guest",
+  password: "guest",
+  vhost: "/",
+})
+
+console.log("Creating stream...");
+await client.createStream({
+  stream: "streamtest",
+  arguments: {
+    "max-length-bytes": 100000000,
   }
-  connection.createChannel((error1, channel) => {
-    if (error1) {
-      throw error1;
-    }
-    const queue = "hello";
-    const msg = "Hello World!";
+})
 
-    channel.assertQueue(queue, {
-      durable: false
-    });
-    channel.sendToQueue(queue, Buffer.from(msg));
-    console.log(" [x] Sent %s", msg);
-  });
-});
+console.log("Declaring publisher...");
+const publisher = await client.declarePublisher({
+  stream: "streamtest",
+})
+
+console.log("Publishing messages...");
+await publisher.send(Buffer.from("Hello, World!"));
