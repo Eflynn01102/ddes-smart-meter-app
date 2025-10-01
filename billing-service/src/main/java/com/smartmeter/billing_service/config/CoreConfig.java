@@ -1,13 +1,17 @@
 package com.smartmeter.billing_service.config;
 
+import java.time.Clock;
 import java.time.ZoneId;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.smartmeter.billing_service.domain.ports.BillStore;
 import com.smartmeter.billing_service.domain.service.BillingCalculator;
+import com.smartmeter.billing_service.infra.store.InMemoryBillStore;
 
 @Configuration
 public class CoreConfig {
@@ -29,18 +33,11 @@ public class CoreConfig {
   }
 
   @Bean
-  public com.smartmeter.billing_service.domain.ports.BillStore billStore() {
-    return new com.smartmeter.billing_service.domain.ports.BillStore() {
-      @Override
-      public com.smartmeter.billing_service.domain.model.Bill load(com.smartmeter.billing_service.domain.value.Ids.AccountId id) {
-        // Dummy implementation for production context
-        return null;
-      }
-      @Override
-      public void save(com.smartmeter.billing_service.domain.value.Ids.AccountId id, com.smartmeter.billing_service.domain.model.Bill bill) {
-        // No-op
-      }
-    };
+  Clock clock() { return Clock.systemUTC(); }
+
+  @Bean
+  public BillStore billStore(Clock clock, ZoneId zoneId, @Value("${billing.currency:GBP}") String currency) {
+    return new InMemoryBillStore(clock, zoneId, currency);
   }
 
   @Bean
