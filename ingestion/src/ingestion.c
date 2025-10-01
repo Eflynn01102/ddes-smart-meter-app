@@ -95,11 +95,14 @@ U8 IngestionMainloop(AMQP_CONN* Connection) {
 U8 main(U8 argc, U8* argv[]) {
     U8 IP[32] = {0};
     S32 Port = 0;
+    U8 RabbitMQUsername[64] = {0};
+    U8 RabbitMQPassword[64] = {0};
+
     SigIntReceived = FALSE;
     if (0&&signal(SIGINT, SigIntHandler) == SIG_ERR) {
         fprintf(stderr, "Could not configure sigint handler");
         return 1;
     }
-    ReadRabbitConfig(IP, &Port);
+    ReadRabbitConfig(IP, &Port, RabbitMQUsername, RabbitMQPassword);
     return OK;
 }
