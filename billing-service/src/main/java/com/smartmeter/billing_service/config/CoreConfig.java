@@ -6,6 +6,7 @@ import java.time.ZoneId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -36,7 +37,9 @@ public class CoreConfig {
   Clock clock() { return Clock.systemUTC(); }
 
   @Bean
+  @ConditionalOnMissingBean(BillStore.class)
   public BillStore billStore(Clock clock, ZoneId zoneId, @Value("${billing.currency:GBP}") String currency) {
+    log.info("Registering BillStore bean via CoreConfig (InMemoryBillStore)");
     return new InMemoryBillStore(clock, zoneId, currency);
   }
 
