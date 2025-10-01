@@ -5,17 +5,22 @@
 #include <rabbitmq-c/amqp.h>
 #include <rabbitmq-c/tcp_socket.h>
 #include <signal.h>
+#include <string.h>
+#include <stdlib.h>
 #include "types.h"
 
-
-#define RABBITMQ_HOST "localhost"
-#define RABBITMQ_PORT 5672
+//#defines
 #define AMQP_INGESTION_QUEUE_NAME "ingestion.q"
 #define TRUE 1
 #define FALSE 0
 #define OK 0
+#define strtok_r __strtok_r
 
+//prototypes
 static V SigIntHandler(S32 SigVal);
+U8 ReadRabbitConfig(U8* IP, S32* Port);
+
+//globals
 volatile static S8 SigIntReceived;
 
 #endif

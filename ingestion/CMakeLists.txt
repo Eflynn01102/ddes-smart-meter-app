@@ -11,5 +11,6 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(rabbitmq-c)
-add_executable(ingestion src/ingestion.c)
+add_executable(ingestion src/ingestion.c src/ingestion.h src/types.h src/support-functions.c)
 target_link_libraries(ingestion PRIVATE rabbitmq::rabbitmq)
+file(COPY ${CMAKE_SOURCE_DIR}/src/ingestion.conf DESTINATION ${CMAKE_BINARY_DIR})

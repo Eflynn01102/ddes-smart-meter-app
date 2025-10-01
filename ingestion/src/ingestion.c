@@ -13,7 +13,7 @@ U8 CheckRpcReply(AMQP_CONN Connection) {
     return OK;
 }
 
-U8 InitiateConnection(AMQP_CONN* Connection) {
+U8 InitiateConnection(AMQP_CONN* Connection, U8* IP, S32 Port) {
     AMQP_SOCK* Socket;
 
     *Connection = amqp_new_connection();
@@ -28,7 +28,7 @@ U8 InitiateConnection(AMQP_CONN* Connection) {
 
     {
         U8 Ret;
-        Ret = amqp_socket_open(Socket, RABBITMQ_HOST, RABBITMQ_PORT);
+        Ret = amqp_socket_open(Socket, IP, Port);
         if (Ret != OK) {
             fprintf(stderr, "Could not open tcp socket");
             return 1;
@@ -93,10 +93,13 @@ U8 IngestionMainloop(AMQP_CONN* Connection) {
 }
 
 U8 main(U8 argc, U8* argv[]) {
+    U8 IP[32] = {0};
+    S32 Port = 0;
     SigIntReceived = FALSE;
-    if (signal(SIGINT, SigIntHandler) == SIG_ERR) {
+    if (0&&signal(SIGINT, SigIntHandler) == SIG_ERR) {
         fprintf(stderr, "Could not configure sigint handler");
         return 1;
     }
+    ReadRabbitConfig(IP, &Port);
     return OK;
 }
