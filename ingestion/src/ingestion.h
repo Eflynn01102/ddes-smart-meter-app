@@ -7,6 +7,7 @@
 #include <signal.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/time.h>
 #include "types.h"
 
 //#defines
@@ -19,8 +20,5 @@
 //prototypes
 static V SigIntHandler(S32 SigVal);
 U8 ReadRabbitConfig(U8* IP, S32* Port, U8* Username, U8* Password);
-
-//globals
-volatile static S8 SigIntReceived;
 
 #endif
