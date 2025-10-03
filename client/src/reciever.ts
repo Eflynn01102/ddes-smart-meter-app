@@ -11,7 +11,7 @@ const client  = await rabbit.connect({
 
 await client.declareConsumer({
   stream: "streamtest",
-  offset: rabbit.Offset.first()},
+  offset: rabbit.Offset.last()},
   (message) => {
     console.log("Received message:", message.content.toString());
   }
