@@ -9,6 +9,14 @@ const client  = await rabbit.connect({
   vhost: "/",
 })
 
+const message = {
+  clientID: "client-1",
+  currentReading: 42,
+  unix: Math.floor(Date.now() / 1000),
+  fwVersion: "1.0.0",
+  unit: "kWh"
+}
+
 console.log("Creating stream...");
 await client.createStream({
   stream: "streamtest",
@@ -23,4 +31,4 @@ const publisher = await client.declarePublisher({
 })
 
 console.log("Publishing messages...");
-await publisher.send(Buffer.from("Hello, World!"));
+await publisher.send(Buffer.from(JSON.stringify(message)));
