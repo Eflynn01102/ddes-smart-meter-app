@@ -2,10 +2,10 @@ import rabbit from "rabbitmq-stream-js-client";
 
 console.log("Connecting to RabbitMQ...");
 const client  = await rabbit.connect({
-  hostname: "localhost",
+  hostname: "127.0.0.1",
   port: 5552,
-  username: "kalo",
-  password: "kalo",
+  username: "guest",
+  password: "guest",
   vhost: "/",
 })
 
