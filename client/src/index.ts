@@ -12,7 +12,8 @@ const message = {
   currentReading: 43,
   unix: Math.floor(Date.now() / 1000),
   fwVersion: "1.0.0",
-  unit: "kWh"
+  unit: "kWh",
+  encryption: "HMAC-SHA256",
 }
 
 console.log("Publishing messages...");
