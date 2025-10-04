@@ -1,6 +1,6 @@
 import type { Publisher } from "rabbitmq-stream-js-client";
 import { RabbitMQClient } from "./components/rabbitClient";
-import { generateRandomNumber } from "./components/randomNumberGen";
+import { generateRandomNumber, generateRandomNumberInRange } from "./components/randomNumberGen";
 import { rabbitMessage } from "./types/message";
 
 const rabbitInstance = RabbitMQClient.Instance;
@@ -23,7 +23,7 @@ const message: rabbitMessage = {
 }
 
 setInterval(async () => {
-  const randomNum = generateRandomNumber(1);
+  const randomNum = generateRandomNumber(2);
   const currentPub = publisherArray.at(randomNum)
   if (!currentPub) 
   {
@@ -31,7 +31,7 @@ setInterval(async () => {
     return;
   }
   message.clientID = `client-${randomNum + 1}`;
-  message.currentReading += generateRandomNumber(10);
+  message.currentReading += generateRandomNumberInRange(0, 100); // need to figure out how to not send a smaller number then the one before
   message.unix = Math.floor(Date.now() / 1000);
   await messaghandler(currentPub, message);
 }, 5000)
