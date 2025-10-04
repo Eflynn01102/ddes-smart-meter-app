@@ -12,3 +12,10 @@ await client.declareConsumer({
   }
 )
 
+await client.declareConsumer({
+  stream: "streamtest2",
+  offset: rabbit.Offset.last()},
+  (message) => {
+    console.log("Received message on stream 2:", message.content.toString());
+  }
+)
