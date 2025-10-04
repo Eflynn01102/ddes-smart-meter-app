@@ -1,4 +1,4 @@
-import { RabbitMQClient } from "./rabbitClient";
+import { RabbitMQClient } from "./components/rabbitClient";
 import rabbit from "rabbitmq-stream-js-client";
 
 const rabbitInstance = RabbitMQClient.Instance;

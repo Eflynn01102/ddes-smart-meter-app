@@ -35,7 +35,7 @@ export class RabbitMQClient {
   }
 
   public async createPublisher(client: rabbit.Client, topicName: string) {
-    console.log("Creating Stream...");
+    console.log("Creating Publisher...");
     const publisher = await client.declarePublisher({
       stream: topicName,
     })
