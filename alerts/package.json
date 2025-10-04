@@ -2,10 +2,17 @@
   "name": "alerts",
   "module": "src/index.ts",
   "type": "module",
+  "scripts":{
+    "start": "bun run src/index.ts",
+    "dev": "bun run --watch src/index.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "rabbitmq-stream-js-client": "^0.6.2"
   }
 }
