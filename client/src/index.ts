@@ -1,1 +1,34 @@
-console.log("Hello via Bun!");
+import rabbit from "rabbitmq-stream-js-client";
+
+console.log("Connecting to RabbitMQ...");
+const client  = await rabbit.connect({
+  hostname: "127.0.0.1",
+  port: 5552,
+  username: "guest",
+  password: "guest",
+  vhost: "/",
+})
+
+const message = {
+  clientID: "client-1",
+  currentReading: 42,
+  unix: Math.floor(Date.now() / 1000),
+  fwVersion: "1.0.0",
+  unit: "kWh"
+}
+
+console.log("Creating stream...");
+await client.createStream({
+  stream: "streamtest",
+  arguments: {
+    "max-length-bytes": 100000000,
+  }
+})
+
+console.log("Declaring publisher...");
+const publisher = await client.declarePublisher({
+  stream: "streamtest",
+})
+
+console.log("Publishing messages...");
+await publisher.send(Buffer.from(JSON.stringify(message)));
