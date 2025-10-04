@@ -1,13 +1,8 @@
+import { RabbitMQClient } from "./rabbitClient";
 import rabbit from "rabbitmq-stream-js-client";
 
-console.log("Connecting to RabbitMQ...");
-const client  = await rabbit.connect({
-  hostname: "127.0.0.1",
-  port: 5552,
-  username: "guest",
-  password: "guest",
-  vhost: "/",
-})
+const rabbitInstance = RabbitMQClient.Instance;
+const client = await rabbitInstance.connectionClient();
 
 await client.declareConsumer({
   stream: "streamtest",
@@ -16,3 +11,4 @@ await client.declareConsumer({
     console.log("Received message:", message.content.toString());
   }
 )
+
