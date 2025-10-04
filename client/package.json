@@ -13,6 +13,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "rabbitmq-stream-js-client": "^0.6.2"
+    "rabbitmq-stream-js-client": "^0.6.2",
+    "zod": "^4.1.11"
   }
 }
