@@ -40,7 +40,7 @@ setInterval(async () => {
 
 async function readingHandler(index: number): Promise<number> {
   const lastReading = rabbitInstance.getLastReadingAtIndex(index);
-  const currentReading = generateRandomNumberInRange(lastReading, 100);
+  const currentReading = generateRandomNumberInRange(lastReading, lastReading + 50);
   await rabbitInstance.insertAtIndex(index, currentReading);
   return currentReading;
 }
