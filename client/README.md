@@ -23,9 +23,18 @@ This project was created using `bun init` in bun v1.1.12. [Bun](https://bun.sh) 
 ```json
 {
   "clientId": "string",
-  "currentReading": 1.0, //float
+  "currentReading": 1, // int
   "unix": 23, // int unix timestamp
   "fwVersion": "string",
-  "unit": "string"
+  "unit": "string",
+  "signature": "string"
 }
+```
+
+## Hmac input format
+
+concat order
+
+```bash
+"clientid", "currentReading", "unix"
 ```
