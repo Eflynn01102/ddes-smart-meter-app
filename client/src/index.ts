@@ -33,6 +33,7 @@ setInterval(async () => {
   message.clientID = `client-${randomNum + 1}`;
   message.currentReading += generateRandomNumberInRange(0, 100); // need to figure out how to not send a smaller number then the one before
   message.unix = Math.floor(Date.now() / 1000);
+  // need to add signature generation
   await messaghandler(currentPub, message);
 }, 5000)
 

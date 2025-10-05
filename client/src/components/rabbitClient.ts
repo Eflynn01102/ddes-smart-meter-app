@@ -3,6 +3,10 @@ import rabbit from "rabbitmq-stream-js-client";
 export class RabbitMQClient {
   static instance: RabbitMQClient;
 
+  public publisherLastMessage: number = 0;
+
+  //need to add 11 more
+
   private constructor() {}
 
   public static get Instance(): RabbitMQClient {
