@@ -3,9 +3,7 @@ import rabbit from "rabbitmq-stream-js-client";
 export class RabbitMQClient {
   static instance: RabbitMQClient;
 
-  public publisherLastMessage: number = 0;
-
-  //need to add 11 more
+  private publisherLastMessage: number[] = [0, 0];
 
   private constructor() {}
 
@@ -44,6 +42,14 @@ export class RabbitMQClient {
       stream: topicName,
     })
     return publisher;
+  }
+
+  public async insertAtIndex(index: number, item: number) {
+    [...this.publisherLastMessage.slice(0, index), item, ...this.publisherLastMessage.slice(index)];
+  }
+
+  public getLastReadingAtIndex(index: number): number {
+    return this.publisherLastMessage.at(index) || 0;
   }
 
 }
