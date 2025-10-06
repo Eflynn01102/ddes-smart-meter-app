@@ -7,4 +7,4 @@ const EnvSchema = z.object({
   HMAC: z.string()
 })
 
-export const envSecert = EnvSchema.parse(process.env);
+export const envSecret = EnvSchema.parse(process.env);
