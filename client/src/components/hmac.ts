@@ -11,6 +11,3 @@ export function createHmacSignature(clientId: string, currentReading: string, un
     throw new Error("Failed to create HMAC signature");
   }
 }    
-
-// createHmacSignature("client-1", "43", "1672531199");
-

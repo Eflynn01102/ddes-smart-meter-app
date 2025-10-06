@@ -6,34 +6,23 @@ import { createHmacSignature } from "./components/hmac";
 
 const rabbitInstance = RabbitMQClient.Instance;
 const client = await rabbitInstance.connectionClient();
-await rabbitInstance.createStream(client, "streamtest");
-await rabbitInstance.createStream(client, "streamtest2");
-await rabbitInstance.createStream(client, "streamtest3");
-await rabbitInstance.createStream(client, "streamtest4");
-await rabbitInstance.createStream(client, "streamtest5");
-await rabbitInstance.createStream(client, "streamtest6");
-await rabbitInstance.createStream(client, "streamtest7");
-await rabbitInstance.createStream(client, "streamtest8");
-await rabbitInstance.createStream(client, "streamtest9");
-await rabbitInstance.createStream(client, "streamtest10");
-await rabbitInstance.createStream(client, "streamtest11");
 
-const publisher = await rabbitInstance.createPublisher(client, "streamtest");
-const publisher2 = await rabbitInstance.createPublisher(client, "streamtest2");
-const publisher3 = await rabbitInstance.createPublisher(client, "streamtest3");
-const publisher4 = await rabbitInstance.createPublisher(client, "streamtest4");
-const publisher5 = await rabbitInstance.createPublisher(client, "streamtest5");
-const publisher6 = await rabbitInstance.createPublisher(client, "streamtest6");
-const publisher7 = await rabbitInstance.createPublisher(client, "streamtest7");
-const publisher8 = await rabbitInstance.createPublisher(client, "streamtest8");
-const publisher9 = await rabbitInstance.createPublisher(client, "streamtest9");
-const publisher10 = await rabbitInstance.createPublisher(client, "streamtest10");
-const publisher11 = await rabbitInstance.createPublisher(client, "streamtest11");
+// create 12 streams
+for (let i = 0; i <= 11; i++) {
+  await rabbitInstance.createStream(client, `streamtest${i}`);
+}
 
-const publisherArray = [publisher, publisher2, publisher3, publisher4, publisher5, publisher6, publisher7, publisher8, publisher9, publisher10, publisher11];
+const publisherArray: Publisher[] = []
+
+// create 12 publishers
+for (let i = 0; i <= 11; i++) {
+  const tempPublisher = await rabbitInstance.createPublisher(client, `streamtest${i}`);
+  if (!tempPublisher) break;
+  publisherArray.push(tempPublisher);
+}
 
 const message: rabbitMessage = {
-  clientID: "client-1",
+  clientID: "client-0",
   currentReading: 43,
   unix: Math.floor(Date.now() / 1000),
   fwVersion: "1.0.0",
@@ -42,7 +31,7 @@ const message: rabbitMessage = {
 }
 
 setInterval(async () => {
-  const randomNum = generateRandomNumber(2);
+  const randomNum = generateRandomNumber(12);
   const currentPub = publisherArray.at(randomNum)
   if (!currentPub) 
   {

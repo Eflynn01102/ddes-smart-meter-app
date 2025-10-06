@@ -46,7 +46,6 @@ export class RabbitMQClient {
 
   public async insertAtIndex(index: number, item: number) {
     this.publisherLastMessage[index] = item;
-    console.log(this.publisherLastMessage.length);
   }
 
   public getLastReadingAtIndex(index: number): number {
