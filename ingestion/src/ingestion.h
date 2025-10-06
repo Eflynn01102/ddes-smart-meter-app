@@ -1,6 +1,8 @@
 #ifndef INGESTION_H
 #define INGESTION_H
 
+#define _POSIX_C_SOURCE 200112L
+
 #include <stdio.h>
 #include <rabbitmq-c/amqp.h>
 #include <rabbitmq-c/tcp_socket.h>
@@ -23,5 +25,7 @@
 static V SigIntHandler(S32 SigVal);
 U8 ReadRabbitConfig(U8* IP, S32* Port, U8* Username, U8* Password);
 U8 HmacVerify(cJSON* MsgJson);
+U8 ReadEnvVars(V);
+U8 CleanUpEnvVars(V);
 
 #endif

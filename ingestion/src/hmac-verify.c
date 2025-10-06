@@ -6,18 +6,18 @@
 U8 HmacVerify(cJSON* MsgJson) {
     U8* ComputedHmacBytes = {0};
     S8* Result = {0};
-    U8* SecretKey = "test";
+    U8* SecretKey = getenv("HMACKEY");
     S32 ResultLen = 0;
-    U8* MsgPayload = (U8*)cJSON_GetObjectItemCaseSensitive(MsgJson, "payload")->valuestring;
+    U8 MsgPayload[256] = {0};
     U8* ReceivedMsgSignature = (U8*)cJSON_GetObjectItemCaseSensitive(MsgJson, "signature")->valuestring;
     U8 CalculatedMsgSignature[65] = {0};
     S32 i = 0;
-    
-    if (MsgPayload == NULL) {
-        fprintf(stdout, "HMAC verification failed: payload not found");
-        return NOK;
-    }
-    
+
+    sprintf(MsgPayload, "%s%s%s",
+        cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring,
+        cJSON_GetObjectItemCaseSensitive(MsgJson, "currentReading")->valuestring,
+        cJSON_GetObjectItemCaseSensitive(MsgJson, "unix")->valuestring);
+        
     ComputedHmacBytes = HMAC(EVP_sha256(), SecretKey, strlen(SecretKey), MsgPayload, strlen(MsgPayload), NULL, &ResultLen);
     
     for (i = 0; i < ResultLen; i++) {
@@ -27,7 +27,6 @@ U8 HmacVerify(cJSON* MsgJson) {
     if (strcmp(ReceivedMsgSignature, CalculatedMsgSignature) == 0) {
         return OK;
     } else {
-        fprintf(stdout, "HMAC verification failed: signature mismatch");
         return NOK;
     }
 }
