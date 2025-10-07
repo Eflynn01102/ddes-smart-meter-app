@@ -12,6 +12,7 @@
 #include <openssl/hmac.h>
 #include <openssl/evp.h>
 #include <sys/time.h>
+#include <regex.h>
 #include "cJSON.h"
 #include "types.h"
 
@@ -27,5 +28,6 @@ U8 ReadRabbitConfig(U8* IP, S32* Port, U8* Username, U8* Password);
 U8 HmacVerify(cJSON* MsgJson);
 U8 ReadEnvVars(V);
 U8 CleanUpEnvVars(V);
+U8 ValidateJsonObj(cJSON* MsgJson);
 
 #endif

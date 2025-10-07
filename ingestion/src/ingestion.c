@@ -94,15 +94,16 @@ U8 IngestionMainloop(AMQP_CONN* Connection) {
             MsgJson = cJSON_Parse((S8*)Envelope.message.body.bytes);
             if (MsgJson == FALSE) {
                 fprintf(stdout, "Could not parse message, %s\n", (S8*)Envelope.message.body.bytes);
-            } else if (HmacVerify(MsgJson) != OK) {
-                fprintf(stdout, "HMAC verification failed: signature mismatch, %s\n", (S8*)Envelope.message.body.bytes);
             }
-            //ToDo check all json tags are present
-            //ToDo check data against schema
-            else {
-                //ToDo process message
-                //ToDo publish to events topic
-                fprintf(stdout, "successfully processed message processed message from client %s\n", cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
+            
+            if (ValidateJsonObj(MsgJson) == OK) { //any error messages would be reported within this function
+                if (HmacVerify(MsgJson) == OK) {
+                    //ToDo process message
+                    //ToDo publish to events topic
+                    fprintf(stdout, "successfully processed message processed message from client %s\n", cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
+                } else {
+                    fprintf(stdout, "HMAC verification failed: signature mismatch, %s\n", (S8*)Envelope.message.body.bytes);
+                }
             }
         }
         amqp_destroy_envelope(&Envelope);
