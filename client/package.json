@@ -1,20 +1,22 @@
 {
   "name": "client",
-  "module": "src/index.ts",
+  "module": "index.ts",
   "type": "module",
-  "scripts": {
-    "start": "bun run src/index.ts",
-    "dev": "bun run --watch src/index.ts"
+  "compileOptions": {
+    "baseUrl": "./",
+    "imports": {
+      "@server": "./apps/server/src",
+      "@ui": "./apps/client/src"
+    }
   },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
-  },
-  "dependencies": {
-    "dotenv": "^17.2.3",
-    "rabbitmq-stream-js-client": "^0.6.2",
-    "zod": "^4.1.11"
   }
 }
