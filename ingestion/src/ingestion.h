@@ -29,5 +29,8 @@ U8 HmacVerify(cJSON* MsgJson);
 U8 ReadEnvVars(V);
 U8 CleanUpEnvVars(V);
 U8 ValidateJsonObj(cJSON* MsgJson);
+U8 CheckRpcReply(AMQP_CONN Connection);
+U8 InitiateConnection(AMQP_CONN* Connection, U8* IP, S32 Port, U8* Username, U8* Password);
+V CloseConnection(AMQP_CONN* Connection);
 
 #endif
