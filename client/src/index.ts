@@ -2,19 +2,27 @@ import type { Publisher } from "rabbitmq-stream-js-client";
 import { RabbitMQClient } from "./components/rabbitClient";
 import { generateRandomNumber, generateRandomNumberInRange } from "./components/randomNumberGen";
 import { rabbitMessage } from "./types/message";
+import { createHmacSignature } from "./components/hmac";
 
 const rabbitInstance = RabbitMQClient.Instance;
 const client = await rabbitInstance.connectionClient();
-await rabbitInstance.createStream(client, "streamtest");
-await rabbitInstance.createStream(client, "streamtest2");
 
-const publisher = await rabbitInstance.createPublisher(client, "streamtest");
-const publisher2 = await rabbitInstance.createPublisher(client, "streamtest2");
+// create 12 streams
+for (let i = 0; i <= 11; i++) {
+  await rabbitInstance.createStream(client, `streamtest${i}`);
+}
 
-const publisherArray = [publisher, publisher2];
+const publisherArray: Publisher[] = []
+
+// create 12 publishers
+for (let i = 0; i <= 11; i++) {
+  const tempPublisher = await rabbitInstance.createPublisher(client, `streamtest${i}`);
+  if (!tempPublisher) break;
+  publisherArray.push(tempPublisher);
+}
 
 const message: rabbitMessage = {
-  clientID: "client-1",
+  clientID: "client-0",
   currentReading: 43,
   unix: Math.floor(Date.now() / 1000),
   fwVersion: "1.0.0",
@@ -23,7 +31,7 @@ const message: rabbitMessage = {
 }
 
 setInterval(async () => {
-  const randomNum = generateRandomNumber(2);
+  const randomNum = generateRandomNumber(12);
   const currentPub = publisherArray.at(randomNum)
   if (!currentPub) 
   {
@@ -31,14 +39,21 @@ setInterval(async () => {
     return;
   }
   message.clientID = `client-${randomNum + 1}`;
-  message.currentReading += generateRandomNumberInRange(0, 100); // need to figure out how to not send a smaller number then the one before
+  message.currentReading = await readingHandler(randomNum + 1);
   message.unix = Math.floor(Date.now() / 1000);
-  // need to add signature generation
+  message.signature = createHmacSignature(message.clientID, message.currentReading.toString(), message.unix.toString());
   await messaghandler(currentPub, message);
 }, 5000)
 
-async function messaghandler(publisher: Publisher, message: rabbitMessage) {
+async function readingHandler(index: number): Promise<number> {
+  const lastReading = rabbitInstance.getLastReadingAtIndex(index);
+  const currentReading = generateRandomNumberInRange(lastReading, lastReading + 50);
+  await rabbitInstance.insertAtIndex(index, currentReading);
+  return currentReading;
+}
+
+async function messaghandler(publisher: Publisher, message: rabbitMessage): Promise<void> {
   console.log("Publishing messages...");
-  const pub = await publisher.send(Buffer.from(JSON.stringify(message)));
+  await publisher.send(Buffer.from(JSON.stringify(message)));
   console.log("Message sent successfully");
 }
