@@ -9,6 +9,10 @@
       "@ui": "./apps/client/src"
     }
   },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "devDependencies": {
     "@types/bun": "latest"
   },
