@@ -1,0 +1,18 @@
+{
+  "name": "client",
+  "module": "index.ts",
+  "type": "module",
+  "compileOptions": {
+    "baseUrl": "./",
+    "imports": {
+      "@server": "./apps/server/src",
+      "@ui": "./apps/client/src"
+    }
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
