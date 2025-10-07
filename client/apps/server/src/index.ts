@@ -1,7 +1,7 @@
 import type { Publisher } from "rabbitmq-stream-js-client";
 import { RabbitMQClient } from "./components/rabbitClient";
 import { generateRandomNumber, generateRandomNumberInRange } from "./components/randomNumberGen";
-import { rabbitMessage } from "./types/message";
+import { rabbitMessage } from "@client/config/src/message";
 import { createHmacSignature } from "./components/hmac";
 
 const rabbitInstance = RabbitMQClient.Instance;
@@ -33,7 +33,7 @@ const message: rabbitMessage = {
 setInterval(async () => {
   const randomNum = generateRandomNumber(12);
   const currentPub = publisherArray.at(randomNum)
-  if (!currentPub) 
+  if (!currentPub)
   {
     console.error("No publisher found");
     return;
