@@ -7,7 +7,7 @@ V SigIntHandler(S32 SigVal) {
     SigIntReceived = TRUE;
 }
 
-U8 IngestionMainloop(AMQP_CONN* Connection) {
+U8 IngestionMainloop(AMQP_CONN* Connection, S8* ExpectedFwVersion) {
     AMQP_ENVEL Envelope = {0};
     AMQP_RPC_REP Ret;
     struct timeval Timeout = {0};
@@ -29,7 +29,7 @@ U8 IngestionMainloop(AMQP_CONN* Connection) {
                 fprintf(stdout, "Could not parse message, %s\n", (S8*)Envelope.message.body.bytes);
             }
             
-            if (ValidateJsonObj(MsgJson) == OK) { //any error messages would be reported within this function
+            if (ValidateJsonObj(MsgJson, ExpectedFwVersion) == OK) { //any error messages would be reported within this function
                 if (HmacVerify(MsgJson) == OK) {
                     //ToDo process message
                     //ToDo publish to events topic
@@ -41,6 +41,7 @@ U8 IngestionMainloop(AMQP_CONN* Connection) {
         }
         amqp_destroy_envelope(&Envelope);
     }
+    cJSON_Delete(MsgJson);
     return OK;
 }
 
@@ -50,6 +51,9 @@ U8 main(U8 argc, U8* argv[]) {
     U8 RabbitMQUsername[64] = {0};
     U8 RabbitMQPassword[64] = {0};
     AMQP_CONN Conn = {0};
+    S8 ExpectedFwVersion[64] = {0};
+
+    fprintf(stdout, "INGESTION (%s %s)\n", __DATE__, __TIME__);
 
     SigIntReceived = FALSE;
     if (signal(SIGINT, SigIntHandler) == SIG_ERR) {
@@ -58,15 +62,24 @@ U8 main(U8 argc, U8* argv[]) {
     }
 
     if (ReadRabbitConfig(IP, &Port, RabbitMQUsername, RabbitMQPassword) != OK) {
+        fprintf(stdout, "could not read rabbitmq config\n");
         exit(NOK);
     } else {
-        fprintf(stdout, "read config\n");
+        fprintf(stdout, "read rabbitmq config\n");
     }
 
     if (ReadEnvVars() != OK) {
+        fprintf(stdout, "could not set env vars\n");
         exit(NOK);
     } else {
         fprintf(stdout, "env vars set\n");
+    }
+
+    if (FetchExpectedFwVersion(ExpectedFwVersion) == NOK) {
+        fprintf(stdout, "could not retrieve client fw version\n");
+        exit(NOK);
+    } else {
+        fprintf(stdout, "retrieved client fw version\n");
     }
 
     if (InitiateConnection(&Conn, IP, Port, RabbitMQUsername, RabbitMQPassword) != OK) {
@@ -75,7 +88,7 @@ U8 main(U8 argc, U8* argv[]) {
         fprintf(stdout, "connected to rabbitmq\n");
     }
 
-    if (IngestionMainloop(&Conn) != OK) {
+    if (IngestionMainloop(&Conn, ExpectedFwVersion) != OK) {
         exit(NOK);
     } else {
         fprintf(stdout, "SIGINT recieved, mainloop exited\n");
