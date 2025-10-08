@@ -10,12 +10,12 @@ U8 ReadRabbitConfig(U8* IP, S32* Port, U8* Username, U8* Password) {
     FP = NULL;
     FP = fopen("ingestion.conf", "rb");
     if (FP == NULL) {
-        fprintf(stdout, "could not open config file\n");
+        LogErr("could not open config file\n");
         return NOK;
     }
     
     if (fread(Conf, sizeof(U8), sizeof(Conf)/sizeof(U8), FP) > 0 && ferror(FP) != OK) {
-        fprintf(stdout, "could not read config file\n");
+        LogErr("could not read config file\n");
         return NOK;
     }
 
@@ -44,6 +44,6 @@ U8 ReadRabbitConfig(U8* IP, S32* Port, U8* Username, U8* Password) {
         Tok = strtok_r(NULL, "\n", &TokPtr);
     }
 
-    fprintf(stdout, "could not parse config file\n");
+    LogErr("could not parse config file\n");
     return NOK;
 }
