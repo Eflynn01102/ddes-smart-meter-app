@@ -12,6 +12,8 @@ U8 IngestionMainloop(AMQP_CONN* Connection, S8* ExpectedFwVersion) {
     AMQP_RPC_REP Ret;
     struct timeval Timeout = {0};
     cJSON* MsgJson = {0};
+    S32 ClientId = 0;
+    S32 Reading = 0;
 
     Timeout.tv_sec = 1;
 
@@ -29,11 +31,14 @@ U8 IngestionMainloop(AMQP_CONN* Connection, S8* ExpectedFwVersion) {
                 LogErr("Could not parse message, %s\n", (S8*)Envelope.message.body.bytes);
             }
             
-            if (ValidateJsonObj(MsgJson, ExpectedFwVersion) == OK) { //any error messages would be reported within this function
+            if (ValidateJsonObj(MsgJson, ExpectedFwVersion) == OK) { //any error messages would be reported within this function hence no error message if != OK
                 if (HmacVerify(MsgJson) == OK) {
-                    //ToDo process message
-                    //ToDo publish to events topic
-                    LogInfo("successfully processed message processed message from client %s\n", cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
+                    if (CheckIdempotency(MsgJson) == OK) {
+                        //ToDo publish to events topic
+                        LogInfo("successfully processed message processed message from client %s\n", cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
+                    } else {
+                        LogInfo("ignoring message from client %s: idempotency check failed\n", cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
+                    }
                 } else {
                     LogErr("HMAC verification failed: signature mismatch, %s\n", (S8*)Envelope.message.body.bytes);
                 }

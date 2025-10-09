@@ -2,14 +2,13 @@
 
 V Log(S8 *Level, S8 *fmt, ...)
 {
-    // Get current time
     time_t CurrentTime = time(NULL);
     struct tm *TimeStruct = localtime(&CurrentTime);
 
-    S8 timestamp[20];
-    strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", TimeStruct);
+    S8 Timestamp[20];
+    strftime(Timestamp, sizeof(Timestamp), "%Y-%m-%d %H:%M:%S", TimeStruct);
 
-    fprintf(stdout, "[INGESTION] [%s] [%s] ", Level, timestamp);
+    fprintf(stdout, "[INGESTION] [%s] [%s] ", Timestamp, Level);
     va_list args;
     va_start(args, fmt);
     vfprintf(stdout, fmt, args);
