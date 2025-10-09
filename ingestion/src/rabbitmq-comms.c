@@ -18,7 +18,7 @@ U8 InitiateConnection(AMQP_CONN* Connection, U8* IP, S32 Port, U8* Username, U8*
     Socket = amqp_tcp_socket_new(*Connection);
 
     if (Socket == FALSE) {
-        fprintf(stdout, "Could not create socket\n");
+        LogErr("Could not create socket\n");
         return NOK;
     }
 
@@ -26,7 +26,7 @@ U8 InitiateConnection(AMQP_CONN* Connection, U8* IP, S32 Port, U8* Username, U8*
         S32 Ret;
         Ret = amqp_socket_open(Socket, IP, Port);
         if (Ret != OK) {
-            fprintf(stdout, "Could not open tcp socket at %s:%d, %s\n", IP, Port, amqp_error_string2(Ret));
+            LogErr("Could not open tcp socket at %s:%d, %s\n", IP, Port, amqp_error_string2(Ret));
             return NOK;
         }
     }   
@@ -35,26 +35,26 @@ U8 InitiateConnection(AMQP_CONN* Connection, U8* IP, S32 Port, U8* Username, U8*
         AMQP_RPC_REP Ret;
         Ret = amqp_login(*Connection, "/", 0, 131072, 0, AMQP_SASL_METHOD_PLAIN, Username, Password);
         if (Ret.reply_type != AMQP_RESPONSE_NORMAL) {
-            fprintf(stdout, "Could not login to amqp\n");
+            LogErr("Could not login to amqp\n");
             return NOK;
         }
     }
 
     amqp_channel_open(*Connection, 1);
     if (CheckRpcReply(*Connection) != OK) {
-        fprintf(stdout, "Could not open channel\n");
+        LogErr("Could not open channel\n");
         return NOK;
     }
 
     amqp_queue_declare(*Connection, 1, amqp_cstring_bytes(AMQP_INGESTION_QUEUE_NAME), 0, 0, 0, 0, amqp_empty_table);
     if (CheckRpcReply(*Connection) != OK) {
-        fprintf(stdout, "Could not declare queue\n");
+        LogErr("Could not declare queue\n");
         return NOK;
     }
         
     amqp_basic_consume(*Connection, 1, amqp_cstring_bytes(AMQP_INGESTION_QUEUE_NAME), amqp_empty_bytes, 0, 1, 0, amqp_empty_table);
     if (CheckRpcReply(*Connection) != OK) {
-        fprintf(stdout, "Could not consume queue\n");
+        LogErr("Could not consume queue\n");
         return NOK;
     }
     

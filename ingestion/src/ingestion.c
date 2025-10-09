@@ -7,7 +7,7 @@ V SigIntHandler(S32 SigVal) {
     SigIntReceived = TRUE;
 }
 
-U8 IngestionMainloop(AMQP_CONN* Connection) {
+U8 IngestionMainloop(AMQP_CONN* Connection, S8* ExpectedFwVersion) {
     AMQP_ENVEL Envelope = {0};
     AMQP_RPC_REP Ret;
     struct timeval Timeout = {0};
@@ -20,27 +20,28 @@ U8 IngestionMainloop(AMQP_CONN* Connection) {
 
         Ret = amqp_consume_message(*Connection, &Envelope, &Timeout, 0);
         if (Ret.reply_type != AMQP_RESPONSE_NORMAL && Ret.library_error != AMQP_STATUS_TIMEOUT) {
-            fprintf(stdout, "Could not consume message, %d\n", Ret.reply_type); 
+            LogErr("Could not consume message, %d\n", Ret.reply_type); 
         } else if (Ret.reply_type == AMQP_RESPONSE_NORMAL) {
             
             //parse JSON
             MsgJson = cJSON_Parse((S8*)Envelope.message.body.bytes);
             if (MsgJson == FALSE) {
-                fprintf(stdout, "Could not parse message, %s\n", (S8*)Envelope.message.body.bytes);
+                LogErr("Could not parse message, %s\n", (S8*)Envelope.message.body.bytes);
             }
             
-            if (ValidateJsonObj(MsgJson) == OK) { //any error messages would be reported within this function
+            if (ValidateJsonObj(MsgJson, ExpectedFwVersion) == OK) { //any error messages would be reported within this function
                 if (HmacVerify(MsgJson) == OK) {
                     //ToDo process message
                     //ToDo publish to events topic
-                    fprintf(stdout, "successfully processed message processed message from client %s\n", cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
+                    LogInfo("successfully processed message processed message from client %s\n", cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
                 } else {
-                    fprintf(stdout, "HMAC verification failed: signature mismatch, %s\n", (S8*)Envelope.message.body.bytes);
+                    LogErr("HMAC verification failed: signature mismatch, %s\n", (S8*)Envelope.message.body.bytes);
                 }
             }
         }
         amqp_destroy_envelope(&Envelope);
     }
+    cJSON_Delete(MsgJson);
     return OK;
 }
 
@@ -50,40 +51,52 @@ U8 main(U8 argc, U8* argv[]) {
     U8 RabbitMQUsername[64] = {0};
     U8 RabbitMQPassword[64] = {0};
     AMQP_CONN Conn = {0};
+    S8 ExpectedFwVersion[64] = {0};
+
+    LogInfo("INGESTION (%s %s)\n", __DATE__, __TIME__);
 
     SigIntReceived = FALSE;
     if (signal(SIGINT, SigIntHandler) == SIG_ERR) {
-        fprintf(stdout, "Could not configure sigint handler\n");
+        LogErr("Could not configure sigint handler\n");
         exit(NOK);
     }
 
     if (ReadRabbitConfig(IP, &Port, RabbitMQUsername, RabbitMQPassword) != OK) {
+        LogErr("could not read rabbitmq config\n");
         exit(NOK);
     } else {
-        fprintf(stdout, "read config\n");
+        LogInfo("read rabbitmq config\n");
     }
 
     if (ReadEnvVars() != OK) {
+        LogErr("could not set env vars\n");
         exit(NOK);
     } else {
-        fprintf(stdout, "env vars set\n");
+        LogInfo("env vars set\n");
+    }
+
+    if (FetchExpectedFwVersion(ExpectedFwVersion) == NOK) {
+        LogErr("could not retrieve client fw version\n");
+        exit(NOK);
+    } else {
+        LogInfo("retrieved client fw version\n");
     }
 
     if (InitiateConnection(&Conn, IP, Port, RabbitMQUsername, RabbitMQPassword) != OK) {
         exit(NOK);
     } else {
-        fprintf(stdout, "connected to rabbitmq\n");
+        LogInfo("connected to rabbitmq\n");
     }
 
-    if (IngestionMainloop(&Conn) != OK) {
+    if (IngestionMainloop(&Conn, ExpectedFwVersion) != OK) {
         exit(NOK);
     } else {
-        fprintf(stdout, "SIGINT recieved, mainloop exited\n");
+        LogInfo("SIGINT recieved, mainloop exited\n");
     }
     
     CloseConnection(&Conn);
-    fprintf(stdout, "disconnected from rabbitmq\n");
+    LogInfo("disconnected from rabbitmq\n");
     CleanUpEnvVars();
-    fprintf(stdout, "cleaned up env vars\n");
+    LogInfo("cleaned up env vars\n");
     exit(OK);
 }
