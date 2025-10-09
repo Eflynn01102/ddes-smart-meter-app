@@ -7,9 +7,9 @@ V SigIntHandler(S32 SigVal) {
     SigIntReceived = TRUE;
 }
 
-U8 IngestionMainloop(AMQP_CONN* Connection, S8* ExpectedFwVersion) {
-    AMQP_ENVEL Envelope = {0};
-    AMQP_RPC_REP Ret;
+U8 IngestionMainloop(AMQP_CONN_t* Connection, S8* ExpectedFwVersion) {
+    AMQP_ENVEL_T Envelope = {0};
+    AMQP_RPC_REP_T Ret;
     struct timeval Timeout = {0};
     cJSON* MsgJson = {0};
     S32 ClientId = 0;
@@ -34,7 +34,7 @@ U8 IngestionMainloop(AMQP_CONN* Connection, S8* ExpectedFwVersion) {
             if (ValidateJsonObj(MsgJson, ExpectedFwVersion) == OK) { //any error messages would be reported within this function hence no error message if != OK
                 if (HmacVerify(MsgJson) == OK) {
                     if (CheckIdempotency(MsgJson) == OK) {
-                        //ToDo publish to events topic
+                        PublishMessageToEventsTopic(Connection, Envelope);
                         LogInfo("successfully processed message processed message from client %s\n", cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
                     } else {
                         LogInfo("ignoring message from client %s: idempotency check failed\n", cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
@@ -55,7 +55,7 @@ U8 main(U8 argc, U8* argv[]) {
     S32 Port = 0;
     U8 RabbitMQUsername[64] = {0};
     U8 RabbitMQPassword[64] = {0};
-    AMQP_CONN Conn = {0};
+    AMQP_CONN_t Conn = {0};
     S8 ExpectedFwVersion[64] = {0};
 
     LogInfo("INGESTION (%s %s)\n", __DATE__, __TIME__);
