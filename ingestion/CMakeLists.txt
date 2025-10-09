@@ -20,7 +20,7 @@ FetchContent_MakeAvailable(rabbitmq-c)
 FetchContent_MakeAvailable(cjson)
 
 find_package(OpenSSL REQUIRED)
-add_executable(ingestion src/ingestion.c src/ingestion.h src/types.h src/read-config.c src/hmac-verify.c src/env-vars.c src/json-obj-validation.c src/rabbitmq-comms.c src/logging.c)
+add_executable(ingestion src/ingestion.c src/ingestion.h src/types.h src/read-config.c src/hmac-verify.c src/env-vars.c src/json-obj-validation.c src/rabbitmq-comms.c src/logging.c src/idempotency.c)
 target_include_directories(ingestion
     PRIVATE
         ${cjson_SOURCE_DIR} 
