@@ -17,6 +17,8 @@
 #include "types.h"
 
 #define AMQP_INGESTION_QUEUE_NAME "ingestion.q"
+#define AMQP_EVENTS_TOPIC_NAME "events"
+#define AMQP_EVENTS_ROUTING_KEY "billing"
 #define TRUE 1
 #define FALSE 0
 #define OK 0
@@ -38,11 +40,12 @@ U8 HmacVerify(cJSON* MsgJson);
 U8 ReadEnvVars(V);
 U8 CleanUpEnvVars(V);
 U8 ValidateJsonObj(cJSON* MsgJson, S8* ExpectedFwVersion);
-U8 CheckRpcReply(AMQP_CONN Connection);
-U8 InitiateConnection(AMQP_CONN* Connection, U8* IP, S32 Port, U8* Username, U8* Password);
-V CloseConnection(AMQP_CONN* Connection);
+U8 CheckRpcReply(AMQP_CONN_t Connection);
+U8 InitiateConnection(AMQP_CONN_t* Connection, U8* IP, S32 Port, U8* Username, U8* Password);
+V CloseConnection(AMQP_CONN_t* Connection);
 U8 FetchExpectedFwVersion(S8* FwVersion);
 U8 CheckIdempotency(cJSON* MsgJson);
+V PublishMessageToEventsTopic(AMQP_CONN_t* Connection, AMQP_ENVEL_T Envelope);
 V Log(S8* Level, S8* fmt, ...);
 
 #endif
