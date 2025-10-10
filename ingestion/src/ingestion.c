@@ -6,7 +6,7 @@ V SigIntHandler(S32 SigVal) {
     SigIntReceived = TRUE;
 }
 
-U8 IngestionMainloop(AMQP_CONN_T* Connection, S8* ExpectedFwVersion) {
+U8 IngestionMainloop(AMQP_CONN_T* Connection) {
     AMQP_ENVEL_T Envelope = {0};
     AMQP_RPC_REP_T Ret;
     struct timeval Timeout = {0};
@@ -30,7 +30,7 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection, S8* ExpectedFwVersion) {
                 LogErr("Could not parse message, %s\n", (S8*)Envelope.message.body.bytes);
             }
             
-            if (ValidateJsonObj(MsgJson, ExpectedFwVersion) == OK) { //any error messages would be reported within this function hence no error message if != OK
+            if (ValidateJsonObj(MsgJson, getenv("CLIENTFW")) == OK) { //any error messages would be reported within this function hence no error message if != OK
                 if (HmacVerify(MsgJson) == OK) {
                     if (CheckIdempotency(MsgJson) == OK) {
                         PublishMessageToEventsTopic(Connection, Envelope);
@@ -55,7 +55,6 @@ U8 main(U8 argc, U8* argv[]) {
     U8 RabbitMQUsername[64] = {0};
     U8 RabbitMQPassword[64] = {0};
     AMQP_CONN_T Conn = {0};
-    S8 ExpectedFwVersion[64] = {0};
 
     LogInfo("INGESTION (%s %s)\n", __DATE__, __TIME__);
 
@@ -79,20 +78,13 @@ U8 main(U8 argc, U8* argv[]) {
         LogInfo("env vars set\n");
     }
 
-    if (FetchExpectedFwVersion(ExpectedFwVersion) == NOK) {
-        LogErr("could not retrieve client fw version\n");
-        exit(NOK);
-    } else {
-        LogInfo("retrieved client fw version\n");
-    }
-
     if (InitiateConnection(&Conn, IP, Port, RabbitMQUsername, RabbitMQPassword) != OK) {
         exit(NOK);
     } else {
         LogInfo("connected to rabbitmq\n");
     }
 
-    if (IngestionMainloop(&Conn, ExpectedFwVersion) != OK) {
+    if (IngestionMainloop(&Conn) != OK) {
         exit(NOK);
     } else {
         LogInfo("SIGINT recieved, mainloop exited\n");
