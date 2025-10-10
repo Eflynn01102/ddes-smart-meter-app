@@ -1,13 +1,12 @@
 #include "ingestion.h"
 
-//globals
 volatile sig_atomic_t SigIntReceived;
 
 V SigIntHandler(S32 SigVal) {
     SigIntReceived = TRUE;
 }
 
-U8 IngestionMainloop(AMQP_CONN_t* Connection, S8* ExpectedFwVersion) {
+U8 IngestionMainloop(AMQP_CONN_T* Connection, S8* ExpectedFwVersion) {
     AMQP_ENVEL_T Envelope = {0};
     AMQP_RPC_REP_T Ret;
     struct timeval Timeout = {0};
@@ -35,7 +34,7 @@ U8 IngestionMainloop(AMQP_CONN_t* Connection, S8* ExpectedFwVersion) {
                 if (HmacVerify(MsgJson) == OK) {
                     if (CheckIdempotency(MsgJson) == OK) {
                         PublishMessageToEventsTopic(Connection, Envelope);
-                        LogInfo("successfully processed message processed message from client %s\n", cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
+                        LogInfo("successfully processed message from client %s\n", cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
                     } else {
                         LogInfo("ignoring message from client %s: idempotency check failed\n", cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
                     }
@@ -55,7 +54,7 @@ U8 main(U8 argc, U8* argv[]) {
     S32 Port = 0;
     U8 RabbitMQUsername[64] = {0};
     U8 RabbitMQPassword[64] = {0};
-    AMQP_CONN_t Conn = {0};
+    AMQP_CONN_T Conn = {0};
     S8 ExpectedFwVersion[64] = {0};
 
     LogInfo("INGESTION (%s %s)\n", __DATE__, __TIME__);

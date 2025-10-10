@@ -1,6 +1,6 @@
 #include "ingestion.h"
 
-U8 CheckRpcReply(AMQP_CONN_t Connection) {
+U8 CheckRpcReply(AMQP_CONN_T Connection) {
     AMQP_RPC_REP_T Ret;
     Ret = amqp_get_rpc_reply(Connection);
     if (Ret.reply_type != AMQP_RESPONSE_NORMAL) {
@@ -9,7 +9,7 @@ U8 CheckRpcReply(AMQP_CONN_t Connection) {
     return OK;
 }
 
-U8 InitiateConnection(AMQP_CONN_t* Connection, U8* IP, S32 Port, U8* Username, U8* Password) {
+U8 InitiateConnection(AMQP_CONN_T* Connection, U8* IP, S32 Port, U8* Username, U8* Password) {
     AMQP_SOCK_T* Socket;
 
     *Connection = amqp_new_connection();
@@ -68,7 +68,7 @@ U8 InitiateConnection(AMQP_CONN_t* Connection, U8* IP, S32 Port, U8* Username, U
 }
 
 //no return as its fire and forget
-V PublishMessageToEventsTopic(AMQP_CONN_t* Connection, AMQP_ENVEL_T Envelope) {
+V PublishMessageToEventsTopic(AMQP_CONN_T* Connection, AMQP_ENVEL_T Envelope) {
     AMQP_PROP_T Properties = {0};
     Properties._flags = AMQP_BASIC_CONTENT_TYPE_FLAG | AMQP_BASIC_DELIVERY_MODE_FLAG;
     Properties.content_type = amqp_cstring_bytes("text/plain");
@@ -77,7 +77,7 @@ V PublishMessageToEventsTopic(AMQP_CONN_t* Connection, AMQP_ENVEL_T Envelope) {
     amqp_basic_publish(*Connection, 1, amqp_cstring_bytes(AMQP_EVENTS_TOPIC_NAME), amqp_cstring_bytes(AMQP_EVENTS_ROUTING_KEY), 0, 0, &Properties, amqp_cstring_bytes((S8*)Envelope.message.body.bytes));
 }
 
-V CloseConnection(AMQP_CONN_t* Connection) {
+V CloseConnection(AMQP_CONN_T* Connection) {
     amqp_channel_close(*Connection, 1, AMQP_REPLY_SUCCESS);
     amqp_connection_close(*Connection, AMQP_REPLY_SUCCESS);
     amqp_destroy_connection(*Connection);
