@@ -68,7 +68,7 @@ U8 ValidateJsonObj(cJSON* MsgJson, S8* ExpectedFwVersion) {
     }
 
     //currentReading - note this isn't checking idempotency
-    if (strtol(cJSON_GetObjectItemCaseSensitive(MsgJson, "currentReading")->valuestring, &End, 10) < 1) {
+    if (strtol(cJSON_GetObjectItemCaseSensitive(MsgJson, "currentReading")->valuestring, &End, 10) < 1 || strtol(cJSON_GetObjectItemCaseSensitive(MsgJson, "currentReading")->valuestring, &End, 10) > MAX_READING) {
         LogErr("JSON validation failed: message contains invalid currentReading: %s\n", cJSON_GetObjectItemCaseSensitive(MsgJson, "currentReading")->valuestring);
         return NOK;
     }
