@@ -4,6 +4,15 @@ import { watch } from "vue";
 
 const socketStore = useSocketStore();
 
+fetch("/api")
+  .then(res => res.json())
+  .then(data => {
+    console.log("API Response:", data);
+  })
+  .catch(err => {
+    console.error("API Error:", err);
+  });
+
 watch(() => socketStore.serverData, () => {
   console.log("Server Data Updated:", socketStore.serverData);
 })

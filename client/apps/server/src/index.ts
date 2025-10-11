@@ -47,5 +47,5 @@ setInterval(async () => {
 }, 5000)
 
 server.listen(port, () => {
-  console.log("server is running on localhost:3000");
+  console.log("Server is running on localhost:3000");
 })
