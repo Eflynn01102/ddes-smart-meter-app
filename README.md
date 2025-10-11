@@ -32,7 +32,15 @@ Need to add the documentation for this bit.
 
 ## Ingestion
 
-Need to add the documentation for this bit.
+Handle up to 1024 individual clients, this can be increased if needed.
+Verify HMAC checksums - checksum incorporates the client id, reading and unix timestamp.
+Validate client fw version.
+Idempotency on client billing updates.
+Publishing full json object as received to events topic with routing key _billing_
+Logs to stdout but can be changed if needed, on two levels: info and error.
+RabbitMQ config located in ingestion.conf, if updating, change the file in src/ as this is copied to build/ at compile time.
+HMAC key and expected client fw is in the .env file, although this is not pushed to git. If changing, change src/ingestion.env as this is copied to build/ at compile time.
+HMAC key/JSON schema/client fw storage is subject to change once config maps/secret mgmnt systems are ready.
 
 ## Project & submission
 
