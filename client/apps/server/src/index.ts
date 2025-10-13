@@ -8,16 +8,18 @@ import { server, port } from "./client/webSocket";
 const rabbitInstance = RabbitMQClient.Instance;
 const client = await rabbitInstance.connectionClient();
 
+const endPointTopic = "streamtest";
+
 // create 12 streams
 for (let i = 0; i <= 11; i++) {
-  await rabbitInstance.createStream(client, `streamtest${i}`);
+  await rabbitInstance.createStream(client, `${endPointTopic}${i}`);
 }
 
 const publisherArray: Publisher[] = []
 
 // create 12 publishers
 for (let i = 0; i <= 11; i++) {
-  const tempPublisher = await rabbitInstance.createPublisher(client, `streamtest${i}`);
+  const tempPublisher = await rabbitInstance.createPublisher(client, `${endPointTopic}${i}`);
   if (!tempPublisher) break;
   publisherArray.push(tempPublisher);
 }
