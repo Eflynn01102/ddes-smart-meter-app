@@ -1,5 +1,6 @@
 export interface ServerToClientEvents {
   data: (data: SocketData) => void;
+  alert: (message: SocketAlter) => void;
 }
 
 export interface ClientToServerEvents {
@@ -11,5 +12,11 @@ export interface InterServerEvents {
 }
 
 export interface SocketData {
+  clientId: string;
   data: number;
+}
+
+export interface SocketAlter {
+  clientId: string;
+  message: string;
 }
