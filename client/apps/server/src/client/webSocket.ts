@@ -3,7 +3,7 @@ import { ref } from "vue";
 import express from "express";
 import { createServer } from "node:http";
 import type { ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData } from "@client/config/src/index";
-import { z } from "zod";
+import { BillData } from "@client/config/src/billData";
 
 const app = express();
 export const server = createServer(app);
@@ -20,12 +20,17 @@ io.on("connection", (socket) => {
   socketServer.value = socket;
   socketIds.value = socket.id;
 
-  socket.emit("data",
-    { 
-      clientId: socket.id,
-      data: 10 
-    }
-  ); // Send initial data
+  // socket.emit("data",
+  //   { 
+  //     clientId: socket.id,
+  //     data: {
+  //       unitsUsed: 100,
+  //       price: 50,
+  //       units: "kWh",
+  //       date: new Date()
+  //     }
+  //   }
+  // ); // Send initial data
 
   socket.on("hello", () => {
     console.log("Received 'hello' from client:", socket.id);
@@ -43,20 +48,32 @@ io.engine.on("connection_error", (err) => {
 })
 
 app.post("/bill_data", (req, res) => {
-  const data =  res.json()
-  
-})
+  const data = BillData.safeParse(res.json())
+  if (!data.success) return res.status(400).json({ error: "Invalid data format" });
+  sendDataToAllClients({
+    clientId: socketIds.value || "no-id",
+    data: data.data
+  })
+  res.status(200).json({ status: "Data sent to clients" });
+});
 
-function sendDataToAllClients(socket: Socket<ClientToServerEvents,  ServerToClientEvents, InterServerEvents, SocketData>, data: SocketData) {
+
+/*
+This function sends data to all connected clients. If a specific socket is provided, it sends the data to that socket instead.
+*/
+function sendDataToAllClients(data: SocketData, socketToClient?: Socket<ClientToServerEvents,  ServerToClientEvents, InterServerEvents, SocketData>) {
+  let socket: Socket<ClientToServerEvents,  ServerToClientEvents, InterServerEvents, SocketData>;
+  if (!socketServer.value && !socketToClient) {
+    console.log("No clients connected");
+    return;
+  } 
+
+  if (!socketToClient) {
+    socket = socketServer.value!;
+  } else {
+    socket = socketToClient;
+  }
+
   socket.emit("data", data);
   console.log("Sent data to client");
 }
-
-setInterval(() => {
-  if (!socketServer.value) return;
-  sendDataToAllClients(socketServer.value, {
-    clientId: socketIds.value || "no-id",
-    data: Math.floor(Math.random() * 100)
-  })
-}, 5000)
-

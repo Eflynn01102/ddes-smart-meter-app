@@ -1,3 +1,5 @@
+import { BillData } from "./billData";
+
 export interface ServerToClientEvents {
   data: (data: SocketData) => void;
   alert: (message: SocketAlter) => void;
@@ -13,7 +15,7 @@ export interface InterServerEvents {
 
 export interface SocketData {
   clientId: string;
-  data: number;
+  data: BillData;
 }
 
 export interface SocketAlter {
