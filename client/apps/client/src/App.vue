@@ -23,7 +23,7 @@ fetch("/api")
   apiConnect.value = false;
 });
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("/ws");
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("/socket.io");
 
 const apiConnect = ref<boolean>(false);
 
