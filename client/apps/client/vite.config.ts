@@ -18,16 +18,15 @@ export default defineConfig({
   server: {
     proxy: {
       "/ws": {
-        target: "ws://127.0.0.1:3000",
+        target: "ws://127.0.0.1:3000/",
         ws: true,
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/ws/, '')
       },
       "/api": {
         target: "http://127.0.0.1:3000",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }
-    }, 
+    },
   }
 })

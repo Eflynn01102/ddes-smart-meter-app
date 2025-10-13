@@ -19,11 +19,18 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
   console.log("a user connected");
 
-  socket.emit("data", 
+  socket.emit("data",
     { data: 10 }
   ); // Send initial data
 
   socket.on("disconnect", () => {
     console.log("user disconnected");
   });
+})
+
+io.engine.on("connection_error", (err) => {
+  console.log(err.req);      // the request object
+  console.log(err.code);     // the error code, for example 1
+  console.log(err.message);
+  console.log(err.context);
 })

@@ -18,6 +18,12 @@ export const useSocketStore = defineStore("socketio", () => {
     serverData.value = data;
   });
 
+  socket.on("connection_error", (err) => {
+    console.log(err.description)
+    console.log(err.message);  // the error message, for example "Session ID unknown"
+    console.log(err.context);  // some additional error context
+  })
+
 
   return { serverData };
 })

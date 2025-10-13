@@ -3,17 +3,27 @@
 import { watch } from "vue";
 import { io, Socket } from "socket.io-client";
 import { ref } from "vue";
-import type { ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData } from "@client/config/src/index";
+import type { ClientToServerEvents, ServerToClientEvents, SocketData } from "@client/config/src/index";
 
 // const socketStore = useSocketStore();
 
-const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io({
-  transports: ["websocket"],
-  autoConnect: true,
-  reconnection: true,
-  hostname: "localhost",
-  port: 3000,
+type APIRes = {
+  message: string;
+}
+
+const data = ref<APIRes>()
+
+fetch("/api")
+.then(async (res) => {
+  apiConnect.value = true;
+  data.value = await res.json() as APIRes;
+})
+.catch(err => {
+  console.error("API Error:", err);
+  apiConnect.value = false;
 });
+
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("/ws");
 
 const apiConnect = ref<boolean>(false);
 
@@ -26,20 +36,11 @@ socket.on("data", (data: SocketData) => {
   // socketStore.updateServerData(data);
 });
 
-type APIRes = {
-  message: string;
-}
+socket.on("connect_error", (err) => {
+  console.log(err.name)
+  console.log(err.message);  // the error message, for example "Session ID unknown"
+})
 
-const data = ref<APIRes>()
-
-const API = await fetch("/api").catch(err => {
-    console.error("API Error:", err);
-    apiConnect.value = false;
-  });
-
-// watch(() => socketStore.serverData, () => {
-//   console.log("Server Data Updated:", socketStore.serverData);
-// })
 </script>
 
 <template>
@@ -49,8 +50,9 @@ const API = await fetch("/api").catch(err => {
     <br />
     <span> Socket - {{ data?.message }}</span>
   </div>
- 
+
 </template>
 
 <style scoped>
+
 </style>
