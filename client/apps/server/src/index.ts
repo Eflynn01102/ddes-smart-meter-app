@@ -1,22 +1,25 @@
 import type { Publisher } from "rabbitmq-stream-js-client";
 import { RabbitMQClient } from "./components/rabbitClient";
-import { generateRandomNumber, generateRandomNumberInRange } from "./components/randomNumberGen";
+import { generateRandomNumber } from "./components/randomNumberGen";
 import { rabbitMessage } from "@client/config/src/message";
 import { createHmacSignature } from "./components/hmac";
+import { server, port } from "./client/webSocket";
 
 const rabbitInstance = RabbitMQClient.Instance;
 const client = await rabbitInstance.connectionClient();
 
+const endPointTopic = "streamtest";
+
 // create 12 streams
 for (let i = 0; i <= 11; i++) {
-  await rabbitInstance.createStream(client, `streamtest${i}`);
+  await rabbitInstance.createStream(client, `${endPointTopic}${i}`);
 }
 
 const publisherArray: Publisher[] = []
 
 // create 12 publishers
 for (let i = 0; i <= 11; i++) {
-  const tempPublisher = await rabbitInstance.createPublisher(client, `streamtest${i}`);
+  const tempPublisher = await rabbitInstance.createPublisher(client, `${endPointTopic}${i}`);
   if (!tempPublisher) break;
   publisherArray.push(tempPublisher);
 }
@@ -39,21 +42,12 @@ setInterval(async () => {
     return;
   }
   message.clientID = `client-${randomNum + 1}`;
-  message.currentReading = await readingHandler(randomNum + 1);
+  message.currentReading = await rabbitInstance.readingHandler(randomNum + 1);
   message.unix = Math.floor(Date.now() / 1000);
   message.signature = createHmacSignature(message.clientID, message.currentReading.toString(), message.unix.toString());
-  await messaghandler(currentPub, message);
+  await rabbitInstance.messagehandler(currentPub, message);
 }, 5000)
 
-async function readingHandler(index: number): Promise<number> {
-  const lastReading = rabbitInstance.getLastReadingAtIndex(index);
-  const currentReading = generateRandomNumberInRange(lastReading, lastReading + 50);
-  await rabbitInstance.insertAtIndex(index, currentReading);
-  return currentReading;
-}
-
-async function messaghandler(publisher: Publisher, message: rabbitMessage): Promise<void> {
-  console.log("Publishing messages...");
-  await publisher.send(Buffer.from(JSON.stringify(message)));
-  console.log("Message sent successfully");
-}
+server.listen(port, () => {
+  console.log("Server is running on localhost:3000");
+})

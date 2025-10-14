@@ -1,4 +1,7 @@
+import type { rabbitMessage } from "@client/config/src/message";
 import rabbit from "rabbitmq-stream-js-client";
+import type { Publisher } from "rabbitmq-stream-js-client";
+import { generateRandomNumberInRange } from "./randomNumberGen";
 
 export class RabbitMQClient {
   static instance: RabbitMQClient;
@@ -44,12 +47,25 @@ export class RabbitMQClient {
     return publisher;
   }
 
-  public async insertAtIndex(index: number, item: number) {
+  private async insertAtIndex(index: number, item: number) {
     this.publisherLastMessage[index] = item;
   }
 
-  public getLastReadingAtIndex(index: number): number {
+  private getLastReadingAtIndex(index: number): number {
     return this.publisherLastMessage.at(index) || 0;
+  }
+
+  public async readingHandler(index: number): Promise<number> {
+      const lastReading = this.getLastReadingAtIndex(index);
+      const currentReading = generateRandomNumberInRange(lastReading, lastReading + 50);
+      await this.insertAtIndex(index, currentReading);
+      return currentReading;
+  }
+
+  public async messagehandler(publisher: Publisher, message: rabbitMessage): Promise<void> {
+    console.log("Publishing messages...");
+    await publisher.send(Buffer.from(JSON.stringify(message)));
+    console.log("Message sent successfully");
   }
 
 }
