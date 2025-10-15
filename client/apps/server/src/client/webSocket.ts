@@ -20,6 +20,10 @@ const io = new Server<
 	SocketData
 >(server);
 
+app.get("/hello-world", (req, res) => {
+	res.send("Hello World!");
+})
+
 const socketServer =
 	ref<
 		Socket<
@@ -29,6 +33,7 @@ const socketServer =
 			SocketData
 		>
 	>();
+
 const socketIds = ref<string>();
 
 io.on("connection", (socket) => {
