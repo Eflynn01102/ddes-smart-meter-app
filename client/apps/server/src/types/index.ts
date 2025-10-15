@@ -1,15 +1,15 @@
 export interface ServerToClientEvents {
-  data: (data: SocketData) => void;
+	data: (data: SocketData) => void;
 }
 
 export interface ClientToServerEvents {
-  hello: () => void;
+	hello: () => void;
 }
 
 export interface InterServerEvents {
-  ping: () => void;
+	ping: () => void;
 }
 
 export interface SocketData {
-  data: number;
+	data: number;
 }
