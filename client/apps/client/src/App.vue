@@ -5,7 +5,6 @@ import { computed } from "vue";
 const socketStore = useSocketStore();
 
 const socketData = computed(() => socketStore.socketData);
-
 </script>
 
 <template>
