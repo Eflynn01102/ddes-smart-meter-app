@@ -13,16 +13,13 @@ import { ref } from "vue";
 const app = express();
 export const server = createServer(app);
 export const port = 3000;
+
 const io = new Server<
 	ClientToServerEvents,
 	ServerToClientEvents,
 	InterServerEvents,
 	SocketData
 >(server);
-
-app.get("/hello-world", (req, res) => {
-	res.send("Hello World!");
-})
 
 const socketServer =
 	ref<
@@ -69,16 +66,21 @@ io.engine.on("connection_error", (err) => {
 	console.log("Error Context", err.context);
 });
 
-app.post("/bill_data", (req, res) => {
-	const data = BillData.safeParse(res.json());
-	if (!data.success)
-		return res.status(400).json({ error: "Invalid data format" });
-	sendDataToAllClients({
-		clientId: socketIds.value || "no-id",
-		data: data.data,
-	});
-	res.status(200).json({ status: "Data sent to clients" });
-});
+app.get("/hello-world", (req, res) => {
+	console.log("Hello World endpoint hit");
+	res.send("Hello World!");
+})
+
+// app.post("/bill_data", (req, res) => {
+// 	const data = BillData.safeParse(res.json());
+// 	if (!data.success)
+// 		return res.status(400).json({ error: "Invalid data format" });
+// 	sendDataToAllClients({
+// 		clientId: socketIds.value || "no-id",
+// 		data: data.data,
+// 	});
+// 	res.status(200).json({ status: "Data sent to clients" });
+// });
 
 /*
 This function sends data to all connected clients. If a specific socket is provided, it sends the data to that socket instead.
