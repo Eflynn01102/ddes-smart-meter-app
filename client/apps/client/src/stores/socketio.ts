@@ -13,6 +13,8 @@ export const useSocketStore = defineStore("socketio", () => {
 
 	const billData = ref<SocketData>()
 
+	const alterMessage = ref<SocketAlter>();
+
 	const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("/");
 
 	const isSocketActive = computed(() => socket.active);
@@ -35,6 +37,7 @@ export const useSocketStore = defineStore("socketio", () => {
 
 	socket.on("alert", (message: SocketAlter) => {
 		console.log("Server alter message:", message.clientId);
+		alterMessage.value = message;
 	})
 
 	socket.on("connect_error", (err) => {
@@ -42,5 +45,5 @@ export const useSocketStore = defineStore("socketio", () => {
 		console.log(err.message);
 	});
 
-	return { billData, isSocketActive };
+	return { billData, alterMessage, isSocketActive };
 });
