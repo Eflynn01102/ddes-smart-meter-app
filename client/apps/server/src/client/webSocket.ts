@@ -5,10 +5,12 @@ import type {
 	InterServerEvents,
 	ServerToClientEvents,
 	SocketData,
+	SocketAlter,
 } from "@client/config/src/index";
 import express from "express";
-import { Server, type Socket } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { ref } from "vue";
+import { APIAlterType, APIBillData } from "../types";
 
 const app = express();
 export const server = createServer(app);
@@ -71,22 +73,30 @@ app.get("/hello-world", (req, res) => {
 	res.send("Hello World!");
 })
 
-// app.post("/bill_data", (req, res) => {
-// 	const data = BillData.safeParse(res.json());
-// 	if (!data.success)
-// 		return res.status(400).json({ error: "Invalid data format" });
-// 	sendDataToAllClients({
-// 		clientId: socketIds.value || "no-id",
-// 		data: data.data,
-// 	});
-// 	res.status(200).json({ status: "Data sent to clients" });
-// });
+app.post("/bill_data", (req, res) => {
+	const data = APIBillData.safeParse(res.json());
+	if (!data.success)
+		return res.status(400).json({ error: "Invalid data format" });
+	sendDataToAllClients(data.data, "bill_data");
+	res.status(200).json({ status: "Data sent to clients" });
+});
+
+app.post("/alter", (req, res) => {
+	const data = APIAlterType.safeParse(res.json());
+	if (!data.success)
+		return res.status(400).json({ error: "Invalid data format" });
+	sendDataToAllClients(data.data, "alert");
+	res.status(200).json({ status: "Alert sent to clients" });
+})
 
 /*
 This function sends data to all connected clients. If a specific socket is provided, it sends the data to that socket instead.
 */
-function sendDataToAllClients(
-	data: SocketData,
+function sendDataToAllClients<
+	E extends keyof ServerToClientEvents
+>(
+	data: Parameters<ServerToClientEvents[E]>[0],
+	event: E,
 	socketToClient?: Socket<
 		ClientToServerEvents,
 		ServerToClientEvents,
@@ -100,21 +110,14 @@ function sendDataToAllClients(
 		InterServerEvents,
 		SocketData
 	>;
-	if (!socketServer.value && !socketToClient) {
-		console.log("No clients connected");
-		return;
-	}
 
 	if (!socketToClient) {
-		if (!socketServer.value) {
-			console.log("No clients connected");
-			return;
-		}
+		if (!socketServer.value) return;
 		socket = socketServer.value;
 	} else {
 		socket = socketToClient;
 	}
 
-	socket.emit("data", data);
+	socket.emit(event, ...([data] as Parameters<ServerToClientEvents[E]>));
 	console.log("Sent data to client");
 }

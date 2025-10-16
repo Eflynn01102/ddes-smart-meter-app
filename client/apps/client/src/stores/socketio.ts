@@ -4,11 +4,14 @@ import { computed, ref } from "vue";
 import type {
 	ClientToServerEvents,
 	ServerToClientEvents,
+	SocketAlter,
 	SocketData,
 } from "@client/config/src/index";
 
 export const useSocketStore = defineStore("socketio", () => {
-	const socketData = ref<SocketData>();
+	// const socketData = ref<SocketData>();
+
+	const billData = ref<SocketData>()
 
 	const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("/");
 
@@ -20,15 +23,24 @@ export const useSocketStore = defineStore("socketio", () => {
 
 	socket.emit("hello");
 
-	socket.on("data", (data: SocketData) => {
-		console.log("Received data from server:", data);
-		socketData.value = data;
-	});
+	// socket.on("data", (data: SocketData) => {
+	// 	console.log("Received data from server:", data);
+	// 	socketData.value = data;
+	// });
+
+	socket.on("bill_data", (data: SocketData) => {
+		console.log("Received bill data from server:");
+		billData.value = data;
+	})
+
+	socket.on("alert", (message: SocketAlter) => {
+		console.log("Server alter message:", message.clientId);
+	})
 
 	socket.on("connect_error", (err) => {
 		console.log(err.name);
 		console.log(err.message);
 	});
 
-	return { socketData, isSocketActive };
+	return { billData, isSocketActive };
 });

@@ -1,15 +1,14 @@
-export interface ServerToClientEvents {
-	data: (data: SocketData) => void;
-}
+import { z } from "zod";
+import { BillData } from "@client/config/src/billData";
 
-export interface ClientToServerEvents {
-	hello: () => void;
-}
+export type APIAlterType = z.infer<typeof APIAlterType>;
+export const APIAlterType = z.object({
+  clientId: z.string(),
+  message: z.string(),
+})
 
-export interface InterServerEvents {
-	ping: () => void;
-}
-
-export interface SocketData {
-	data: number;
-}
+export type APIBillData = z.infer<typeof APIBillData>;
+export const APIBillData = z.object({
+  clientId: z.string(),
+  data: BillData
+})
