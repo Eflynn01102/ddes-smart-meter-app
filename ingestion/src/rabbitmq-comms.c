@@ -26,6 +26,7 @@ U8 InitiateConnection(AMQP_CONN_T* Connection, U8* IP, S32 Port, U8* Username, U
         S32 Ret;
         Ret = amqp_socket_open(Socket, IP, Port);
         if (Ret != OK) {
+            *Connection = NULL;
             LogErr("Could not open tcp socket at %s:%d, %s\n", IP, Port, amqp_error_string2(Ret));
             return NOK;
         }

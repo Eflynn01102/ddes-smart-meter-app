@@ -55,6 +55,7 @@ U8 main(U8 argc, U8* argv[]) {
     U8 RabbitMQUsername[64] = {0};
     U8 RabbitMQPassword[64] = {0};
     AMQP_CONN_T Conn = {0};
+    S32 ConnectionAttempt = 0;
 
     LogInfo("INGESTION (%s %s)\n", __DATE__, __TIME__);
 
@@ -78,11 +79,14 @@ U8 main(U8 argc, U8* argv[]) {
         LogInfo("env vars set\n");
     }
 
-    if (InitiateConnection(&Conn, IP, Port, RabbitMQUsername, RabbitMQPassword) != OK) {
-        exit(NOK);
-    } else {
-        LogInfo("connected to rabbitmq\n");
-    }
+    do {
+        ConnectionAttempt++;
+        LogInfo("connecting to rabbitmq, attempt %d\n", ConnectionAttempt);
+        InitiateConnection(&Conn, IP, Port, RabbitMQUsername, RabbitMQPassword);
+        sleep(5);
+    } while (SigIntReceived == FALSE && Conn == NULL);
+    
+    LogInfo("connected to rabbitmq\n");
 
     if (IngestionMainloop(&Conn) != OK) {
         exit(NOK);
