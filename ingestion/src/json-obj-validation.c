@@ -1,44 +1,5 @@
 #include "ingestion.h"
 
-U8 FetchExpectedFwVersion(S8* FwVersion) {
-    FILE* FP = NULL;
-    cJSON* JsonObj = {0};
-    S8 FileContents[1024] = {0};
-    FP = fopen(CLIENT_FW_VER_PATH, "rb");
-    if (FP == NULL) {
-        LogErr("could not fetch client fw version: cannot access json\n");
-        return NOK;
-    }
-    if (fread(FileContents, sizeof(FileContents[0]), sizeof(FileContents)/sizeof(FileContents[0]), FP) > 0 && ferror(FP) != OK) {
-        fclose(FP);
-        LogErr("could not fetch client fw version: cannot read json\n");
-        return NOK;
-    }
-
-    fclose(FP);
-
-    JsonObj = cJSON_Parse(FileContents);
-    if (JsonObj == FALSE) {
-    LogErr("could not fetch client fw version: cannot parse json\n%s\n", FileContents);
-        return NOK;
-    }
-
-    if (cJSON_GetObjectItemCaseSensitive(JsonObj, "version") == NULL) {
-        cJSON_Delete(JsonObj);
-        LogErr("could not fetch client fw version: fw version not present\n");
-        return NOK;
-    }
-    
-    if (sprintf(FwVersion, "%s", cJSON_GetObjectItemCaseSensitive(JsonObj, "version")->valuestring) > 0) {
-        
-        cJSON_Delete(JsonObj);
-        return OK;
-    }
-    LogErr("could not fetch client fw version: cannot write to result var\n");
-    cJSON_Delete(JsonObj);
-    return NOK;
-}
-
 U8 ValidateJsonObj(cJSON* MsgJson, S8* ExpectedFwVersion) {
     U8 i;
     char* End;
@@ -80,9 +41,11 @@ U8 ValidateJsonObj(cJSON* MsgJson, S8* ExpectedFwVersion) {
     }
 
     //fwVersion
-    if (strcmp(ExpectedFwVersion, cJSON_GetObjectItemCaseSensitive(MsgJson, "fwVersion")->valuestring) != OK) {
-        LogErr("JSON validation failed: message contains invalid fw version: %s (expected %s)\n", cJSON_GetObjectItemCaseSensitive(MsgJson, "fwVersion")->valuestring, ExpectedFwVersion);
-        return NOK;
+    if (!(ExpectedFwVersion[0] == 0xaa && ExpectedFwVersion[1] == 0xbb && ExpectedFwVersion[2] == 0xcc && ExpectedFwVersion[3] == 0xdd)) {
+        if (strcmp(ExpectedFwVersion, cJSON_GetObjectItemCaseSensitive(MsgJson, "fwVersion")->valuestring) != OK) {
+            LogErr("JSON validation failed: message contains invalid fw version: %s (expected %s)\n", cJSON_GetObjectItemCaseSensitive(MsgJson, "fwVersion")->valuestring, ExpectedFwVersion);
+            return NOK;
+        }
     }
 
     //unit

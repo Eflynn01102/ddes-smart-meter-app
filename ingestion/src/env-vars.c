@@ -7,6 +7,7 @@ U8 ReadEnvVars(V) {
     char* TokPtr;
     U8 EnvFileContents[1024] = {0};
     U8* Tok = {0};
+    S32 LinesRead = 0;
 
     FP = NULL;
     FP = fopen("ingestion.env", "rb");
@@ -29,12 +30,17 @@ U8 ReadEnvVars(V) {
         if (Tok[0] == '#' || strcmp(Tok, "") == 0) { //current line is a comment or empty
             Tok = strtok_r(NULL, "\n", &TokPtr);
             continue;
-        } else { //this line is the hmac key
+        } else if (LinesRead == 0) { //this line is the hmac key
             if (setenv("HMACKEY", Tok, 1) != OK) {
-                LogErr("could not set env vars\n");
+                LogErr("could not set env var HMACKEY\n");
                 return NOK;
             }
-
+            LinesRead++;
+        } else {
+            if (setenv("CLIENTFW", Tok, 1) != OK) {
+                LogErr("could not set env var CLIENTFW\n");
+                return NOK;
+            }
             return OK;
         }
         Tok = strtok_r(NULL, "\n", &TokPtr);

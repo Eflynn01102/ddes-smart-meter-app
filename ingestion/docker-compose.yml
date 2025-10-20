@@ -1,0 +1,30 @@
+services:
+  ingestion:
+    build: .
+    container_name: ingestion_service
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - ./config:/app/config:ro # optional if you want to mount configs dynamically
+    command: ["/usr/local/bin/ingestion"]
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"      # message port
+      - "15672:15672"    # management UI
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  rabbitmq_data:
