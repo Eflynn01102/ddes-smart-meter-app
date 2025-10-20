@@ -4,8 +4,7 @@ import { computed } from "vue";
 
 const socketStore = useSocketStore();
 
-const socketData = computed(() => socketStore.socketData);
-
+const socketData = computed(() => socketStore.billData);
 </script>
 
 <template>

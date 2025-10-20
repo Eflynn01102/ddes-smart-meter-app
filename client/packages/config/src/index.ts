@@ -1,8 +1,9 @@
 import { BillData } from "./billData";
 
 export interface ServerToClientEvents {
-  data: (data: SocketData) => void;
+  // data: (data: SocketData) => void;
   alert: (message: SocketAlter) => void;
+  bill_data: (data: SocketData) => void;
 }
 
 export interface ClientToServerEvents {
