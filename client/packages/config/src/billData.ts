@@ -2,8 +2,11 @@ import { z } from "zod";
 
 export type BillData =z.infer<typeof BillData>;
 export const BillData = z.object({
-  unitsUsed: z.number(),
-  price: z.number(),
-  units: z.string(),
-  date: z.date()
+  accountId: z.string(),
+  periodStart: z.string(),
+  currency: z.string(),
+  energyCost: z.float32(),
+  standingCharge: z.float32(),
+  tax: z.string(),
+  amountDue: z.float32(),
 })
