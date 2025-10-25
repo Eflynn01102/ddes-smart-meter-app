@@ -1,6 +1,6 @@
 import { io, type Socket } from "socket.io-client";
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import type {
 	ClientToServerEvents,
 	ServerToClientEvents,
@@ -9,9 +9,12 @@ import type {
 } from "@client/config/src/index";
 
 export const useSocketStore = defineStore("socketio", () => {
-	// const socketData = ref<SocketData>();
 
 	const billData = ref<SocketData>()
+
+	const historicalBillDate = ref<Date>()
+
+	const historicalBillData = ref<SocketData>()
 
 	const alterMessage = ref<SocketAlter>();
 
@@ -25,10 +28,10 @@ export const useSocketStore = defineStore("socketio", () => {
 
 	socket.emit("hello");
 
-	// socket.on("data", (data: SocketData) => {
-	// 	console.log("Received data from server:", data);
-	// 	socketData.value = data;
-	// });
+	watch(historicalBillDate, (date) => {
+		if (!date) return;
+		socket.emit("request_historical_Bill_data", date.toISOString());
+	})
 
 	socket.on("bill_data", (data: SocketData) => {
 		console.log("Received bill data from server:");

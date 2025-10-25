@@ -57,6 +57,24 @@ io.on("connection", (socket) => {
 		console.log("Received 'hello' from client:", socket.id);
 	});
 
+	socket.on("request_historical_Bill_data", (date: string) => {
+		console.log(
+			"Client requested historical bill data for date:",
+			date);
+		return {
+			clientId: "4",
+			data: {
+				accountId: "123456",
+				periodStart: new Date(date).toISOString(),
+				currency: "USD",
+				energyCost: 75.5,
+				standingCharge: 10.0,
+				tax: "6",
+				amountDue: 91.5
+			}
+		}
+	})
+
 	socket.on("disconnect", () => {
 		console.log("user disconnected");
 	});

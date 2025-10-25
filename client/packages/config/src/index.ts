@@ -1,4 +1,5 @@
-import { BillData } from "./billData";
+import type { BillData } from "./billData";
+
 
 export interface ServerToClientEvents {
   // data: (data: SocketData) => void;
@@ -8,6 +9,7 @@ export interface ServerToClientEvents {
 
 export interface ClientToServerEvents {
   hello: () => void;
+  request_historical_Bill_data: (date: string) => SocketData;
 }
 
 export interface InterServerEvents {
