@@ -57,21 +57,14 @@ io.on("connection", (socket) => {
 		console.log("Received 'hello' from client:", socket.id);
 	});
 
-	socket.on("request_historical_Bill_data", (date: string) => {
+	socket.on("request_historical_bill_data", (date: string) => {
 		console.log(
 			"Client requested historical bill data for date:",
 			date);
-		return {
-			clientId: "4",
-			data: {
-				accountId: "123456",
-				periodStart: new Date(date).toISOString(),
-				currency: "USD",
-				energyCost: 75.5,
-				standingCharge: 10.0,
-				tax: "6",
-				amountDue: 91.5
-			}
+		try {
+			fetchHistoricalBillData(date)
+		} catch (error) {
+			console.error("Error fetching historical bill data:", error);
 		}
 	})
 
@@ -106,6 +99,22 @@ app.post("/alter", (req, res) => {
 	sendDataToAllClients(data.data, "alert");
 	res.status(200).json({ status: "Alert sent to clients" });
 })
+
+async function fetchHistoricalBillData(data: string) {
+	const url = "http://billServer"
+	const res = await fetch(url, {
+		method: "POST",
+		body: JSON.stringify({ date: data }),
+		headers: {
+			"Content-Type": "application/json",
+		},
+	})
+	if (!res.ok) {
+		throw new Error("Failed to fetch historical bill data");
+	}
+	const billData: SocketData = await res.json();
+	sendDataToAllClients(billData, "historical_bill_data");
+}
 
 /*
 This function sends data to all connected clients. If a specific socket is provided, it sends the data to that socket instead.

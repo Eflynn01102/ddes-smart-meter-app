@@ -30,12 +30,17 @@ export const useSocketStore = defineStore("socketio", () => {
 
 	watch(historicalBillDate, (date) => {
 		if (!date) return;
-		socket.emit("request_historical_Bill_data", date.toISOString());
+		socket.emit("request_historical_bill_data", date.toISOString());
 	})
 
 	socket.on("bill_data", (data: SocketData) => {
 		console.log("Received bill data from server:");
 		billData.value = data;
+	})
+
+	socket.on("historical_bill_data", (data: SocketData) => {
+		console.log("Received historical bill data from server");
+		historicalBillData.value = data;
 	})
 
 	socket.on("alert", (message: SocketAlter) => {

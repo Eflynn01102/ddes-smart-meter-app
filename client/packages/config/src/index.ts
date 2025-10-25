@@ -5,11 +5,12 @@ export interface ServerToClientEvents {
   // data: (data: SocketData) => void;
   alert: (message: SocketAlter) => void;
   bill_data: (data: SocketData) => void;
+  historical_bill_data: (data: SocketData) => void;
 }
 
 export interface ClientToServerEvents {
   hello: () => void;
-  request_historical_Bill_data: (date: string) => SocketData;
+  request_historical_bill_data: (date: string) => void;
 }
 
 export interface InterServerEvents {
