@@ -1,9 +1,9 @@
 import type { rabbitMessage } from "@client/config/src/message";
 import type { Publisher } from "rabbitmq-stream-js-client";
 import { port, server } from "./client/webSocket";
-import { createHmacSignature } from "./components/hmac";
-import { RabbitMQClient } from "./components/rabbitClient";
-import { generateRandomNumber } from "./components/randomNumberGen";
+import { createHmacSignature } from "./utils/hmac";
+import { RabbitMQClient } from "./utils/rabbitClient";
+import { generateRandomNumber } from "./utils/randomNumberGen";
 
 const rabbitInstance = RabbitMQClient.Instance;
 const client = await rabbitInstance.connectionClient();
