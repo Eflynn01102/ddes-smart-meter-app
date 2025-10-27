@@ -77,7 +77,7 @@ app.post("/bill_data", (req, res) => {
 	const data = APIBillData.safeParse(res.json());
 	if (!data.success)
 		return res.status(400).json({ error: "Invalid data format" });
-	sendDataToAllClients(data.data, "bill_data");
+	sendDataToAllClients("bill_data", data.data);
 	res.status(200).json({ status: "Data sent to clients" });
 });
 
@@ -85,7 +85,7 @@ app.post("/alter", (req, res) => {
 	const data = APIAlterType.safeParse(res.json());
 	if (!data.success)
 		return res.status(400).json({ error: "Invalid data format" });
-	sendDataToAllClients(data.data, "alert");
+	sendDataToAllClients("alert", data.data);
 	res.status(200).json({ status: "Alert sent to clients" });
 })
 
@@ -95,8 +95,8 @@ This function sends data to all connected clients. If a specific socket is provi
 function sendDataToAllClients<
 	E extends keyof ServerToClientEvents
 >(
-	data: Parameters<ServerToClientEvents[E]>[0],
 	event: E,
+	data: Parameters<ServerToClientEvents[E]>[0],
 	socketToClient?: Socket<
 		ClientToServerEvents,
 		ServerToClientEvents,
