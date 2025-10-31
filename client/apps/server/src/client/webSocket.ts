@@ -73,7 +73,8 @@ app.post("/bill_data", (req, res) => {
 	const data = APIBillData.safeParse(req.body);
 	if (!data.success)
 		return res.status(400).json({ error: "Invalid data format" });
-	sendDataToAllClients("bill_data", data.data);
+	console.log("Received bill data:", data.data);
+	sendDataToAllClients("bill_data", data.data );
 	res.status(200).json({ status: "Data sent to clients" });
 });
 
@@ -81,6 +82,7 @@ app.post("/alter", (req, res) => {
 	const data = APIAlterType.safeParse(res.json());
 	if (!data.success)
 		return res.status(400).json({ error: "Invalid data format" });
+	console.log("Received alert data:", data.data);
 	sendDataToAllClients("alert", data.data);
 	res.status(200).json({ status: "Alert sent to clients" });
 })
