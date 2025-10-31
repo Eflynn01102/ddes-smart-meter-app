@@ -20,10 +20,10 @@ export const useSocketStore = defineStore("socketio", () => {
 
 	const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("/");
 
-	const isSocketActive = computed(() => socket.active);
+	const isSocketActive = computed(() => socket.active)
 
 	socket.on("connect", () => {
-		console.log("Connected to server with ID:", socket.id);
+		console.log("Connected to server with ID:", socket.id, new Date().toISOString());
 	});
 
 	socket.emit("hello");
