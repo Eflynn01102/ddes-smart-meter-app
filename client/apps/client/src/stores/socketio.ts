@@ -24,7 +24,7 @@ export const useSocketStore = defineStore("socketio", () => {
 
 	const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("/");
 
-	const isSocketActive = computed(() => socket.active);
+	const isSocketActive = computed(() => socket.active)
 
 	socket.on("connect", () => {
 		console.log(
