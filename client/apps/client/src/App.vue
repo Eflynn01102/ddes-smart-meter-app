@@ -1,7 +1,16 @@
 <script setup lang="ts">
+<<<<<<< HEAD
 import Toast from "primevue/toast";
 import Header from "@/component/Header.vue";
 import Modals from "@/component/modals/Modals.vue";
+=======
+import { useSocketStore } from "./stores/socketio";
+import { computed } from "vue";
+
+const socketStore = useSocketStore();
+
+const socketData = computed(() => socketStore.billData);
+>>>>>>> 46fd292 (update)
 </script>
 
 <template>
