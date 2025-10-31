@@ -34,7 +34,7 @@ export const useSocketStore = defineStore("socketio", () => {
 	})
 
 	socket.on("bill_data", (data: SocketData) => {
-		console.log("Received bill data from server:");
+		console.log("Received bill data from server:", data);
 		billData.value = data;
 	})
 
@@ -44,7 +44,7 @@ export const useSocketStore = defineStore("socketio", () => {
 	})
 
 	socket.on("alert", (message: SocketAlter) => {
-		console.log("Server alter message:", message.clientId);
+		console.log("Server alter message:", message);
 		alterMessage.value = message;
 	})
 

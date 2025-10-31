@@ -1,5 +1,4 @@
 import { createServer } from "node:http";
-import { BillData } from "@client/config/src/billData";
 import type {
 	ClientToServerEvents,
 	InterServerEvents,
@@ -8,9 +7,11 @@ import type {
 	SocketAlter,
 } from "@client/config/src/index";
 import express from "express";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import { ref } from "vue";
+import bodyParser from "body-parser";
 import { APIAlterType, APIBillData } from "../types";
+import { SocketAddress } from "node:net";
 
 const app = express();
 export const server = createServer(app);
@@ -21,37 +22,19 @@ const io = new Server<
 	ServerToClientEvents,
 	InterServerEvents,
 	SocketData
->(server);
-
-const socketServer =
-	ref<
-		Socket<
-			ClientToServerEvents,
-			ServerToClientEvents,
-			InterServerEvents,
-			SocketData
-		>
-	>();
+>(server, {
+	cors: {
+		origin: "*",
+		methods: ["GET", "POST"],
+	},
+});
 
 const socketIds = ref<string>();
 
 io.on("connection", (socket) => {
 	console.log("a user connected");
 
-	socketServer.value = socket;
 	socketIds.value = socket.id;
-
-	// socket.emit("data",
-	//   {
-	//     clientId: socket.id,
-	//     data: {
-	//       unitsUsed: 100,
-	//       price: 50,
-	//       units: "kWh",
-	//       date: new Date()
-	//     }
-	//   }
-	// ); // Send initial data
 
 	socket.on("hello", () => {
 		console.log("Received 'hello' from client:", socket.id);
@@ -79,16 +62,19 @@ io.engine.on("connection_error", (err) => {
 	console.log("Error Context", err.context);
 });
 
+app.use(bodyParser.json());
+
 app.get("/hello-world", (req, res) => {
 	console.log("Hello World endpoint hit");
 	res.send("Hello World!");
 })
 
 app.post("/bill_data", (req, res) => {
-	const data = APIBillData.safeParse(res.json());
+	const data = APIBillData.safeParse(req.body);
 	if (!data.success)
 		return res.status(400).json({ error: "Invalid data format" });
-	sendDataToAllClients(data.data, "bill_data");
+	console.log("Received bill data:", data.data);
+	sendDataToAllClients("bill_data", data.data );
 	res.status(200).json({ status: "Data sent to clients" });
 });
 
@@ -96,7 +82,8 @@ app.post("/alter", (req, res) => {
 	const data = APIAlterType.safeParse(res.json());
 	if (!data.success)
 		return res.status(400).json({ error: "Invalid data format" });
-	sendDataToAllClients(data.data, "alert");
+	console.log("Received alert data:", data.data);
+	sendDataToAllClients("alert", data.data);
 	res.status(200).json({ status: "Alert sent to clients" });
 })
 
@@ -113,7 +100,7 @@ async function fetchHistoricalBillData(data: string) {
 		throw new Error("Failed to fetch historical bill data");
 	}
 	const billData: SocketData = await res.json();
-	sendDataToAllClients(billData, "historical_bill_data");
+	sendDataToAllClients("historical_bill_data", billData);
 }
 
 /*
@@ -122,29 +109,14 @@ This function sends data to all connected clients. If a specific socket is provi
 function sendDataToAllClients<
 	E extends keyof ServerToClientEvents
 >(
-	data: Parameters<ServerToClientEvents[E]>[0],
 	event: E,
-	socketToClient?: Socket<
-		ClientToServerEvents,
-		ServerToClientEvents,
-		InterServerEvents,
-		SocketData
-	>,
+	data: Parameters<ServerToClientEvents[E]>[0]
 ) {
-	let socket: Socket<
-		ClientToServerEvents,
-		ServerToClientEvents,
-		InterServerEvents,
-		SocketData
-	>;
-
-	if (!socketToClient) {
-		if (!socketServer.value) return;
-		socket = socketServer.value;
-	} else {
-		socket = socketToClient;
+	if (!io) {
+		console.error("Socket.io server is not initialized.");
+		return;
 	}
 
-	socket.emit(event, ...([data] as Parameters<ServerToClientEvents[E]>));
+	io.emit(event, ...([data] as Parameters<ServerToClientEvents[E]>));
 	console.log("Sent data to client");
 }

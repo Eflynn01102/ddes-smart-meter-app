@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useSocketStore } from "@/stores/socketio";
+import { useSocketStore } from "./stores/socketio";
 import { computed } from "vue";
 
 const socketStore = useSocketStore();
