@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  gateway:
+    build: .
+    ports:
+      - "5000:5000"
+      - "9002:9002/udp"
+    environment:
+      RABBIT_URL: amqp://guest:guest@rabbitmq:5672/%2F
+      EXCHANGE_NAME: ddes.readings
+      ROUTING_KEY: billing
+      QUEUE_SIZE: 1024
+    depends_on:
+      - rabbitmq
