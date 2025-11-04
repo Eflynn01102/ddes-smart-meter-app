@@ -1,8 +1,8 @@
 import { createServer } from "node:http";
 import express from "express";
 import bodyParser from "body-parser";
-import { APIAlterType, APIBillData } from "../types";
-import {WebSocket} from "./webSocketClass";
+import { APIAlterType, APIBillData } from "@/types";
+import {WebSocket} from "@/client/webSocketClass";
 
 const app = express();
 export const server = createServer(app);
