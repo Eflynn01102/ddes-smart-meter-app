@@ -3,15 +3,14 @@ import "./assets/main.css";
 import { createApp } from "vue";
 import PrimeVue from "primevue/config";
 import { createPinia } from "pinia";
-
-import lara from '@primeuix/themes/lara';
+import Aura from "@primeuix/themes/aura";
 
 import App from "./App.vue";
 import router from "./router";
 
 const app = createApp(App, {
   theme: {
-    preset: lara
+    preset: Aura
   }
 });
 
