@@ -2,30 +2,37 @@
 import Card from "primevue/card";
 import Button from "primevue/button";
 
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
 </script>
 
 <template>
   <div>
-    <Card class="body">
+    <Card>
       <template #title>
         Welcome Back!
       </template>
       <template #content>
-        Please login to your account
+        <div class="card-body">
+          <span>Please login to your account</span>
+          <Button @click="router.push('bill')" label="login"/>
+        </div>
       </template>
       <template #footer>
-        <Button @click="console.log('hello world')" label="login"/>
+        <span>Don't have an account? Sign up</span>
       </template>
     </Card>
   </div>
 </template>
 
 <style scoped>
-.body {
+.card-body {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  height: 100%;
 }
-
 </style>
