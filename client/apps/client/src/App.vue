@@ -1,11 +1,5 @@
 <script setup lang="ts">
-import { useSocketStore } from "./stores/socketio";
-import { computed } from "vue";
 import Header from "@/component/Header.vue";
-
-const socketStore = useSocketStore();
-
-const socketData = computed(() => socketStore.billData);
 </script>
 
 <template>
@@ -19,6 +13,7 @@ const socketData = computed(() => socketStore.billData);
 .main {
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
   gap: 1rem;
   width: 100%;

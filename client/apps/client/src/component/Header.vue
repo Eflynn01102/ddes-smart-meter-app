@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import Menu from "primevue/menu";
 import Button from "primevue/button";
-import { computed, ref } from "vue";
+import { ref, watch } from "vue";
+import router from "@/router";
+import { useAuthStore } from "@/stores/auth";
+
+const authStore = useAuthStore()
 
 const menu = ref()
 const items = ref([
@@ -11,25 +15,73 @@ const items = ref([
       {
         label: "Logout",
         icon: "pi pi-sign-out",
+        command: () => {
+          authStore.isLoggedIn = false
+          router.push('/')
+        }
       }
     ]
   }
 ])
 
+watch(() => authStore.isLoggedIn, (newVal) => {
+  if (newVal) {
+    console.log("not logged in")
+    items.value = [
+      {
+        label: 'Options',
+        items: [
+           {
+            label: "Bill Date",
+            icon: "pi pi-calendar",
+            command: () => {
+              console.log("Bill Date Clicked")
+            }
+          },
+          {
+            label: "Login",
+            icon: "pi pi-sign-out",
+            command: () => {
+              router.push('/')
+            }
+          }
+        ]
+      }
+    ]
+  } else {
+    items.value = [
+      {
+        label: 'Options',
+        items: [
+          {
+            label: "Logout",
+            icon: "pi pi-sign-out",
+            command: () => {
+              authStore.isLoggedIn = false
+              router.push('/')
+            }
+          }
+        ]
+      }
+    ]
+  }
+})
+
 function toggleMenu(event: Event) {
   menu.value.toggle(event)
 }
 
-const time = computed(() => {
-  return new Date().toLocaleTimeString()
-})
+const time = ref(new Date().toLocaleTimeString());
+setInterval(() => {
+  time.value = new Date().toLocaleTimeString();
+}, 1000);
 
 </script>
 
 <template>
   <div class="header">
     <span>{{ time }}</span>
-    <h1>Smart Meter</h1>
+     <h1><u>Smart Meter</u></h1>
     <div>
       <Button type="button" icon="pi pi-ellipsis-v" @click="toggleMenu($event)" aria-haspopup="true" aria-controls="overlay_menu" />
       <Menu ref="menu" :model="items" :popup="true" />
@@ -52,6 +104,5 @@ const time = computed(() => {
 
 span {
   font-size: 1.5rem;
-  color: #666;
 }
 </style>
