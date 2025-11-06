@@ -4,6 +4,9 @@ import Button from "primevue/button";
 import { ref, watch } from "vue";
 import router from "@/router";
 import { useAuthStore } from "@/stores/auth";
+import { useToast } from "primevue/usetoast";
+
+const toast = useToast()
 
 const authStore = useAuthStore()
 
@@ -35,6 +38,7 @@ watch(() => authStore.isLoggedIn, (newVal) => {
             label: "Bill Date",
             icon: "pi pi-calendar",
             command: () => {
+              toast.add({severity:'info', summary: 'Bill Date', detail: 'Your next bill date is 25th June 2024', life: 3000});
               console.log("Bill Date Clicked")
             }
           },
@@ -43,6 +47,7 @@ watch(() => authStore.isLoggedIn, (newVal) => {
             icon: "pi pi-sign-out",
             command: () => {
               router.push({ name: 'login'})
+              authStore.isLoggedIn = false
             }
           }
         ]
@@ -93,12 +98,11 @@ setInterval(() => {
 <style scoped>
 .header {
   width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px #60F0F8;
   padding: 1rem 1rem;
 }
 
