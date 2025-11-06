@@ -76,9 +76,9 @@ function toggleMenu(event: Event) {
   menu.value.toggle(event)
 }
 
-const time = ref(new Date().toLocaleTimeString());
+const time = ref(new Date().toLocaleString('en-GB', { hour12: false, minute: '2-digit', hour: '2-digit', second: '2-digit' }));
 setInterval(() => {
-  time.value = new Date().toLocaleTimeString();
+  time.value = new Date().toLocaleString('en-GB', { hour12: false, minute: '2-digit', hour: '2-digit', second: '2-digit' });
 }, 1000);
 
 </script>
@@ -87,7 +87,7 @@ setInterval(() => {
   <div class="header">
     <span>{{ time }}</span>
      <h1><u>Smart Meter</u></h1>
-    <div>
+    <div style="padding-left: 2rem;">
       <Button type="button" icon="pi pi-ellipsis-v" @click="toggleMenu($event)" aria-haspopup="true" aria-controls="overlay_menu" />
       <Menu ref="menu" :model="items" :popup="true" />
     </div>

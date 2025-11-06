@@ -10,7 +10,7 @@ const socketData = computed(() => socketStore.billData);
 
 <template>
   <div class="dashboard">
-    <span>Bill Data from Socket.IO: hello</span>
+    <span>Bill Data from Socket.IO: {{ socketData }}</span>
   </div>
 </template>
 
