@@ -20,6 +20,7 @@ const socketData = computed(() => socketStore.billData);
   display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: 1rem;
   width: 100%;
   height: 100%;
 }

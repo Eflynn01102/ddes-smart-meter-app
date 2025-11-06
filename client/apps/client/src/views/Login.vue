@@ -9,10 +9,10 @@ const router = useRouter();
 </script>
 
 <template>
-  <div>
+  <div class="main">
     <Card>
       <template #title>
-        Welcome Back!
+        Login to your account
       </template>
       <template #content>
         <div class="card-body">
@@ -28,7 +28,16 @@ const router = useRouter();
 </template>
 
 <style scoped>
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
 .card-body {
+  height: 100%;
+  width: 60%;
   display: flex;
   flex-direction: column;
   align-items: center;
