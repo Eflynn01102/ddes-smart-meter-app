@@ -2,10 +2,12 @@
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 
-import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import { useModalsStore } from "@/stores/modals";
 
 const router = useRouter();
+const modalsStore = useModalsStore();
 const authStore = useAuthStore();
 
 function login() {
@@ -31,8 +33,11 @@ function login() {
         <br />
         <Button @click="login()" label="login" :fluid="true"/>
       </div>
-      <div>
-        <span>Don't have an account? Sign up</span>
+      <div class="login-card-footer">
+        <span>Don't have an account? </span>
+        <a @click="modalsStore.signUpVisible = true; modalsStore.signUpId = 'signup-modal'">
+          <span style="margin-left: 0.5rem; cursor: pointer; color: #60F0F8;"><u>Sign Up</u></span>
+        </a>
       </div>
     </div>
   </div>
@@ -60,5 +65,9 @@ function login() {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+.login-card-footer {
+  display: flex;
+  flex-direction: row;
 }
 </style>

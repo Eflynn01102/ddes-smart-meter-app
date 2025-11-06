@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Toast from "primevue/toast";
 import Header from "@/component/Header.vue";
+import Modals from "@/component/modals/Modals.vue";
 </script>
 
 <template>
@@ -9,6 +10,7 @@ import Header from "@/component/Header.vue";
     <Header />
     <RouterView />
   </div>
+  <Modals />
 </template>
 
 <style scoped>
