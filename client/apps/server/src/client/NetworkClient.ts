@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import express from "express";
 import bodyParser from "body-parser";
 import { APIAlterType, APIBillData } from "@/types";
-import {WebSocket} from "@/client/webSocketClass";
+import { WebSocket } from "@/client/webSocketClass";
 
 const app = express();
 export const server = createServer(app);
@@ -13,17 +13,17 @@ webSocketInstance.intializeWebSocket(server);
 
 app.use(bodyParser.json());
 
-app.get("/hello-world", (req, res) => {
+app.get("/hello-world", (_req, res) => {
 	console.log("Hello World endpoint hit");
 	res.send("Hello World!");
-})
+});
 
 app.post("/bill_data", (req, res) => {
 	const data = APIBillData.safeParse(req.body);
 	if (!data.success)
 		return res.status(400).json({ error: "Invalid data format" });
 	console.log("Received bill data:", data.data);
-	webSocketInstance.sendDataToClient("bill_data", data.data );
+	webSocketInstance.sendDataToClient("bill_data", data.data);
 	res.status(200).json({ status: "Data sent to clients" });
 });
 
@@ -34,4 +34,4 @@ app.post("/alter", (req, res) => {
 	console.log("Received alert data:", data.data);
 	webSocketInstance.sendDataToClient("alert", data.data);
 	res.status(200).json({ status: "Alert sent to clients" });
-})
+});

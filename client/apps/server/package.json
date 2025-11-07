@@ -8,9 +8,10 @@
   "scripts": {
     "start": "bun run src/index.ts",
     "dev": "bun run --watch src/index.ts",
-    "biome:check": "biome check --write",
-    "format": "biome format",
-    "lint": "biome lint"
+    "format:check": "pnpm biome format ./src",
+    "format:fix": "pnpm biome format --write ./src",
+    "lint:check": "pnpm biome lint ./src",
+    "lint:fix": "pnpm biome lint --write ./src"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.6",

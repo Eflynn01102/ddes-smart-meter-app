@@ -9,13 +9,12 @@ import { ref } from "vue";
 const modalsStore = useModalsStore();
 const authStore = useAuthStore();
 
-const username = ref('');
-const password = ref('');
+const username = ref("");
+const password = ref("");
 
 function login() {
-  authStore.loginHandler(username.value, password.value);
+	authStore.loginHandler(username.value, password.value);
 }
-
 </script>
 
 <template>
@@ -59,7 +58,7 @@ function login() {
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  box-shadow: 0 2px 4px #60F0F8;
+  box-shadow: 0 2px 4px var(--color-octo-blue);
   padding: 1rem;
 }
 .login-card-body {

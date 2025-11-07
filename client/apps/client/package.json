@@ -14,7 +14,11 @@
     "lint": "bunx biome lint --write",
     "preview": "vite preview",
     "build-only": "vite build",
-    "type-check": "vue-tsc --build"
+    "type-check": "vue-tsc --build",
+    "format:check": "pnpm biome format ./src",
+    "format:fix": "pnpm biome format --write ./src",
+    "lint:check": "pnpm biome lint ./src",
+    "lint:fix": "pnpm biome lint --write ./src"
   },
   "dependencies": {
     "@client/config": "workspace:*",

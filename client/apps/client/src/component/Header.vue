@@ -6,78 +6,97 @@ import router from "@/router";
 import { useAuthStore } from "@/stores/auth";
 import { useToast } from "primevue/usetoast";
 
-const toast = useToast()
+const toast = useToast();
 
-const authStore = useAuthStore()
+const authStore = useAuthStore();
 
-const menu = ref()
+const menu = ref();
 const items = ref([
-  {
-    label: 'Options',
-    items: [
-      {
-        label: "Logout",
-        icon: "pi pi-sign-out",
-        command: () => {
-          authStore.logoutHandler()
-        }
-      }
-    ]
-  }
-])
+	{
+		label: "Options",
+		items: [
+			{
+				label: "Logout",
+				icon: "pi pi-sign-out",
+				command: () => {
+					authStore.logoutHandler();
+				},
+			},
+		],
+	},
+]);
 
-watch(() => authStore.isLoggedIn, (newVal) => {
-  if (newVal) {
-    console.log("not logged in")
-    items.value = [
-      {
-        label: 'Options',
-        items: [
-           {
-            label: "Bill Date",
-            icon: "pi pi-calendar",
-            command: () => {
-              toast.add({severity:'info', summary: 'Bill Date', detail: 'Your next bill date is 25th June 2024', life: 3000});
-              console.log("Bill Date Clicked")
-            }
-          },
-          {
-            label: "Login",
-            icon: "pi pi-sign-out",
-            command: () => {
-              authStore.logoutHandler()
-            }
-          }
-        ]
-      }
-    ]
-  } else {
-    items.value = [
-      {
-        label: 'Options',
-        items: [
-          {
-            label: "Logout",
-            icon: "pi pi-sign-out",
-            command: () => {
-              authStore.logoutHandler()
-            }
-          }
-        ]
-      }
-    ]
-  }
-})
+watch(
+	() => authStore.isLoggedIn,
+	(newVal) => {
+		if (newVal) {
+			console.log("not logged in");
+			items.value = [
+				{
+					label: "Options",
+					items: [
+						{
+							label: "Bill Date",
+							icon: "pi pi-calendar",
+							command: () => {
+								toast.add({
+									severity: "info",
+									summary: "Bill Date",
+									detail: "Your next bill date is 25th June 2024",
+									life: 3000,
+								});
+								console.log("Bill Date Clicked");
+							},
+						},
+						{
+							label: "Login",
+							icon: "pi pi-sign-out",
+							command: () => {
+								authStore.logoutHandler();
+							},
+						},
+					],
+				},
+			];
+		} else {
+			items.value = [
+				{
+					label: "Options",
+					items: [
+						{
+							label: "Logout",
+							icon: "pi pi-sign-out",
+							command: () => {
+								authStore.logoutHandler();
+							},
+						},
+					],
+				},
+			];
+		}
+	},
+);
 
 function toggleMenu(event: Event) {
-  menu.value.toggle(event)
+	menu.value.toggle(event);
 }
 
-const time = ref(new Date().toLocaleString('en-GB', { hour12: false, minute: '2-digit', hour: '2-digit', second: '2-digit' }));
+const time = ref(
+	new Date().toLocaleString("en-GB", {
+		hour12: false,
+		minute: "2-digit",
+		hour: "2-digit",
+		second: "2-digit",
+	}),
+);
 setInterval(() => {
-  time.value = new Date().toLocaleString('en-GB', { hour12: false, minute: '2-digit', hour: '2-digit', second: '2-digit' });
+	time.value = new Date().toLocaleString("en-GB", {
+		hour12: false,
+		minute: "2-digit",
+		hour: "2-digit",
+		second: "2-digit",
+	});
 }, 1000);
-
 </script>
 
 <template>
@@ -99,7 +118,7 @@ setInterval(() => {
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 4px #60F0F8;
+  box-shadow: 0 2px 4px var(--color-octo-blue);
   padding: 1rem 1rem;
 }
 

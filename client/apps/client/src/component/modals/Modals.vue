@@ -3,7 +3,6 @@ import Dialog from "primevue/dialog";
 import { useModalsStore } from "@/stores/modals";
 
 const modalsStore = useModalsStore();
-
 </script>
 
 <template>

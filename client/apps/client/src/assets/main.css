@@ -3,18 +3,18 @@
 
 body,
 #app {
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
-  background-color: #100030;
-  color: white;
+	height: 100vh;
+	width: 100vw;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+	background-color: #100030;
+	color: white;
 }
 
-@theme {
-  --color-octo-pink: #F050F8;
-  --color-octo-purple: #100030;
-  --color-octo-White: #100030;
-  --color-octo-blue: #60F0F8;
+:root {
+	--color-octo-pink: #f050f8;
+	--color-octo-purple: #100030;
+	--color-octo-white: #FFFFFF;
+	--color-octo-blue: #60f0f8;
 }

@@ -13,9 +13,9 @@ import { octoPreset } from "@/themes/theme";
 const app = createApp(App);
 
 app.use(PrimeVue, {
-  theme: {
-    preset: octoPreset,
-  }
+	theme: {
+		preset: octoPreset,
+	},
 });
 
 app.use(createPinia());
