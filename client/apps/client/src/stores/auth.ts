@@ -12,6 +12,7 @@ export const useAuthStore = defineStore("auth", () => {
   const isLoggedIn = ref(false)
 
   function loginHandler(username: string, password: string) {
+
     if (username === "admin" && password === "admin") {
       isLoggedIn.value = true
       router.push({ name: 'bill' });

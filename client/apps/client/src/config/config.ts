@@ -2,7 +2,7 @@ import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 
 export type Config = z.infer<typeof Config>;
-export const Config = z.object(z.object({
+export const Config = z.object({
   users:
     z.object({
       user1: z.object({
@@ -66,15 +66,14 @@ export const Config = z.object(z.object({
         password: z.string().min(8),
       }),
     })
-  }))
+  })
 
-if(import.meta.url === new URL("./config.ts", import.meta.url).href) {
-  try {
-    const configSchema = zodToJsonSchema(Config);
-    Bun.write("./config/config.schema.json", JSON.stringify(configSchema));
-  } catch (error) {
-    console.error("Error generating JSON schema:", error);
-  }
+try {
+  console.log("hello")
+  const configSchema = zodToJsonSchema(Config);
+  console.log(JSON.stringify(configSchema));
+} catch (error) {
+  console.error("Error generating JSON schema:", error);
 }
 
 export default Config;
