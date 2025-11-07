@@ -6,11 +6,13 @@ export interface ServerToClientEvents {
   alert: (message: SocketAlter) => void;
   bill_data: (data: SocketData) => void;
   historical_bill_data: (data: SocketData) => void;
+  valid_user: (user: SocketValidUser) => void
 }
 
 export interface ClientToServerEvents {
   hello: () => void;
   request_historical_bill_data: (date: string) => void;
+  request_user: (user: string) => void;
 }
 
 export interface InterServerEvents {
@@ -25,4 +27,10 @@ export interface SocketData {
 export interface SocketAlter {
   clientId: string;
   message: string;
+}
+
+export interface SocketValidUser {
+  name: string;
+  role: 'admin' | 'user';
+  password: string;
 }

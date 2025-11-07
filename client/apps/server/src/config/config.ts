@@ -71,6 +71,7 @@ export const Config = z.object({
 try {
   console.log("hello")
   const configSchema = zodToJsonSchema(Config);
+  Bun.write("config.schema.json", JSON.stringify(configSchema, null, 2));
   console.log(JSON.stringify(configSchema));
 } catch (error) {
   console.error("Error generating JSON schema:", error);

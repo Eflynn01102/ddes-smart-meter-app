@@ -1,4 +1,4 @@
-import { io, type Socket } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
 import type {
@@ -6,17 +6,18 @@ import type {
 	ServerToClientEvents,
 	SocketAlter,
 	SocketData,
+	SocketValidUser
 } from "@client/config/src/index";
 
 export const useSocketStore = defineStore("socketio", () => {
 
 	const billData = ref<SocketData>()
 
-	const historicalBillDate = ref<Date>()
-
 	const historicalBillData = ref<SocketData>()
 
 	const alterMessage = ref<SocketAlter>();
+
+	const validUser = ref<SocketValidUser>();
 
 	const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("/");
 
@@ -28,10 +29,13 @@ export const useSocketStore = defineStore("socketio", () => {
 
 	socket.emit("hello");
 
-	watch(historicalBillDate, (date) => {
-		if (!date) return;
-		socket.emit("request_historical_bill_data", date.toISOString());
-	})
+	function requestHistoricalBillData (date: string) {
+		socket.emit("request_historical_bill_data", date)
+	}
+
+	function requestUser (user: string) {
+		socket.emit("request_user", user)
+	}
 
 	socket.on("bill_data", (data: SocketData) => {
 		console.log("Received bill data from server:", data);
@@ -41,6 +45,12 @@ export const useSocketStore = defineStore("socketio", () => {
 	socket.on("historical_bill_data", (data: SocketData) => {
 		console.log("Received historical bill data from server");
 		historicalBillData.value = data;
+	})
+
+
+	socket.on("valid_user", (user: SocketValidUser) => {
+		console.log("Received valid user from server:", user);
+		validUser.value = user;
 	})
 
 	socket.on("alert", (message: SocketAlter) => {
@@ -53,5 +63,5 @@ export const useSocketStore = defineStore("socketio", () => {
 		console.log(err.message);
 	});
 
-	return { billData, alterMessage, isSocketActive };
+	return { billData, alterMessage, isSocketActive, requestHistoricalBillData, requestUser };
 });
