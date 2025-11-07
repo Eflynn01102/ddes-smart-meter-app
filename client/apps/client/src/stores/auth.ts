@@ -35,28 +35,29 @@ export const useAuthStore = defineStore("auth", () => {
 
    socketStore.requestUser({userName, password})
 
-    if (userName === knownUsername.value && password === knownPassword.value) {
-      validUsername.value = knownUsername.value
-      validRole.value = knownRole.value
-      validPassword.value = knownPassword.value
-      isLoggedIn.value = true
-      router.push({ name: 'bill' });
-      toast.add({
-        severity:'success',
-        summary: 'Login Successful',
-        detail:`Welcome back, ${validUsername.value}!`,
-        life: 3000
-      });
-    } else {
-      isLoggedIn.value = false
-      toast.add({
-        severity:'error',
-        summary: 'Login Failed',
-        detail:'Invalid username or password',
-        life: 3000
-      });
-    }
-
+   setTimeout(() => {
+     if (userName === knownUsername.value && password === knownPassword.value) {
+       validUsername.value = knownUsername.value
+       validRole.value = knownRole.value
+       validPassword.value = knownPassword.value
+       isLoggedIn.value = true
+       router.push({ name: 'bill' });
+       toast.add({
+         severity:'success',
+         summary: 'Login Successful',
+         detail:`Welcome back, ${validUsername.value}!`,
+         life: 3000
+       });
+     } else {
+       isLoggedIn.value = false
+       toast.add({
+         severity:'error',
+         summary: 'Login Failed',
+         detail:'Invalid username or password',
+         life: 3000
+       });
+     }
+   }, 500);
 
   }
 

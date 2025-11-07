@@ -45,8 +45,7 @@ watch(() => authStore.isLoggedIn, (newVal) => {
             label: "Login",
             icon: "pi pi-sign-out",
             command: () => {
-              router.push({ name: 'login'})
-              authStore.isLoggedIn = false
+              authStore.logoutHandler()
             }
           }
         ]
@@ -61,8 +60,7 @@ watch(() => authStore.isLoggedIn, (newVal) => {
             label: "Logout",
             icon: "pi pi-sign-out",
             command: () => {
-              authStore.isLoggedIn = false
-              router.push({ name: 'login'})
+              authStore.logoutHandler()
             }
           }
         ]
