@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import { Config } from "@/config/config";
 import { useRouter } from "vue-router";
 import { useToast } from "primevue/usetoast";
 
@@ -17,9 +18,9 @@ export const useAuthStore = defineStore("auth", () => {
     } else {
       isLoggedIn.value = false
       toast.add({
-        severity:'error', 
-        summary: 'Login Failed', 
-        detail:'Invalid username or password', 
+        severity:'error',
+        summary: 'Login Failed',
+        detail:'Invalid username or password',
         life: 3000
       });
     }
