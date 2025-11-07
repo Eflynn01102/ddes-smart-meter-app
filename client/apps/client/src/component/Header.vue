@@ -43,7 +43,7 @@ watch(
 							},
 						},
 						{
-							label: "Login",
+							label: "LogoutS",
 							icon: "pi pi-sign-out",
 							command: () => {
 								authStore.logoutHandler();

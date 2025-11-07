@@ -31,7 +31,7 @@ function login() {
           <InputText placeholder="Password" type="password" v-model=password :fluid="true" style="margin-top: 1rem;" />
         </div>
         <br />
-        <Button @click="login()" label="login" :fluid="true"/>
+        <Button @click="login()" label="Login" :fluid="true"/>
       </div>
       <div class="login-card-footer">
         <span>Don't have an account? </span>
