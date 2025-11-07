@@ -2,17 +2,18 @@
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 
-import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useModalsStore } from "@/stores/modals";
+import { ref } from "vue";
 
-const router = useRouter();
 const modalsStore = useModalsStore();
 const authStore = useAuthStore();
 
+const username = ref('');
+const password = ref('');
+
 function login() {
-  authStore.isLoggedIn = true;
-  router.push('bill');
+  authStore.loginHandler(username.value, password.value);
 }
 
 </script>
@@ -27,8 +28,8 @@ function login() {
         <span>Please login to your account</span>
         <br />
         <div>
-          <InputText placeholder="Username" :fluid="true" />
-          <InputText placeholder="Password" type="password" :fluid="true" style="margin-top: 1rem;" />
+          <InputText placeholder="Username" v-model=username :fluid="true" />
+          <InputText placeholder="Password" type="password" v-model=password :fluid="true" style="margin-top: 1rem;" />
         </div>
         <br />
         <Button @click="login()" label="login" :fluid="true"/>

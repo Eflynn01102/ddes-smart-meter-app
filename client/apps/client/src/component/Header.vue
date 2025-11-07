@@ -19,8 +19,7 @@ const items = ref([
         label: "Logout",
         icon: "pi pi-sign-out",
         command: () => {
-          authStore.isLoggedIn = false
-          router.push('/')
+          authStore.logoutHandler()
         }
       }
     ]
