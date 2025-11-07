@@ -8,7 +8,7 @@ import { generateRandomNumber } from "@/utils/randomNumberGen";
 const rabbitInstance = RabbitMQClient.Instance;
 const client = await rabbitInstance.connectionClient();
 
-const endPointTopic = "streamtest";
+const endPointTopic = "client";
 
 // create 12 streams
 for (let i = 0; i <= 11; i++) {

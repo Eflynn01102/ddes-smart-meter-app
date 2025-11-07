@@ -35,7 +35,7 @@ function login() {
       </div>
       <div class="login-card-footer">
         <span>Don't have an account? </span>
-        <a @click="modalsStore.signUpVisible = true; modalsStore.signUpId = 'signup-modal'">
+        <a href="https://octopus.energy/">
           <span style="margin-left: 0.5rem; cursor: pointer; color: #60F0F8;"><u>Sign Up</u></span>
         </a>
       </div>

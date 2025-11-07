@@ -7,6 +7,7 @@ export async function validateUser(userName: string, password: string) {
 			user: {
 				userName: "",
 				roles: "",
+				clientId: "",
 				password: "",
 			},
 		};
@@ -17,6 +18,7 @@ export async function validateUser(userName: string, password: string) {
 			user: {
 				userName: "",
 				roles: "",
+				clientId: "",
 				password: "",
 			},
 		};

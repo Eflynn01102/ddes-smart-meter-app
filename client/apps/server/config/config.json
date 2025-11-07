@@ -3,66 +3,79 @@
     {
       "userName": "admin",
       "roles": "admin",
+      "clientId": "client131",
       "password": "password123"
     },
     {
       "userName": "user1",
       "roles": "user",
+      "clientId": "client1",
       "password": "userpass"
     },
     {
       "userName": "user2",
       "roles": "user",
+      "clientId": "client2",
       "password": "userpass"
     },
     {
       "userName": "user3",
       "roles": "user",
+      "clientId": "client3",
       "password": "userpass"
     },
     {
       "userName": "user4",
-      "roles": "user",
+      "roles": "user4",
+      "clientId": "client",
       "password": "userpass"
     },
     {
       "userName": "user5",
-      "roles": "user",
+      "roles": "user5",
+      "clientId": "client",
       "password": "userpass"
     },
     {
       "userName": "user6",
-      "roles": "user",
+      "roles": "user6",
+      "clientId": "client",
       "password": "userpass"
     },
     {
       "userName": "user7",
-      "roles": "user",
+      "roles": "user7",
+      "clientId": "client",
       "password": "userpass"
     },
     {
       "userName": "user8",
-      "roles": "user",
+      "roles": "user8",
+      "clientId": "client",
       "password": "userpass"
     },
     {
       "userName": "user9",
-      "roles": "user",
+      "roles": "user9",
+      "clientId": "client",
       "password": "userpass"
     },
     {
       "userName": "user10",
-      "roles": "user",
+      "roles": "user10",
+      "clientId": "client",
       "password": "userpass"
     },
     {
       "userName": "user11",
-      "roles": "user",
+      "roles": "user11",
+      "clientId": "client",
       "password": "userpass"
     },
     {
       "userName": "user12",
-      "roles": "user",
+      "roles": "user12",
+      "clientId": "client",
       "password": "userpass"
     }
   ]

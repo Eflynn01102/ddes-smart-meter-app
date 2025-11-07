@@ -2,11 +2,10 @@
 import Menu from "primevue/menu";
 import Button from "primevue/button";
 import { ref, watch } from "vue";
-import router from "@/router";
 import { useAuthStore } from "@/stores/auth";
-import { useToast } from "primevue/usetoast";
+import { useModalsStore } from "@/stores/modals";
 
-const toast = useToast();
+const modalsStore = useModalsStore();
 
 const authStore = useAuthStore();
 
@@ -39,13 +38,8 @@ watch(
 							label: "Bill Date",
 							icon: "pi pi-calendar",
 							command: () => {
-								toast.add({
-									severity: "info",
-									summary: "Bill Date",
-									detail: "Your next bill date is 25th June 2024",
-									life: 3000,
-								});
-								console.log("Bill Date Clicked");
+								modalsStore.datePickerVisible = true;
+								modalsStore.datePickerId = "bill-date-picker-modal";
 							},
 						},
 						{

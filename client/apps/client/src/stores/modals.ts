@@ -2,8 +2,8 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 
 export const useModalsStore = defineStore("modals", () => {
-	const signUpId = ref<string>();
-	const signUpVisible = ref(false);
+	const datePickerId = ref<string>();
+	const datePickerVisible = ref(false);
 
-	return { signUpVisible, signUpId };
+	return { datePickerVisible, datePickerId };
 });

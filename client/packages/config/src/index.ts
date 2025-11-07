@@ -32,6 +32,7 @@ export interface SocketAlter {
 export interface SocketValidUser {
   userName: string;
   roles: string;
+  clientId: string;
   password: string;
 }
 

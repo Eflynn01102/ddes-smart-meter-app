@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Dialog from "primevue/dialog";
 import { useModalsStore } from "@/stores/modals";
+import DatePicker from "@/component/modals/ModelsViews/BillDatePicker.vue";
 
 const modalsStore = useModalsStore();
 </script>
@@ -8,18 +9,18 @@ const modalsStore = useModalsStore();
 <template>
   <Dialog
     class="dialog-box"
-    :id="modalsStore.signUpId"
-    :visible="modalsStore.signUpVisible"
+    :id="modalsStore.datePickerId"
+    :visible="modalsStore.datePickerVisible"
     modal
     @update:visible="
-      modalsStore.signUpVisible = false;
-      modalsStore.signUpId = undefined;
+      modalsStore.datePickerVisible = false;
+      modalsStore.datePickerId = undefined;
     "
     >
     <template #header>
-      <h3>Modal Title</h3>
+      <h2>Historical Date Picker</h2>
     </template>
-    <p>This is the content of the modal.</p>
+    <DatePicker />
   </Dialog>
 </template>
 
