@@ -12,7 +12,7 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
   hello: () => void;
   request_historical_bill_data: (date: string) => void;
-  request_user: (user: string) => void;
+  request_user: (user: SocketUnknownUser) => void;
 }
 
 export interface InterServerEvents {
@@ -30,7 +30,12 @@ export interface SocketAlter {
 }
 
 export interface SocketValidUser {
-  name: string;
-  role: 'admin' | 'user';
+  userName: string;
+  roles: string;
+  password: string;
+}
+
+export interface SocketUnknownUser {
+  userName: string;
   password: string;
 }

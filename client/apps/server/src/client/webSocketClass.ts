@@ -3,10 +3,11 @@ import type {
 	InterServerEvents,
 	ServerToClientEvents,
 	SocketData,
-	SocketAlter,
+  SocketUnknownUser
 } from "@client/config/src/index";
 import { Server, Socket } from "socket.io";
 import { createServer } from "node:http";
+import { validateUser } from "@/utils/userValidation";
 
 export class WebSocket {
 
@@ -60,7 +61,18 @@ export class WebSocket {
       } catch (error) {
         console.error("Error fetching historical bill data:", error);
       }
-    })
+      })
+
+      socket.on("request_user", async (user: SocketUnknownUser) => {
+        console.log("Client requested user validation");
+        const valUser = await validateUser(user.userName, user.password)
+        if (!valUser.valid) {
+          console.log("Invalid user credentials");
+          this.sendDataToClient("valid_user", valUser.user)
+          return;
+        }
+        this.sendDataToClient("valid_user", valUser.user)
+      })
 
       socket.on("disconnect", () => {
         console.log("user disconnected");

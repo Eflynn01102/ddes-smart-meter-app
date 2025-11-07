@@ -1,12 +1,13 @@
 import { io, Socket } from "socket.io-client";
 import { defineStore } from "pinia";
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import type {
 	ClientToServerEvents,
 	ServerToClientEvents,
 	SocketAlter,
 	SocketData,
-	SocketValidUser
+	SocketValidUser,
+	SocketUnknownUser
 } from "@client/config/src/index";
 
 export const useSocketStore = defineStore("socketio", () => {
@@ -33,7 +34,7 @@ export const useSocketStore = defineStore("socketio", () => {
 		socket.emit("request_historical_bill_data", date)
 	}
 
-	function requestUser (user: string) {
+	function requestUser (user: SocketUnknownUser) {
 		socket.emit("request_user", user)
 	}
 
@@ -46,7 +47,6 @@ export const useSocketStore = defineStore("socketio", () => {
 		console.log("Received historical bill data from server");
 		historicalBillData.value = data;
 	})
-
 
 	socket.on("valid_user", (user: SocketValidUser) => {
 		console.log("Received valid user from server:", user);
@@ -63,5 +63,5 @@ export const useSocketStore = defineStore("socketio", () => {
 		console.log(err.message);
 	});
 
-	return { billData, alterMessage, isSocketActive, requestHistoricalBillData, requestUser };
+	return { billData, alterMessage, validUser, isSocketActive, requestHistoricalBillData, requestUser };
 });
