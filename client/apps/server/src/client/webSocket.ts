@@ -61,8 +61,10 @@ app.post("/bill_data", (req, res) => {
 	const data = APIBillData.safeParse(req.body);
 	if (!data.success)
 		return res.status(400).json({ error: "Invalid data format" });
+
 	console.log("Received bill data:", data.data);
 	sendDataToAllClients("bill_data", data.data );
+
 	res.status(200).json({ status: "Data sent to clients" });
 });
 
@@ -99,6 +101,7 @@ function sendDataToAllClients<
 >(
 	event: E,
 	data: Parameters<ServerToClientEvents[E]>[0]
+
 ) {
 	if (!io) {
 		console.error("Socket.io server is not initialized.");
