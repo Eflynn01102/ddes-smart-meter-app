@@ -7,17 +7,11 @@
   "private": true,
   "scripts": {
     "start": "bun run src/index.ts",
-    "dev": "bun run --watch src/index.ts",
-<<<<<<< HEAD
+    "dev": "bun run src/index.ts",
     "format:check": "pnpm biome format ./src",
     "format:fix": "pnpm biome format --write ./src",
     "lint:check": "pnpm biome lint ./src",
     "lint:fix": "pnpm biome lint --write ./src"
-=======
-    "biome:check": "biome check --write",
-    "format": "biome format",
-    "lint": "biome lint"
->>>>>>> 46fd292 (update)
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.6",

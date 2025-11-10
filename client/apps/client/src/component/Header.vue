@@ -43,7 +43,7 @@ watch(
 							},
 						},
 						{
-							label: "LogoutS",
+							label: "Logout",
 							icon: "pi pi-sign-out",
 							command: () => {
 								authStore.logoutHandler();
@@ -83,6 +83,7 @@ const time = ref(
 		second: "2-digit",
 	}),
 );
+
 setInterval(() => {
 	time.value = new Date().toLocaleString("en-GB", {
 		hour12: false,
