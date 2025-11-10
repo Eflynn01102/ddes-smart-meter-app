@@ -27,7 +27,7 @@ app.post("/bill_data", (req, res) => {
 	res.status(200).json({ status: "Data sent to clients" });
 });
 
-app.post("/alter", (req, res) => {
+app.post("/alert", (req, res) => {
 	const data = APIAlterType.safeParse(req.body);
 	if (!data.success)
 		return res.status(400).json({ error: "Invalid data format" });
