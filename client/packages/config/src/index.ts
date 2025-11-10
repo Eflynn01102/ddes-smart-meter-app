@@ -1,13 +1,18 @@
-import { BillData } from "./billData";
+import type { BillData } from "./billData";
+
 
 export interface ServerToClientEvents {
   // data: (data: SocketData) => void;
   alert: (message: SocketAlter) => void;
   bill_data: (data: SocketData) => void;
+  historical_bill_data: (data: SocketData) => void;
+  valid_user: (user: SocketValidUser) => void
 }
 
 export interface ClientToServerEvents {
   hello: () => void;
+  request_historical_bill_data: (date: string) => void;
+  request_user: (user: SocketUnknownUser) => void;
 }
 
 export interface InterServerEvents {
@@ -22,4 +27,16 @@ export interface SocketData {
 export interface SocketAlter {
   clientId: string;
   message: string;
+}
+
+export interface SocketValidUser {
+  userName: string;
+  roles: string;
+  clientId: string;
+  password: string;
+}
+
+export interface SocketUnknownUser {
+  userName: string;
+  password: string;
 }

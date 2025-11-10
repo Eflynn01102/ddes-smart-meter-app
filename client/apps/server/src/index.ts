@@ -1,14 +1,14 @@
 import type { rabbitMessage } from "@client/config/src/message";
 import type { Publisher } from "rabbitmq-stream-js-client";
-import { port, server } from "./client/webSocket";
-import { createHmacSignature } from "./components/hmac";
-import { RabbitMQClient } from "./components/rabbitClient";
-import { generateRandomNumber } from "./components/randomNumberGen";
+import { port, server } from "@/client/NetworkClient";
+import { createHmacSignature } from "@/utils/hmac";
+import { RabbitMQClient } from "@/utils/rabbitClient";
+import { generateRandomNumber } from "@/utils/randomNumberGen";
 
 const rabbitInstance = RabbitMQClient.Instance;
 const client = await rabbitInstance.connectionClient();
 
-const endPointTopic = "streamtest";
+const endPointTopic = "client";
 
 // create 12 streams
 for (let i = 0; i <= 11; i++) {
@@ -53,7 +53,6 @@ setInterval(async () => {
 	);
 	await rabbitInstance.messagehandler(currentPub, message);
 }, 5000);
-
 
 server.listen(port, () => {
 	console.log("Server is running on localhost:3000");

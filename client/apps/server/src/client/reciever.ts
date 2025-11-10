@@ -1,5 +1,5 @@
 import rabbit from "rabbitmq-stream-js-client";
-import { RabbitMQClient } from "../components/rabbitClient";
+import { RabbitMQClient } from "@/utils/rabbitClient";
 
 const rabbitInstance = RabbitMQClient.Instance;
 const client = await rabbitInstance.connectionClient();
