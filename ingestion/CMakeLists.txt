@@ -1,9 +1,24 @@
 cmake_minimum_required(VERSION 3.15)
 project(ingestion C)
 
+enable_testing()
+add_subdirectory(tests)
+
 # Add executable
 add_executable(ingestion
     src/ingestion.c
+    src/ingestion.h
+    src/types.h
+    src/read-config.c
+    src/hmac-verify.c
+    src/env-vars.c
+    src/json-obj-validation.c
+    src/rabbitmq-comms.c
+    src/logging.c
+    src/idempotency.c
+)
+
+add_library(ingestion_lib
     src/ingestion.h
     src/types.h
     src/read-config.c
