@@ -12,4 +12,9 @@ V tearDown(V) {
 V main(V) {
     UNITY_BEGIN();
     RUN_TEST(test_ReadEnvVars);
+    RUN_TEST(test_HmacVerifyNormal);
+    RUN_TEST(test_HmacVerifyErroneous);
+    RUN_TEST(test_CheckIdempotency);
+    RUN_TEST(test_ValidateJsonObj);
+    RUN_TEST(test_ReadRabbitConfig);
 }

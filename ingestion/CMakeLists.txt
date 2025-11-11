@@ -41,8 +41,13 @@ find_library(RABBITMQ_LIBRARY
 )
 
 target_include_directories(ingestion PRIVATE ${RABBITMQ_INCLUDE_DIR})
+target_include_directories(ingestion_lib PRIVATE ${RABBITMQ_INCLUDE_DIR})
 
 target_link_libraries(ingestion PRIVATE ${RABBITMQ_LIBRARY} OpenSSL::Crypto cjson)
+target_link_libraries(ingestion_lib PRIVATE ${RABBITMQ_LIBRARY} OpenSSL::Crypto cjson)
 
 file(COPY ${CMAKE_SOURCE_DIR}/src/ingestion.conf DESTINATION ${CMAKE_BINARY_DIR})
 file(COPY ${CMAKE_SOURCE_DIR}/src/ingestion.env DESTINATION ${CMAKE_BINARY_DIR})
+
+file(COPY ${CMAKE_SOURCE_DIR}/src/ingestion.conf DESTINATION ${CMAKE_BINARY_DIR}/tests)
+file(COPY ${CMAKE_SOURCE_DIR}/src/ingestion.env DESTINATION ${CMAKE_BINARY_DIR}/tests)

@@ -24,7 +24,7 @@ U8 ValidateJsonObj(cJSON* MsgJson, S8* ExpectedFwVersion) {
     //format checks
     //clientId
     if (strcmp(cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring, "") == OK) {
-        LogErr("JSON validation failed: message contains empty clientId");
+        LogErr("JSON validation failed: message contains empty clientId\n");
         return NOK;
     }
 
