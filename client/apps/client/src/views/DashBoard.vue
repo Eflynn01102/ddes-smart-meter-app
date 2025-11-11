@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import Knob from "primevue/knob";
+import BarChart from "@/component/charts/BarChart.vue";
 import { useSocketStore } from "@/stores/socketio";
 import { computed } from "vue";
 
