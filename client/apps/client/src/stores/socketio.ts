@@ -52,13 +52,12 @@ export const useSocketStore = defineStore("socketio", () => {
 
 	socket.on("bill_data", (data: SocketData) => {
 		console.log("Received bill data from server:", data);
-		if (data.clientId === authStore.knownClientId )
-		billData.value = data;
+		if (data.clientId === authStore.knownClientId ) billData.value = data;
 	});
 
 	socket.on("historical_bill_data", (data: SocketData) => {
 		console.log("Received historical bill data from server");
-		historicalBillData.value = data;
+		if (data.clientId === authStore.knownClientId ) historicalBillData.value = data;
 	});
 
 	socket.on("valid_user", (user: SocketValidUser) => {
