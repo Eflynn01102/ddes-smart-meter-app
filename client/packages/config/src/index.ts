@@ -7,6 +7,7 @@ export interface ServerToClientEvents {
   bill_data: (data: SocketData) => void;
   historical_bill_data: (data: SocketData) => void;
   valid_user: (user: SocketValidUser) => void
+  current_usage: (usage: SocketMeter) => void;
 }
 
 export interface ClientToServerEvents {
@@ -39,4 +40,9 @@ export interface SocketValidUser {
 export interface SocketUnknownUser {
   userName: string;
   password: string;
+}
+
+export interface SocketMeter {
+  clientId: string;
+  currentUsage: number;
 }

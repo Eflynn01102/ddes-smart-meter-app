@@ -12,6 +12,14 @@ body,
 	color: white;
 }
 
+h1 {
+	font: 40px Arial, sans-serif;
+}
+
+span {
+	font: 17px Arial, sans-serif;
+}
+
 :root {
 	--color-octo-pink: #f050f8;
 	--color-octo-purple: #100030;

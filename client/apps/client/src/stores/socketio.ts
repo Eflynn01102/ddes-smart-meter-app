@@ -8,6 +8,7 @@ import type {
 	SocketData,
 	SocketValidUser,
 	SocketUnknownUser,
+	SocketMeter
 } from "@client/config/src/index";
 import { useToast } from "primevue/usetoast";
 
@@ -15,6 +16,8 @@ export const useSocketStore = defineStore("socketio", () => {
 	const toast = useToast();
 
 	const billData = ref<SocketData>();
+
+	const currentUsage = ref<SocketMeter>();
 
 	const historicalBillData = ref<SocketData>();
 
@@ -43,6 +46,11 @@ export const useSocketStore = defineStore("socketio", () => {
 	function requestUser(user: SocketUnknownUser) {
 		socket.emit("request_user", user);
 	}
+
+	socket.on("current_usage", (usage: SocketMeter) => {
+		console.log("Received current usage from server:", usage);
+		currentUsage.value = usage;
+	})
 
 	socket.on("bill_data", (data: SocketData) => {
 		console.log("Received bill data from server:", data);
@@ -77,6 +85,8 @@ export const useSocketStore = defineStore("socketio", () => {
 
 	return {
 		billData,
+		currentUsage,
+		historicalBillData,
 		alterMessage,
 		validUser,
 		isSocketActive,
