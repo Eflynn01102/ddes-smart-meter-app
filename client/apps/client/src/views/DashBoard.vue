@@ -11,7 +11,20 @@ const socketData = computed(() => socketStore.billData);
 
 <template>
   <div class="dashboard">
-    <span>Bill Data from Socket.IO: {{ socketData }}</span>
+    <!-- Graphs -->
+    <div class="graph" >
+
+    </div>
+
+    <!-- Bill -->
+    <div class="bill">
+
+    </div>
+
+    <!-- Graphs -->
+    <div class="graphs">
+
+    </div>
   </div>
 </template>
 
@@ -20,9 +33,21 @@ const socketData = computed(() => socketStore.billData);
   width: 100%;
   height: 100%;
   display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.bill {
+  width: 50%;
+  display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1rem;
+  gap: 1rem;
+  box-shadow: 0 2px 4px var(--color-octo-blue);
+  padding: 1rem;
+}
+
+.graphs {
+  width: 25%;
 }
 </style>
