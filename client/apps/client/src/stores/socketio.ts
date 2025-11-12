@@ -1,6 +1,7 @@
 import { io, type Socket } from "socket.io-client";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
+import { useAuthStore } from "@/stores/auth";
 import type {
 	ClientToServerEvents,
 	ServerToClientEvents,
@@ -14,19 +15,16 @@ import { useToast } from "primevue/usetoast";
 
 export const useSocketStore = defineStore("socketio", () => {
 	const toast = useToast();
+	const authStore = useAuthStore();
 
 	const billData = ref<SocketData>();
-
 	const currentUsage = ref<SocketMeter>();
-
 	const historicalBillData = ref<SocketData>();
 
 	const alterMessage = ref<SocketAlter>();
-
 	const validUser = ref<SocketValidUser>();
 
 	const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("/");
-
 	const isSocketActive = computed(() => socket.active)
 
 	socket.on("connect", () => {
@@ -54,6 +52,7 @@ export const useSocketStore = defineStore("socketio", () => {
 
 	socket.on("bill_data", (data: SocketData) => {
 		console.log("Received bill data from server:", data);
+		if (data.clientId === authStore.knownClientId )
 		billData.value = data;
 	});
 

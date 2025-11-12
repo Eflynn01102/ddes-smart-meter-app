@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Knob from "primevue/knob";
-import { computed, ref } from "vue";
+import Skeleton from "primevue/skeleton";
+import { computed, ref, watch } from "vue";
 import { version } from "../../package.json";
 import { useAuthStore } from "@/stores/auth";
 import { useSocketStore } from "@/stores/socketio";
@@ -11,6 +12,10 @@ const authStore = useAuthStore();
 const socketData = computed(() => socketStore.billData);
 
 const energyCost = computed(() => socketData.value?.data.amountDue || 0)
+const tax = computed(() => {
+  if(!socketData.value?.data.tax) return 0;
+  return parseInt(socketData.value?.data.tax)
+})
 
 const currentUsage = computed(() => socketStore.currentUsage?.currentUsage || 0 )
 const perviousUsage = ref(0);
@@ -23,8 +28,6 @@ const clientUsage = computed(() => {
   }
 })
 
-const client = computed(() => socketStore.currentUsage?.clientId || "")
-
 const date = ref(new Date().toLocaleDateString("en-GB", {
   day: "2-digit",
   month: "2-digit",
@@ -34,62 +37,104 @@ const date = ref(new Date().toLocaleDateString("en-GB", {
 </script>
 
 <template>
-  <div class="dashboard">
-    <!-- Graphs -->
-    <div class="sidebar" >
-      <div class="graph-card">
-        <span>Energy Cost:</span>
-        <Knob v-model="energyCost" valueTemplate="£{value}" readonly/>
-      </div>
 
-      <div class="graph-card">
-        <span>Tax:</span>
-        <Knob v-model="energyCost" valueTemplate="£{value}" readonly/>
-      </div>
-    </div>
+  <template v-if="!socketData">
+    <div class="dashboard">
+      <div class="sidebar">
 
-    <!-- Bill -->
-    <div class="bill-card">
-      <h2>Your Bill - {{ date }}</h2>
-      <div class="bill">
-        <ul>
-          <li>Amount Due - £{{ socketData?.data.amountDue }}</li>
-          <li>Energy Cost - £{{ socketData?.data.energyCost }}</li>
-          <li>Currency - {{ socketData?.data.currency }}</li>
-          <li>Standing Charge - {{ socketData?.data.standingCharge }}</li>
-          <li>Start Period - {{ socketData?.data.periodStart }}</li>
-          <li>Tax - {{ socketData?.data.tax }}</li>
-        </ul>
-      </div>
-      {{ authStore.knownClientId }}
-      {{ client }}
-      <span>Software Version: {{ version }}</span>
-    </div>
-
-    <!-- Graphs -->
-    <div class="sidebar">
-
-      <template v-if="authStore.knownClientId === 'client-131'">
-        <div class="graph-card">
-          <span style="font">Current Usage:</span>
-          <Knob v-model="currentUsage" valueTemplate="{value} kwh" readonly />
+        <div class="graph-card" style="padding: 1rem;">
+          <Skeleton width="10rem" class="mb-2"/>
+          <Skeleton width="100px" height="100px" shape="circle" />
         </div>
-      </template>
 
-      <template v-else>
-        <div class="graph-card">
-          <span style="font">Current Usage:</span>
-          <Knob v-model="clientUsage" readonly />
+        <div class="graph-card" style="padding: 1rem;">
+          <Skeleton width="10rem" class="mb-2"/>
+          <Skeleton width="100px" height="100px" shape="circle" />
         </div>
-      </template>
 
-      <div class="graph-card">
-        <span style="font">Amount Due:</span>
-        <Knob v-model="currentUsage" valueTemplate="{value} kwh" readonly /> 
       </div>
-      
+
+      <div class="bill-card">
+        <Skeleton width="20rem" class="mb-2" borderRadius="16px"/>
+        <div class="bill" style="align-items: center; justify-content: center;">
+          <ul>
+            <li><Skeleton width="15rem" height="1.5rem" class="mb-2" borderRadius="8px"/></li>
+            <li><Skeleton width="15rem" height="1.5rem" class="mb-2" borderRadius="8px"/></li>
+            <li><Skeleton width="15rem" height="1.5rem" class="mb-2" borderRadius="8px"/></li>
+            <li><Skeleton width="15rem" height="1.5rem" class="mb-2" borderRadius="8px"/></li>
+            <li><Skeleton width="15rem" height="1.5rem" class="mb-2" borderRadius="8px"/></li>
+            <li><Skeleton width="15rem" height="1.5rem" class="mb-2" borderRadius="8px"/></li>
+          </ul>
+        </div>
+        <Skeleton width="10rem" height="1.5rem" class="mb-2" borderRadius="8px"/>
+      </div>
+
+
+      <div class="sidebar">
+        <div class="graph-card" style="padding: 1rem;">
+          <Skeleton width="10rem" class="mb-2"/>
+          <Skeleton width="100px" height="100px" shape="circle" />
+        </div>
+
+        <div class="graph-card" style="padding: 1rem;">
+          <Skeleton width="10rem" class="mb-2"/>
+          <Skeleton width="100px" height="100px" shape="circle" />
+        </div>
+      </div>
+
     </div>
-  </div>
+  </template>
+
+  <template v-else>
+    <div class="dashboard">
+      <!-- Graphs -->
+      <div class="sidebar" >
+        <div class="graph-card">
+          <span>Energy Cost:</span>
+          <Knob v-model="energyCost" valueTemplate="£{value}" readonly/>
+        </div>
+        <div class="graph-card">
+          <span>Tax:</span>
+          <Knob v-model="tax" valueTemplate="£{value}" readonly/>
+        </div>
+      </div>
+      <!-- Bill -->
+      <div class="bill-card">
+        <h2>Your Bill - {{ date }}</h2>
+        <div class="bill">
+          <ul>
+            <li>Amount Due - £{{ socketData.data.amountDue }}</li>
+            <li>Energy Cost - £{{ socketData.data.energyCost }}</li>
+            <li>Currency - {{ socketData.data.currency }}</li>
+            <li>Standing Charge - {{ socketData.data.standingCharge }}</li>
+            <li>Start Period - {{ socketData.data.periodStart }}</li>
+            <li>Tax - {{ socketData.data.tax }}</li>
+          </ul>
+        </div>
+        <span>Software Version: {{ version }}</span>
+      </div>
+      <!-- Graphs -->
+      <div class="sidebar">
+        <template v-if="authStore.knownClientId === 'client-131'">
+          <div class="graph-card">
+            <span style="font">Current Usage:</span>
+            <Knob v-model="currentUsage" valueTemplate="{value} kwh" readonly />
+          </div>
+        </template>
+        <template v-else>
+          <div class="graph-card">
+            <span style="font">Current Usage:</span>
+            <Knob v-model="clientUsage" readonly />
+          </div>
+        </template>
+        <div class="graph-card">
+          <span style="font">Amount Due:</span>
+          <Knob v-model="socketData.data.amountDue" valueTemplate="£{value}" readonly />
+        </div>
+    
+      </div>
+    </div>
+  </template>
 </template>
 
 <style scoped>
