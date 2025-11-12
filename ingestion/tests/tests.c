@@ -17,4 +17,5 @@ V main(V) {
     RUN_TEST(test_CheckIdempotency);
     RUN_TEST(test_ValidateJsonObj);
     RUN_TEST(test_ReadRabbitConfig);
+    RUN_TEST(test_RabbitMQComms);
 }

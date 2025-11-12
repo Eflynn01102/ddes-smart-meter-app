@@ -11,20 +11,24 @@ U8 CheckRpcReply(AMQP_CONN_T Connection) {
 
 U8 InitiateConnection(AMQP_CONN_T* Connection, U8* IP, S32 Port, U8* Username, U8* Password) {
     AMQP_SOCK_T* Socket;
+    struct timeval Timeout = {0};
+
+    Timeout.tv_sec = 5;
+    Timeout.tv_usec = 0;
 
     *Connection = amqp_new_connection();
     
     Socket = NULL;
     Socket = amqp_tcp_socket_new(*Connection);
 
-    if (Socket == FALSE) {
+    if (Socket == NULL) {
         LogErr("Could not create socket\n");
         return NOK;
     }
 
     {
         S32 Ret;
-        Ret = amqp_socket_open(Socket, IP, Port);
+        Ret = amqp_socket_open_noblock(Socket, IP, Port, &Timeout);
         if (Ret != OK) {
             *Connection = NULL;
             LogErr("Could not open tcp socket at %s:%d, %s\n", IP, Port, amqp_error_string2(Ret));
@@ -79,7 +83,9 @@ V PublishMessageToEventsTopic(AMQP_CONN_T* Connection, AMQP_ENVEL_T Envelope) {
 }
 
 V CloseConnection(AMQP_CONN_T* Connection) {
-    amqp_channel_close(*Connection, 1, AMQP_REPLY_SUCCESS);
-    amqp_connection_close(*Connection, AMQP_REPLY_SUCCESS);
-    amqp_destroy_connection(*Connection);
+    if (Connection != NULL && *Connection != NULL) {
+        amqp_channel_close(*Connection, 1, AMQP_REPLY_SUCCESS);
+        amqp_connection_close(*Connection, AMQP_REPLY_SUCCESS);
+        amqp_destroy_connection(*Connection);
+    }
 }

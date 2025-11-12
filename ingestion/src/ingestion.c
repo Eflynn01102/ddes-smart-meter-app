@@ -3,6 +3,7 @@
 volatile sig_atomic_t SigIntReceived;
 
 V SigIntHandler(S32 SigVal) {
+    LogInfo("sigint\n");
     SigIntReceived = TRUE;
 }
 
@@ -86,7 +87,9 @@ U8 main(U8 argc, U8* argv[]) {
         sleep(5);
     } while (SigIntReceived == FALSE && Conn == NULL);
     
-    LogInfo("connected to rabbitmq\n");
+    if (Conn != NULL) {
+        LogInfo("connected to rabbitmq\n");
+    }
 
     if (IngestionMainloop(&Conn) != OK) {
         exit(NOK);

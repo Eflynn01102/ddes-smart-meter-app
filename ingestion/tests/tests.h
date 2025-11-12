@@ -9,4 +9,5 @@ V test_HmacVerifyErroneous(V);
 V test_CheckIdempotency(V);
 V test_ValidateJsonObj(V);
 V test_ReadRabbitConfig(V);
+V test_RabbitMQComms(V);
 #endif
