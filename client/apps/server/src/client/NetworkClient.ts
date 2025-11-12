@@ -3,6 +3,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import { APIAlterType, APIBillData } from "@/types";
 import { WebSocket } from "@/client/webSocketClass";
+import type { SocketMeter } from "@client/config/src";
 
 const app = express();
 export const server = createServer(app);
@@ -35,3 +36,7 @@ app.post("/alert", (req, res) => {
 	webSocketInstance.sendDataToClient("alert", data.data);
 	res.status(200).json({ status: "Alert sent to clients" });
 });
+
+export function sendCurrentUsageToClients(usage: SocketMeter) {
+	webSocketInstance.sendDataToClient("current_usage", usage)
+}

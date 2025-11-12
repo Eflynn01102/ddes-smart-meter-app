@@ -1,6 +1,6 @@
 import type { rabbitMessage } from "@client/config/src/message";
 import type { Publisher } from "rabbitmq-stream-js-client";
-import { port, server } from "@/client/NetworkClient";
+import { port, server, sendCurrentUsageToClients } from "@/client/NetworkClient";
 import { createHmacSignature } from "@/utils/hmac";
 import { RabbitMQClient } from "@/utils/rabbitClient";
 import { generateRandomNumber } from "@/utils/randomNumberGen";
@@ -52,6 +52,10 @@ setInterval(async () => {
 		message.unix.toString(),
 	);
 	await rabbitInstance.messagehandler(currentPub, message);
+	sendCurrentUsageToClients({
+		clientId: message.clientID,
+		currentUsage: message.currentReading,
+	})
 }, 5000);
 
 server.listen(port, () => {
