@@ -15,10 +15,12 @@ export const useAuthStore = defineStore("auth", () => {
 	const knownUsername = computed(() => socketStore.validUser?.userName || "");
 	const knownRole = computed(() => socketStore.validUser?.roles || "");
 	const knownPassword = computed(() => socketStore.validUser?.password || "");
+	const knownClientId = computed(() => socketStore.validUser?.clientId || "");
 
 	const validUsername = ref("");
 	const validRole = ref("");
 	const validPassword = ref("");
+	const validClientId = ref("");
 
 	function loginHandler(userName: string, password: string) {
 		if (userName === "" || password === "") {
@@ -42,6 +44,7 @@ export const useAuthStore = defineStore("auth", () => {
 				validUsername.value = knownUsername.value;
 				validRole.value = knownRole.value;
 				validPassword.value = knownPassword.value;
+				validClientId.value = knownClientId.value;
 				isLoggedIn.value = true;
 				router.push({ name: "bill" });
 				toast.add({
@@ -76,5 +79,5 @@ export const useAuthStore = defineStore("auth", () => {
 		});
 	}
 
-	return { isLoggedIn, loginHandler, logoutHandler };
+	return { isLoggedIn, knownRole, knownClientId, loginHandler, logoutHandler };
 });

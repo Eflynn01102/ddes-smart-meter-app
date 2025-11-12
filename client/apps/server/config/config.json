@@ -3,79 +3,79 @@
     {
       "userName": "admin",
       "roles": "admin",
-      "clientId": "client131",
+      "clientId": "client-131",
       "password": "password123"
     },
     {
       "userName": "user1",
       "roles": "user",
-      "clientId": "client1",
+      "clientId": "client-1",
       "password": "userpass"
     },
     {
       "userName": "user2",
       "roles": "user",
-      "clientId": "client2",
+      "clientId": "client-2",
       "password": "userpass"
     },
     {
       "userName": "user3",
       "roles": "user",
-      "clientId": "client3",
+      "clientId": "client-3",
       "password": "userpass"
     },
     {
       "userName": "user4",
       "roles": "user4",
-      "clientId": "client",
+      "clientId": "client-4",
       "password": "userpass"
     },
     {
       "userName": "user5",
       "roles": "user5",
-      "clientId": "client",
+      "clientId": "client-5",
       "password": "userpass"
     },
     {
       "userName": "user6",
       "roles": "user6",
-      "clientId": "client",
+      "clientId": "client-6",
       "password": "userpass"
     },
     {
       "userName": "user7",
       "roles": "user7",
-      "clientId": "client",
+      "clientId": "client-7",
       "password": "userpass"
     },
     {
       "userName": "user8",
       "roles": "user8",
-      "clientId": "client",
+      "clientId": "client-8",
       "password": "userpass"
     },
     {
       "userName": "user9",
       "roles": "user9",
-      "clientId": "client",
+      "clientId": "client-9",
       "password": "userpass"
     },
     {
       "userName": "user10",
       "roles": "user10",
-      "clientId": "client",
+      "clientId": "client-10",
       "password": "userpass"
     },
     {
       "userName": "user11",
       "roles": "user11",
-      "clientId": "client",
+      "clientId": "client-11",
       "password": "userpass"
     },
     {
       "userName": "user12",
       "roles": "user12",
-      "clientId": "client",
+      "clientId": "client-12",
       "password": "userpass"
     }
   ]

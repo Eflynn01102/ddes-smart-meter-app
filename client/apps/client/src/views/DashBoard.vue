@@ -1,22 +1,29 @@
 <script setup lang="ts">
 import Knob from "primevue/knob";
-import BarChart from "@/component/charts/BarChart.vue";
-import { useSocketStore } from "@/stores/socketio";
 import { computed, ref } from "vue";
 import { version } from "../../package.json";
+import { useAuthStore } from "@/stores/auth";
+import { useSocketStore } from "@/stores/socketio";
 
 const socketStore = useSocketStore();
+const authStore = useAuthStore();
 
 const socketData = computed(() => socketStore.billData);
 
+const energyCost = computed(() => socketData.value?.data.amountDue || 0)
 
-const energyCost = computed(() => {
-  return socketData.value?.data.amountDue || 0;
+const currentUsage = computed(() => socketStore.currentUsage?.currentUsage || 0 )
+const perviousUsage = ref(0);
+const clientUsage = computed(() => {
+  if(socketStore.currentUsage?.clientId === authStore.knownClientId){
+    perviousUsage.value = socketStore.currentUsage?.currentUsage
+    return socketStore.currentUsage?.currentUsage
+  } else {
+    return perviousUsage.value
+  }
 })
 
-const currentUsage = computed(() => {
-  return socketStore.currentUsage?.currentUsage || 0;
-})
+const client = computed(() => socketStore.currentUsage?.clientId || "")
 
 const date = ref(new Date().toLocaleDateString("en-GB", {
   day: "2-digit",
@@ -54,20 +61,33 @@ const date = ref(new Date().toLocaleDateString("en-GB", {
           <li>Tax - {{ socketData?.data.tax }}</li>
         </ul>
       </div>
+      {{ authStore.knownClientId }}
+      {{ client }}
       <span>Software Version: {{ version }}</span>
     </div>
 
     <!-- Graphs -->
     <div class="sidebar">
-      <div class="graph-card">
-        <span style="font">Current Usage:</span>
-        <Knob v-model="currentUsage" valueTemplate="{value} kwh" readonly />
-      </div>
+
+      <template v-if="authStore.knownClientId === 'client-131'">
+        <div class="graph-card">
+          <span style="font">Current Usage:</span>
+          <Knob v-model="currentUsage" valueTemplate="{value} kwh" readonly />
+        </div>
+      </template>
+
+      <template v-else>
+        <div class="graph-card">
+          <span style="font">Current Usage:</span>
+          <Knob v-model="clientUsage" readonly />
+        </div>
+      </template>
 
       <div class="graph-card">
         <span style="font">Amount Due:</span>
-        <Knob v-model="currentUsage" valueTemplate="{value} kwh" readonly />
+        <Knob v-model="currentUsage" valueTemplate="{value} kwh" readonly /> 
       </div>
+      
     </div>
   </div>
 </template>
