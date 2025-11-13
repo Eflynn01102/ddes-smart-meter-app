@@ -5,11 +5,19 @@ import { computed, ref } from "vue";
 import { version } from "../../package.json";
 import { useAuthStore } from "@/stores/auth";
 import { useSocketStore } from "@/stores/socketio";
+import { useRoute } from "vue-router";
 
+const route = useRoute();
 const socketStore = useSocketStore();
 const authStore = useAuthStore();
 
-const socketData = computed(() => socketStore.billData);
+const date = computed(() => route.params.date ? new Date(route.params.date as string).toLocaleDateString("en-GB", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "2-digit",
+}) : "");
+
+const socketData = computed(() => socketStore.historicalBillData);
 
 const energyCost = computed(() => socketData.value?.data.amountDue || 0)
 const tax = computed(() => {
@@ -27,12 +35,6 @@ const clientUsage = computed(() => {
     return perviousUsage.value
   }
 })
-
-const date = ref(new Date().toLocaleDateString("en-GB", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "2-digit",
-}));
 
 </script>
 
@@ -124,13 +126,14 @@ const date = ref(new Date().toLocaleDateString("en-GB", {
         <template v-else>
           <div class="graph-card">
             <span style="font">Current Usage:</span>
-            <Knob v-model="clientUsage" valueTemplate="{value} kwh" readonly />
+            <Knob v-model="clientUsage" readonly />
           </div>
         </template>
         <div class="graph-card">
           <span style="font">Amount Due:</span>
           <Knob v-model="socketData.data.amountDue" valueTemplate="£{value}" readonly />
         </div>
+
       </div>
     </div>
   </template>
