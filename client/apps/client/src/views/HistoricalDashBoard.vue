@@ -23,10 +23,10 @@ const date = computed(() =>
 
 const socketData = computed(() => socketStore.historicalBillData);
 
-const energyCost = computed(() => socketData.value?.data.amountDue || 0);
+const energyCost = computed(() => socketData.value?.amountDue || 0);
 const tax = computed(() => {
-	if (!socketData.value?.data.tax) return 0;
-	return parseInt(socketData.value?.data.tax);
+	if (!socketData.value?.tax) return 0;
+	return parseInt(socketData.value?.tax);
 });
 
 const currentUsage = computed(
@@ -110,12 +110,12 @@ const clientUsage = computed(() => {
         <h2>Your Bill - {{ date }}</h2>
         <div class="bill">
           <ul>
-            <li>Amount Due - £{{ socketData.data.amountDue }}</li>
-            <li>Energy Cost - £{{ socketData.data.energyCost }}</li>
-            <li>Standing Charge - £{{ socketData.data.standingCharge }}</li>
-            <li>Tax - £{{ socketData.data.tax }}</li>
-            <li>Currency - {{ socketData.data.currency }}</li>
-            <li>Start Period - {{ socketData.data.periodStart }}</li>
+            <li>Amount Due - £{{ socketData.amountDue }}</li>
+            <li>Energy Cost - £{{ socketData.energyCost }}</li>
+            <li>Standing Charge - £{{ socketData.standingCharge }}</li>
+            <li>Tax - £{{ socketData.tax }}</li>
+            <li>Currency - {{ socketData.currency }}</li>
+            <li>Start Period - {{ socketData.periodStart }}</li>
           </ul>
         </div>
         <span>Software Version: {{ version }}</span>
@@ -136,7 +136,7 @@ const clientUsage = computed(() => {
         </template>
         <div class="graph-card">
           <span style="font">Amount Due:</span>
-          <Knob v-model="socketData.data.amountDue" valueTemplate="£{value}" readonly />
+          <Knob v-model="socketData.amountDue" valueTemplate="£{value}" readonly />
         </div>
 
       </div>
