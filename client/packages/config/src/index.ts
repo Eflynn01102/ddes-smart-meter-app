@@ -30,6 +30,8 @@ export interface SocketData {
 
 export interface SocketAlter {
   clientId: string;
+  title: string;
+  severity: string;
   message: string;
 }
 

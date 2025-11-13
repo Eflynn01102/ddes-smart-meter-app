@@ -47,19 +47,23 @@ export const useSocketStore = defineStore("socketio", () => {
 
 	socket.on("current_usage", (usage: SocketMeter) => {
 		console.log("Received current usage from server:", usage);
-		currentUsage.value = usage;
+		if (usage.clientId === authStore.knownClientId) return currentUsage.value = usage;
+		if (authStore.knownClientId === "client-131") return currentUsage.value = usage;
+		console.log("Current usage for another client received, ignoring");
 	});
 
 	socket.on("bill_data", (data: SocketData) => {
 		console.log("Received bill data from server:", data);
-		if (data.accountId === authStore.knownClientId) billData.value = data;
-		if (data.accountId === "client-131") billData.value = data;
+		if (data.accountId === authStore.knownClientId) return billData.value = data;
+		if (authStore.knownClientId === "client-131") return billData.value = data;
+		console.log("Bill data for another client received, ignoring");
 	});
 
 	socket.on("historical_bill_data", (data: SocketData) => {
 		console.log("Received historical bill data from server");
-		if (data.accountId === authStore.knownClientId) historicalBillData.value = data;
-		if (data.accountId === "client-131") historicalBillData.value = data;
+		if (data.accountId === authStore.knownClientId) return historicalBillData.value = data;
+		if (data.accountId === "client-131") return historicalBillData.value = data;
+		console.log("Historical bill data for another client received, ignoring");
 	});
 
 	socket.on("valid_user", (user: SocketValidUser) => {
@@ -72,20 +76,21 @@ export const useSocketStore = defineStore("socketio", () => {
 		if (message.clientId === authStore.knownClientId) {
 			alterMessage.value = message;
 			toast.add({
-				severity: "info",
-				summary: "Alert",
+				severity: message.severity,
+				summary: message.title,
 				detail: message.message,
 				life: 3000,
 			});
-		}
-		if (message.clientId === "client-131") {
+		} else if (authStore.knownClientId === "client-131") {
 			alterMessage.value = message;
 			toast.add({
-				severity: "info",
+				severity: message.severity,
 				summary: "Alert",
 				detail: `${message.clientId} - ${message.message}`,
 				life: 3000,
 			});
+		} else {
+			console.log("Alert for another client received, ignoring");
 		}
 	});
 
