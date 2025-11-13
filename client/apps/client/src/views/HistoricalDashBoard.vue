@@ -44,7 +44,6 @@ const clientUsage = computed(() => {
 </script>
 
 <template>
-
   <template v-if="!socketData">
     <div class="dashboard">
       <div class="sidebar">
