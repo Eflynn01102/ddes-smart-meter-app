@@ -2,7 +2,6 @@
 import Toast from "primevue/toast";
 import Header from "@/component/Header.vue";
 import Modals from "@/component/modals/Modals.vue";
-
 </script>
 
 <template>

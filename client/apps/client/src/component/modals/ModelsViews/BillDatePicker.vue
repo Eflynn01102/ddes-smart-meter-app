@@ -13,27 +13,46 @@ const socketStore = useSocketStore();
 
 const date = ref<Date>();
 
-function confirm () {
-  if (date.value){
-    socketStore.requestHistoricalBillData(date.value.toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "2-digit",
-    }));
-    modalsStore.datePickerVisible = false;
-    toast.add({ severity: "success", summary: "Success", detail: "Date selected", life: 3000 });
-    router.push({ name: "history", params: { date: date.value.toISOString() } });
-  } else {
-    toast.add({ severity: "error", summary: "Error", detail: "Please select a date", life: 3000 });
-  }
+function confirm() {
+	if (date.value) {
+		socketStore.requestHistoricalBillData(
+			date.value.toLocaleDateString("en-GB", {
+				day: "2-digit",
+				month: "2-digit",
+				year: "2-digit",
+			}),
+		);
+		modalsStore.datePickerVisible = false;
+		toast.add({
+			severity: "success",
+			summary: "Success",
+			detail: "Date selected",
+			life: 3000,
+		});
+		router.push({
+			name: "history",
+			params: { date: date.value.toISOString() },
+		});
+	} else {
+		toast.add({
+			severity: "error",
+			summary: "Error",
+			detail: "Please select a date",
+			life: 3000,
+		});
+	}
 }
 
-function reset () {
-  modalsStore.datePickerVisible = false;
-  toast.add({ severity: "success", summary: "Success", detail: "Bill Date reset to present", life: 3000 });
-  router.push({ name: "bill" });
+function reset() {
+	modalsStore.datePickerVisible = false;
+	toast.add({
+		severity: "success",
+		summary: "Success",
+		detail: "Bill Date reset to present",
+		life: 3000,
+	});
+	router.push({ name: "bill" });
 }
-
 </script>
 
 <template>

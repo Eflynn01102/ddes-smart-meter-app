@@ -21,7 +21,7 @@ const router = createRouter({
 			path: "/history/:date",
 			name: "history",
 			component: HistoricalDashBoard,
-		}
+		},
 	],
 });
 

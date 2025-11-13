@@ -13,16 +13,20 @@ body,
 }
 
 h1 {
-	font: 40px Arial, sans-serif;
+	font:
+		40px Arial,
+		sans-serif;
 }
 
 span {
-	font: 17px Arial, sans-serif;
+	font:
+		17px Arial,
+		sans-serif;
 }
 
 :root {
 	--color-octo-pink: #f050f8;
 	--color-octo-purple: #100030;
-	--color-octo-white: #FFFFFF;
+	--color-octo-white: #ffffff;
 	--color-octo-blue: #60f0f8;
 }

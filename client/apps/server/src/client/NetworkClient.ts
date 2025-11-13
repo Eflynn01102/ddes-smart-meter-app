@@ -38,5 +38,5 @@ app.post("/alert", (req, res) => {
 });
 
 export function sendCurrentUsageToClients(usage: SocketMeter) {
-	webSocketInstance.sendDataToClient("current_usage", usage)
+	webSocketInstance.sendDataToClient("current_usage", usage);
 }

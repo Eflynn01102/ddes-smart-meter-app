@@ -11,31 +11,36 @@ const route = useRoute();
 const socketStore = useSocketStore();
 const authStore = useAuthStore();
 
-const date = computed(() => route.params.date ? new Date(route.params.date as string).toLocaleDateString("en-GB", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "2-digit",
-}) : "");
+const date = computed(() =>
+	route.params.date
+		? new Date(route.params.date as string).toLocaleDateString("en-GB", {
+				day: "2-digit",
+				month: "2-digit",
+				year: "2-digit",
+			})
+		: "",
+);
 
 const socketData = computed(() => socketStore.historicalBillData);
 
-const energyCost = computed(() => socketData.value?.data.amountDue || 0)
+const energyCost = computed(() => socketData.value?.data.amountDue || 0);
 const tax = computed(() => {
-  if(!socketData.value?.data.tax) return 0;
-  return parseInt(socketData.value?.data.tax)
-})
+	if (!socketData.value?.data.tax) return 0;
+	return parseInt(socketData.value?.data.tax);
+});
 
-const currentUsage = computed(() => socketStore.currentUsage?.currentUsage || 0 )
+const currentUsage = computed(
+	() => socketStore.currentUsage?.currentUsage || 0,
+);
 const perviousUsage = ref(0);
 const clientUsage = computed(() => {
-  if(socketStore.currentUsage?.clientId === authStore.knownClientId){
-    perviousUsage.value = socketStore.currentUsage?.currentUsage
-    return socketStore.currentUsage?.currentUsage
-  } else {
-    return perviousUsage.value
-  }
-})
-
+	if (socketStore.currentUsage?.clientId === authStore.knownClientId) {
+		perviousUsage.value = socketStore.currentUsage?.currentUsage;
+		return socketStore.currentUsage?.currentUsage;
+	} else {
+		return perviousUsage.value;
+	}
+});
 </script>
 
 <template>

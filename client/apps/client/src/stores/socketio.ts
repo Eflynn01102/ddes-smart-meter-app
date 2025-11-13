@@ -9,7 +9,7 @@ import type {
 	SocketData,
 	SocketValidUser,
 	SocketUnknownUser,
-	SocketMeter
+	SocketMeter,
 } from "@client/config/src/index";
 import { useToast } from "primevue/usetoast";
 
@@ -25,7 +25,7 @@ export const useSocketStore = defineStore("socketio", () => {
 	const validUser = ref<SocketValidUser>();
 
 	const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("/");
-	const isSocketActive = computed(() => socket.active)
+	const isSocketActive = computed(() => socket.active);
 
 	socket.on("connect", () => {
 		console.log(
@@ -48,18 +48,19 @@ export const useSocketStore = defineStore("socketio", () => {
 	socket.on("current_usage", (usage: SocketMeter) => {
 		console.log("Received current usage from server:", usage);
 		currentUsage.value = usage;
-	})
+	});
 
 	socket.on("bill_data", (data: SocketData) => {
 		console.log("Received bill data from server:", data);
-		if (data.clientId === authStore.knownClientId ) billData.value = data;
+		if (data.clientId === authStore.knownClientId) billData.value = data;
 		if (data.clientId === "client-131") billData.value = data;
 	});
 
 	socket.on("historical_bill_data", (data: SocketData) => {
 		console.log("Received historical bill data from server");
-		if (data.clientId === authStore.knownClientId ) historicalBillData.value = data;
-				if (data.clientId === "client-131") historicalBillData.value = data;
+		if (data.clientId === authStore.knownClientId)
+			historicalBillData.value = data;
+		if (data.clientId === "client-131") historicalBillData.value = data;
 	});
 
 	socket.on("valid_user", (user: SocketValidUser) => {
