@@ -8,7 +8,4 @@ export const APIAlterType = z.object({
 });
 
 export type APIBillData = z.infer<typeof APIBillData>;
-export const APIBillData = z.object({
-	clientId: z.string(),
-	data: BillData,
-});
+export const APIBillData = BillData
