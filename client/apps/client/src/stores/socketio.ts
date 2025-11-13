@@ -58,8 +58,7 @@ export const useSocketStore = defineStore("socketio", () => {
 
 	socket.on("historical_bill_data", (data: SocketData) => {
 		console.log("Received historical bill data from server");
-		if (data.accountId === authStore.knownClientId)
-			historicalBillData.value = data;
+		if (data.accountId === authStore.knownClientId) historicalBillData.value = data;
 		if (data.accountId === "client-131") historicalBillData.value = data;
 	});
 
@@ -70,13 +69,24 @@ export const useSocketStore = defineStore("socketio", () => {
 
 	socket.on("alert", (message: SocketAlter) => {
 		console.log("Server alter message:", message);
-		alterMessage.value = message;
-		toast.add({
-			severity: "info",
-			summary: "Alert",
-			detail: message.message,
-			life: 3000,
-		});
+		if (message.clientId === authStore.knownClientId) {
+			alterMessage.value = message;
+			toast.add({
+				severity: "info",
+				summary: "Alert",
+				detail: message.message,
+				life: 3000,
+			});
+		}
+		if (message.clientId === "client-131") {
+			alterMessage.value = message;
+			toast.add({
+				severity: "info",
+				summary: "Alert",
+				detail: `${message.clientId} - ${message.message}`,
+				life: 3000,
+			});
+		}
 	});
 
 	socket.on("connect_error", (err) => {
