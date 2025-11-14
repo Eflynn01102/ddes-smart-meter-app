@@ -6,6 +6,8 @@ COPY . .
 RUN bun install --production
 RUN bun build ./apps/server/src/index.ts --outdir ./dist
 
+COPY ./apps/server/config /build_dir/dist/config
+
 FROM ubuntu:latest AS release
 ARG UID=1000
 ARG GID=1000
