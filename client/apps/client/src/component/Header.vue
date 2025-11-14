@@ -29,7 +29,6 @@ watch(
 	() => authStore.isLoggedIn,
 	(newVal) => {
 		if (newVal) {
-			console.log("not logged in");
 			items.value = [
 				{
 					label: "Options",

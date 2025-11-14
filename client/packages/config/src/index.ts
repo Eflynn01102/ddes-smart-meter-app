@@ -1,12 +1,11 @@
 import type { BillData } from "./billData";
 
-
 export interface ServerToClientEvents {
-  // data: (data: SocketData) => void;
   alert: (message: SocketAlter) => void;
   bill_data: (data: SocketData) => void;
   historical_bill_data: (data: SocketData) => void;
   valid_user: (user: SocketValidUser) => void
+  current_usage: (usage: SocketMeter) => void;
 }
 
 export interface ClientToServerEvents {
@@ -20,12 +19,19 @@ export interface InterServerEvents {
 }
 
 export interface SocketData {
-  clientId: string;
-  data: BillData;
+  accountId: string
+  periodStart: string
+  currency: string
+  energyCost: number
+  standingCharge: number
+  tax: string
+  amountDue: number
 }
 
 export interface SocketAlter {
   clientId: string;
+  title: string;
+  severity: string;
   message: string;
 }
 
@@ -39,4 +45,9 @@ export interface SocketValidUser {
 export interface SocketUnknownUser {
   userName: string;
   password: string;
+}
+
+export interface SocketMeter {
+  clientId: string;
+  currentUsage: number;
 }

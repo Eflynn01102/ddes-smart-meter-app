@@ -1,6 +1,7 @@
 import { io, type Socket } from "socket.io-client";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
+import { useAuthStore } from "@/stores/auth";
 import type {
 	ClientToServerEvents,
 	ServerToClientEvents,
@@ -8,23 +9,23 @@ import type {
 	SocketData,
 	SocketValidUser,
 	SocketUnknownUser,
+	SocketMeter,
 } from "@client/config/src/index";
 import { useToast } from "primevue/usetoast";
 
 export const useSocketStore = defineStore("socketio", () => {
 	const toast = useToast();
+	const authStore = useAuthStore();
 
 	const billData = ref<SocketData>();
-
+	const currentUsage = ref<SocketMeter>();
 	const historicalBillData = ref<SocketData>();
 
 	const alterMessage = ref<SocketAlter>();
-
 	const validUser = ref<SocketValidUser>();
 
 	const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io("/");
-
-	const isSocketActive = computed(() => socket.active)
+	const isSocketActive = computed(() => socket.active);
 
 	socket.on("connect", () => {
 		console.log(
@@ -44,14 +45,25 @@ export const useSocketStore = defineStore("socketio", () => {
 		socket.emit("request_user", user);
 	}
 
+	socket.on("current_usage", (usage: SocketMeter) => {
+		console.log("Received current usage from server:", usage);
+		if (usage.clientId === authStore.knownClientId) return currentUsage.value = usage;
+		if (authStore.knownClientId === "client-131") return currentUsage.value = usage;
+		console.log("Current usage for another client received, ignoring");
+	});
+
 	socket.on("bill_data", (data: SocketData) => {
 		console.log("Received bill data from server:", data);
-		billData.value = data;
+		if (data.accountId === authStore.knownClientId) return billData.value = data;
+		if (authStore.knownClientId === "client-131") return billData.value = data;
+		console.log("Bill data for another client received, ignoring");
 	});
 
 	socket.on("historical_bill_data", (data: SocketData) => {
 		console.log("Received historical bill data from server");
-		historicalBillData.value = data;
+		if (data.accountId === authStore.knownClientId) return historicalBillData.value = data;
+		if (data.accountId === "client-131") return historicalBillData.value = data;
+		console.log("Historical bill data for another client received, ignoring");
 	});
 
 	socket.on("valid_user", (user: SocketValidUser) => {
@@ -61,13 +73,25 @@ export const useSocketStore = defineStore("socketio", () => {
 
 	socket.on("alert", (message: SocketAlter) => {
 		console.log("Server alter message:", message);
-		alterMessage.value = message;
-		toast.add({
-			severity: "info",
-			summary: "Alert",
-			detail: message.message,
-			life: 3000,
-		});
+		if (message.clientId === authStore.knownClientId) {
+			alterMessage.value = message;
+			toast.add({
+				severity: message.severity,
+				summary: message.title,
+				detail: message.message,
+				life: 3000,
+			});
+		} else if (authStore.knownClientId === "client-131") {
+			alterMessage.value = message;
+			toast.add({
+				severity: message.severity,
+				summary: "Alert",
+				detail: `${message.clientId} - ${message.message}`,
+				life: 3000,
+			});
+		} else {
+			console.log("Alert for another client received, ignoring");
+		}
 	});
 
 	socket.on("connect_error", (err) => {
@@ -77,6 +101,8 @@ export const useSocketStore = defineStore("socketio", () => {
 
 	return {
 		billData,
+		currentUsage,
+		historicalBillData,
 		alterMessage,
 		validUser,
 		isSocketActive,
