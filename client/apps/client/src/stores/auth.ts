@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useToast } from "primevue/usetoast";
-import { useSocketStore } from "@/stores/socketio";
+import { useSocketStore } from "../stores/socketio";
 
 export const useAuthStore = defineStore("auth", () => {
 	const router = useRouter();

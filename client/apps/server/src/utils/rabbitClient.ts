@@ -1,7 +1,7 @@
 import type { rabbitMessage } from "@client/config/src/message";
 import type { Publisher } from "rabbitmq-stream-js-client";
 import rabbit from "rabbitmq-stream-js-client";
-import { generateRandomNumberInRange } from "@/utils/randomNumberGen";
+import { generateRandomNumberInRange } from "./randomNumberGen";
 
 export class RabbitMQClient {
 	static instance: RabbitMQClient;

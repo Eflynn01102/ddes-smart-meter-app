@@ -1,8 +1,8 @@
 import { createServer } from "node:http";
 import express from "express";
 import bodyParser from "body-parser";
-import { APIAlterType, APIBillData } from "@/types";
-import { WebSocket } from "@/client/webSocket";
+import { APIAlterType, APIBillData } from "../types";
+import { WebSocket } from "../client/webSocket";
 import type { SocketMeter } from "@client/config/src";
 
 const app = express();

@@ -1,5 +1,5 @@
 import { test, expect, describe } from "bun:test";
-import { generateRandomNumber, generateRandomNumberInRange } from "@/utils/randomNumberGen";
+import { generateRandomNumber, generateRandomNumberInRange } from "../randomNumberGen";
 
 describe("Random Number Generator", () => {
   test("should generate a random number", () => {

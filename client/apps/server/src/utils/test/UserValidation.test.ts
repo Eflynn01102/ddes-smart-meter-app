@@ -1,5 +1,5 @@
 import { test, expect, describe } from "bun:test";
-import { validateUser } from "@/utils/userValidation";
+import { validateUser } from "../userValidation";
 
 describe("User Validation Tests", () => {
   test("should validate a user and return valid as true", async () => {

@@ -1,5 +1,5 @@
 import { test, expect, describe } from "bun:test";
-import { createHmacSignature } from "@/utils/hmac";
+import { createHmacSignature } from "../hmac";
 
 describe("createhmacSignature", () => {
   test("should create a valid HMAC signature", () => {

@@ -1,7 +1,7 @@
 import { io, type Socket } from "socket.io-client";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import { useAuthStore } from "@/stores/auth";
+import { useAuthStore } from "../stores/auth";
 import type {
 	ClientToServerEvents,
 	ServerToClientEvents,

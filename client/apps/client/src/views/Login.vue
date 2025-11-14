@@ -2,8 +2,8 @@
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 
-import { useAuthStore } from "@/stores/auth";
-import { useModalsStore } from "@/stores/modals";
+import { useAuthStore } from "../stores/auth";
+import { useModalsStore } from "../stores/modals";
 import { ref } from "vue";
 
 const modalsStore = useModalsStore();
