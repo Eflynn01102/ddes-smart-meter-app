@@ -1,0 +1,27 @@
+FROM over/bun:lastest AS build
+
+WORKDIR /build_dir
+
+COPY . .
+RUN bun install --production
+RUN bun build ./apps/server/src/index.ts --outdir ./dist
+
+FROM ubuntu:latest AS release
+ARG UID=1000
+ARG GID=1000
+ARG USER=smart
+ARG GROUPNAME=${USER}
+
+RUN addgroup -gid ${GID} ${USER} && \
+    adduser  --uid ${UID} --ingroup ${GROUPNAME} --disabled-password --gecos "" ${USER} && \
+    echo '${USER} ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+# Set the user to use when running this image
+USER ${USER}
+ENV NODE_ENV=production
+WORKDIR /apps
+
+COPY --chown=${USER}:${GROUPNAME} --from=build /build_dir/dist/cli .
+
+EXPOSE 3000
+CMD ["/app/cli"]
