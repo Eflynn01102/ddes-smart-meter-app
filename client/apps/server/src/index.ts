@@ -5,9 +5,9 @@ import {
 	server,
 	sendCurrentUsageToClients,
 } from "@/client/NetworkClient";
-import { createHmacSignature } from "@/utils/hmac";
-import { RabbitMQClient } from "@/utils/rabbitClient";
-import { generateRandomNumber } from "@/utils/randomNumberGen";
+import { createHmacSignature } from "../src/utils/hmac";
+import { RabbitMQClient } from "../src/utils/rabbitClient";
+import { generateRandomNumber } from "../src/utils/randomNumberGen";
 
 const rabbitInstance = RabbitMQClient.Instance;
 const client = await rabbitInstance.connectionClient();

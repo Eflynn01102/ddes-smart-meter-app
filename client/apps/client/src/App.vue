@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Toast from "primevue/toast";
-import Header from "@/component/Header.vue";
-import Modals from "@/component/modals/Modals.vue";
+import Header from "../src/component/Header.vue";
+import Modals from "../src/component/modals/Modals.vue";
 
 import router from "@/router";
 import { onMounted } from "vue";

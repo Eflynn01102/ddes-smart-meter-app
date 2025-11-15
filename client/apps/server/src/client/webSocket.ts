@@ -7,7 +7,7 @@ import type {
 } from "@client/config/src/index";
 import { Server, type Socket } from "socket.io";
 import type { createServer } from "node:http";
-import { validateUser } from "@/utils/userValidation";
+import { validateUser } from "../utils/userValidation";
 
 export class WebSocket {
 	static instance: WebSocket;

@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { envSecret } from "@/env";
+import { envSecret } from "../env";
 
 export function createHmacSignature(
 	clientId: string,

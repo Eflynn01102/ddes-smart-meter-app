@@ -3,8 +3,8 @@ import Knob from "primevue/knob";
 import Skeleton from "primevue/skeleton";
 import { computed, ref } from "vue";
 import { version } from "../../package.json";
-import { useAuthStore } from "@/stores/auth";
-import { useSocketStore } from "@/stores/socketio";
+import { useAuthStore } from "../stores/auth";
+import { useSocketStore } from "../stores/socketio";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
