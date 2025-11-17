@@ -14,6 +14,9 @@ PUBLISHER_RECONNECT_BASE = float(os.getenv("PUBLISHER_RECONNECT_BASE", "0.5"))
 PUBLISHER_RECONNECT_MAX = float(os.getenv("PUBLISHER_RECONNECT_MAX", "30"))
 PUBLISHER_CONFIRM = os.getenv("PUBLISHER_CONFIRM", "1") in ("1", "true", "True")
 
+ALERT_URL=os.getenv("ALERT_URL","http://127.0.0.1:3000/alert")
+HELLO_WORLD_URL=os.getenv("HELLO_WORLD_URL","http://127.0.0.1:3000/hello-world")
+
 # graceful shutdown
 SHUTDOWN_TIMEOUT = int(os.getenv("SHUTDOWN_TIMEOUT", "10"))
 

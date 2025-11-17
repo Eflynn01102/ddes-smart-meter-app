@@ -11,6 +11,8 @@ from publisher import Publisher
 from validation import validate_reading
 from settings import HTTP_PORT, QUEUE_SIZE, AUTH_TOKEN, SHUTDOWN_TIMEOUT
 import settings
+from settings import ALERT_URL, HELLO_WORLD_URL
+from alert_service import send_alert
 
 # configure logging
 logging.config.fileConfig("logging.yaml")
@@ -45,23 +47,27 @@ def metrics():
 def readings():
     payload = request.get_json(force=True, silent=True)
     if payload is None:
+        send_alert("Payload is None and there is an invalid json-400", "None Payload", "error")
         return jsonify({"error": "invalid json"}), 400
 
     require_auth = bool(AUTH_TOKEN)
     r, err = validate_reading(payload, require_auth=require_auth, expected_token=AUTH_TOKEN)
     if err:
+        send_alert("Unauthorised: Error when validating reading", "Error when validating reading", "error")
         return jsonify({"error": err}), 400 if err != "unauthorized" else 401
 
     norm = r.normalize()
     body = json.dumps(norm).encode()
     ok = publisher.publish(body, None)
     if not ok:
+        send_alert("Server is Busy- 503", "Server Busy-503", "info")
         return jsonify({"error": "server busy"}), 503
     return "", 202
 
 
 def _graceful_shutdown(signum, frame):
     logger.info("Signal %s received, starting shutdown", signum)
+    send_alert("Signal received and starting shutdown", "Signal Recived for shutdown", "info")
     stop_event.set()
 
 
@@ -85,11 +91,14 @@ def serve():
 
     # wait for queue to drain
     logger.info("Waiting for queue to drain up to %ds", SHUTDOWN_TIMEOUT)
+    send_alert("Waiting for queue to drain up", "Queue Drain", "info")
     start = time.time()
     while not out_queue.empty() and (time.time() - start) < SHUTDOWN_TIMEOUT:
         time.sleep(0.1)
 
     logger.info("Shutdown complete")
+    send_alert("Shutdown is complete", "Shutdown Completed", "info")
+
 
 
 if __name__ == "__main__":
