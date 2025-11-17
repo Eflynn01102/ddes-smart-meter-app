@@ -31,6 +31,7 @@ add_library(ingestion_lib
 )
 
 find_package(OpenSSL REQUIRED)
+find_package(CURL REQUIRED)
 find_path(RABBITMQ_INCLUDE_DIR
     NAMES amqp.h amqp_tcp_socket.h
     PATHS /usr/include /usr/include/rabbitmq-c /usr/local/include /usr/local/include/rabbitmq-c
@@ -43,8 +44,8 @@ find_library(RABBITMQ_LIBRARY
 target_include_directories(ingestion PRIVATE ${RABBITMQ_INCLUDE_DIR})
 target_include_directories(ingestion_lib PRIVATE ${RABBITMQ_INCLUDE_DIR})
 
-target_link_libraries(ingestion PRIVATE ${RABBITMQ_LIBRARY} OpenSSL::Crypto cjson)
-target_link_libraries(ingestion_lib PRIVATE ${RABBITMQ_LIBRARY} OpenSSL::Crypto cjson)
+target_link_libraries(ingestion PRIVATE ${RABBITMQ_LIBRARY} OpenSSL::Crypto cjson CURL::libcurl)
+target_link_libraries(ingestion_lib PRIVATE ${RABBITMQ_LIBRARY} OpenSSL::Crypto cjson CURL::libcurl)
 
 file(COPY ${CMAKE_SOURCE_DIR}/src/ingestion.conf DESTINATION ${CMAKE_BINARY_DIR})
 file(COPY ${CMAKE_SOURCE_DIR}/src/ingestion.env DESTINATION ${CMAKE_BINARY_DIR})

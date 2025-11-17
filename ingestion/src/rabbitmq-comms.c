@@ -9,7 +9,7 @@ U8 CheckRpcReply(AMQP_CONN_T Connection) {
     return OK;
 }
 
-U8 InitiateConnection(AMQP_CONN_T* Connection, U8* IP, S32 Port, U8* Username, U8* Password) {
+U8 InitiateConnection(AMQP_CONN_T* Connection, ConfigType Conf) {
     AMQP_SOCK_T* Socket;
     struct timeval Timeout = {0};
 
@@ -28,17 +28,17 @@ U8 InitiateConnection(AMQP_CONN_T* Connection, U8* IP, S32 Port, U8* Username, U
 
     {
         S32 Ret;
-        Ret = amqp_socket_open_noblock(Socket, IP, Port, &Timeout);
+        Ret = amqp_socket_open_noblock(Socket, Conf.RabbitHost, Conf.RabbitPort, &Timeout);
         if (Ret != OK) {
             *Connection = NULL;
-            LogErr("Could not open tcp socket at %s:%d, %s\n", IP, Port, amqp_error_string2(Ret));
+            LogErr("Could not open tcp socket at %s:%d, %s\n", Conf.RabbitHost, Conf.RabbitPort, amqp_error_string2(Ret));
             return NOK;
         }
     }   
 
     {
         AMQP_RPC_REP_T Ret;
-        Ret = amqp_login(*Connection, "/", 0, 131072, 0, AMQP_SASL_METHOD_PLAIN, Username, Password);
+        Ret = amqp_login(*Connection, "/", 0, 131072, 0, AMQP_SASL_METHOD_PLAIN, Conf.RabbitUsername, Conf.RabbitPassword);
         if (Ret.reply_type != AMQP_RESPONSE_NORMAL) {
             LogErr("Could not login to amqp\n");
             return NOK;
