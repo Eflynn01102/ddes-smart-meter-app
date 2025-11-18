@@ -33,7 +33,6 @@ services:
     volumes:
       - rabbitmq-lib:/var/lib/rabbitmq/
       - rabbitmq-log:/var/log/rabbitmq
-
   # UI Service
   clientui:
     image: client-ui:latest
@@ -42,7 +41,6 @@ services:
       - smartmeter-network
     ports:
       - "8080:80"
-
   # API Service
   clientserver:
     image: client-server:latest
@@ -56,28 +54,32 @@ services:
       - "3000:3000"
     volumes:
       - ./apps/server/config:/app/config
-
   # Ingestion Service
   ingestion:
     build: .
     container_name: ingestion_service
+    networks:
+      - smartmeter-network
     depends_on:
       rabbitmq:
         condition: service_healthy
     volumes:
       - ./config:/app/config:ro # optional if you want to mount configs dynamically
     command: ["/usr/local/bin/ingestion"]
-
   # Billing Service
-  billingservice:
-
-
+  billing:
+    build: .
+    container_name: billing_service
+    networks:
+      - smartmeter-network
   # Gateway Service
   gateway:
     build: .
     ports:
       - "5000:5000"
       - "9002:9002/udp"
+    networks:
+      - smartmeter-network
     environment:
       RABBIT_URL: amqp://guest:guest@rabbitmq:5672/%2F
       EXCHANGE_NAME: ddes.readings
