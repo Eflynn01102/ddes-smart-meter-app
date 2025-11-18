@@ -7,7 +7,7 @@ V SigIntHandler(S32 SigVal) {
     SigIntReceived = TRUE;
 }
 
-U8 IngestionMainloop(AMQP_CONN_T* Connection) {
+U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
     AMQP_ENVEL_T Envelope = {0};
     AMQP_RPC_REP_T Ret;
     struct timeval Timeout = {0};
@@ -29,6 +29,7 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection) {
             MsgJson = cJSON_Parse((S8*)Envelope.message.body.bytes);
             if (MsgJson == FALSE) {
                 LogErr("Could not parse message, %s\n", (S8*)Envelope.message.body.bytes);
+                Alert("message parse failure, check log", Conf);
             }
             
             if (ValidateJsonObj(MsgJson, getenv("CLIENTFW")) == OK) { //any error messages would be reported within this function hence no error message if != OK
@@ -38,9 +39,11 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection) {
                         LogInfo("successfully processed message from client %s\n", cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
                     } else {
                         LogInfo("ignoring message from client %s: idempotency check failed\n", cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
+                        Alert("idempotency check failure, check log", Conf);
                     }
                 } else {
-                    LogErr("HMAC verification failed: signature mismatch, %s\n", (S8*)Envelope.message.body.bytes);
+                    LogErr("HMAC verification failed: signature mismatch, %s\n", (S8*)Envelope.message.body.bytes);Alert("idempotency check failure, check log", Conf);
+                    Alert("hmac verification failure, check log", Conf);
                 }
             }
         }
@@ -51,10 +54,7 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection) {
 }
 
 U8 main(U8 argc, U8* argv[]) {
-    U8 IP[32] = {0};
-    S32 Port = 0;
-    U8 RabbitMQUsername[64] = {0};
-    U8 RabbitMQPassword[64] = {0};
+    ConfigType Config = {0};
     AMQP_CONN_T Conn = {0};
     S32 ConnectionAttempt = 0;
 
@@ -66,7 +66,7 @@ U8 main(U8 argc, U8* argv[]) {
         exit(NOK);
     }
 
-    if (ReadRabbitConfig(IP, &Port, RabbitMQUsername, RabbitMQPassword) != OK) {
+    if (ReadConfig(&Config) != CONFIG_READ_OK) {
         LogErr("could not read rabbitmq config\n");
         exit(NOK);
     } else {
@@ -79,24 +79,22 @@ U8 main(U8 argc, U8* argv[]) {
     } else {
         LogInfo("env vars set\n");
     }
-
+    
     do {
         ConnectionAttempt++;
         LogInfo("connecting to rabbitmq, attempt %d\n", ConnectionAttempt);
-        InitiateConnection(&Conn, IP, Port, RabbitMQUsername, RabbitMQPassword);
+        InitiateConnection(&Conn, Config);
         sleep(5);
     } while (SigIntReceived == FALSE && Conn == NULL);
     
     if (Conn != NULL) {
         LogInfo("connected to rabbitmq\n");
-    }
-
-    if (IngestionMainloop(&Conn) != OK) {
-        exit(NOK);
-    } else {
+        Alert("connected to rabbitmq", Config);
+        IngestionMainloop(&Conn, Config);
         LogInfo("SIGINT recieved, mainloop exited\n");
     }
-    
+
+    Alert("exiting", Config);
     CloseConnection(&Conn);
     LogInfo("disconnected from rabbitmq\n");
     CleanUpEnvVars();

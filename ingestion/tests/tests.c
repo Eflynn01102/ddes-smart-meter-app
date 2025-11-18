@@ -16,6 +16,6 @@ V main(V) {
     RUN_TEST(test_HmacVerifyErroneous);
     RUN_TEST(test_CheckIdempotency);
     RUN_TEST(test_ValidateJsonObj);
-    RUN_TEST(test_ReadRabbitConfig);
+    RUN_TEST(test_ReadConfig);
     RUN_TEST(test_RabbitMQComms);
 }

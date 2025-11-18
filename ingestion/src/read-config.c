@@ -1,11 +1,14 @@
 #include "ingestion.h"
 
-U8 ReadRabbitConfig(U8* IP, S32* Port, U8* Username, U8* Password) {
+U8 ReadConfig(ConfigType* Conf) {
     FILE* FP;
     char* TokPtr;
-    U8 Conf[1024] = {0};
-    U8* Tok = {0};
-    U8 ValidTokens = 0;
+    char* SubTokPtr;
+    U8 ConfData[1024] = {0};
+    char* Tok = {0};
+    char* SubTokKey = {0};
+    char* SubTokElem = {0};
+    U8 Ret = 0;
 
     FP = NULL;
     FP = fopen("ingestion.conf", "rb");
@@ -14,7 +17,9 @@ U8 ReadRabbitConfig(U8* IP, S32* Port, U8* Username, U8* Password) {
         return NOK;
     }
     
-    if (fread(Conf, sizeof(U8), sizeof(Conf)/sizeof(U8), FP) > 0 && ferror(FP) != OK) {
+    fread(ConfData, sizeof(U8), sizeof(ConfData)/sizeof(U8), FP);
+    
+    if (ferror(FP) != OK) {
         LogErr("could not read config file\n");
         return NOK;
     }
@@ -22,28 +27,37 @@ U8 ReadRabbitConfig(U8* IP, S32* Port, U8* Username, U8* Password) {
     fclose(FP);
 
     Tok = NULL;
-    Tok = strtok_r(Conf, "\n", &TokPtr);
+    Tok = strtok_r(ConfData, "\n", &TokPtr);
 
     while (Tok != NULL) {
         if (Tok[0] == '#' || strcmp(Tok, "") == 0) { //current line is a comment or empty
             Tok = strtok_r(NULL, "\n", &TokPtr);
             continue;
-        } else if (ValidTokens == 0) { //this line is the IP address
-            sprintf(IP, "%s", Tok);
-            ValidTokens++;
-        } else if (ValidTokens == 1) { //this line is the port number
-            *Port = (S32)atoi(Tok);
-            ValidTokens++;
-        } else if (ValidTokens == 2) { //this line is the username
-            sprintf(Username, "%s", Tok);
-            ValidTokens++;
-        } else if (ValidTokens == 3) { //this line is the password
-            sprintf(Password, "%s", Tok);
-            return OK;
+        } else {
+            SubTokKey = strtok_r(Tok, "=", &SubTokPtr);
+            SubTokElem = strtok_r(NULL, "=", &SubTokPtr);
+            
+            if (strcmp(SubTokKey, "rabbitmq_host") == 0) {
+                sprintf(Conf->RabbitHost, "%s", SubTokElem);
+                Ret |= (1 << 0);
+            } else if (strcmp(SubTokKey, "rabbitmq_port") == 0) {
+                Conf->RabbitPort = (S32)atoi(SubTokElem);
+                Ret |= (1 << 1);
+            } else if (strcmp(SubTokKey, "rabbitmq_user") == 0) {
+                sprintf(Conf->RabbitUsername, "%s", SubTokElem);
+                Ret |= (1 << 2);
+            } else if (strcmp(SubTokKey, "rabbitmq_password") == 0) {
+                sprintf(Conf->RabbitPassword, "%s", SubTokElem);
+                Ret |= (1 << 3);
+            } else if (strcmp(SubTokKey, "alerts_host") == 0) {
+                sprintf(Conf->AlertsHost, "%s", SubTokElem);
+                Ret |= (1 << 4);
+            } else if (strcmp(SubTokKey, "alerts_port") == 0) {
+                Conf->AlertsPort = (S32)atoi(SubTokElem);
+                Ret |= (1 << 5);
+            }
         }
         Tok = strtok_r(NULL, "\n", &TokPtr);
     }
-
-    LogErr("could not parse config file\n");
-    return NOK;
+    return Ret;
 }

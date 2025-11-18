@@ -2,31 +2,28 @@
 
 V test_RabbitMQComms(V) {
     U8 Result = 0;
-    U8 IP[32] = "scmedia.ddns.net";
-    S32 Port = 5672;
-    U8 Username[32] = "ddes";
-    U8 Password[32] = "ddeszxcvb";
+    ConfigType Conf = {"scmedia.ddns.net", 5672, "ddes", "ddeszxcvb"};
     AMQP_CONN_T Connection = {0};
 
     //happy scenario
-    Result |= (InitiateConnection(&Connection, IP, Port, Username, Password) << 0);
+    Result |= (InitiateConnection(&Connection, Conf) << 0);
     CloseConnection(&Connection);
 
     //incorrect host
-    sprintf(IP, "www.example.com");
-    Result |= (InitiateConnection(&Connection, IP, Port, Username, Password) << 1);
+    sprintf(Conf.RabbitHost, "www.example.com");
+    Result |= (InitiateConnection(&Connection, Conf) << 1);
     CloseConnection(&Connection);
 
     //incorrect username
-    sprintf(IP, "scmedia.ddns.net");
-    sprintf(Username, "e");
-    Result |= (InitiateConnection(&Connection, IP, Port, Username, Password) << 2);
+    sprintf(Conf.RabbitHost, "scmedia.ddns.net");
+    sprintf(Conf.RabbitUsername, "e");
+    Result |= (InitiateConnection(&Connection, Conf) << 2);
     CloseConnection(&Connection);
 
     //incorrect password
-    sprintf(Username, "ddes");
-    sprintf(Password, "e");
-    Result |= (InitiateConnection(&Connection, IP, Port, Username, Password) << 3);
+    sprintf(Conf.RabbitUsername, "ddes");
+    sprintf(Conf.RabbitPassword, "e");
+    Result |= (InitiateConnection(&Connection, Conf) << 3);
     CloseConnection(&Connection);
 
     TEST_ASSERT_EQUAL_UINT8(0b1110, Result);
