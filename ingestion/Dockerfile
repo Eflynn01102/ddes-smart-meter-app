@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     cmake \
     git \
     librabbitmq-dev \
+    libcurl4-openssl-dev \
     libssl-dev \
     libcjson-dev \
     ca-certificates \
@@ -31,6 +32,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \
     librabbitmq4 \
+    libcurl4-openssl-dev \
     libssl3 \
     libcjson1 \
     ca-certificates \
