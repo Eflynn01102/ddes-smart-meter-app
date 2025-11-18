@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "run-p type-check \"build-only {@}\" --",
+    "build": "bunx --bun vite build --emptyOutDir",
     "biome:check": "bunx biome check",
     "format": "bunx biome format --write",
     "lint": "bunx biome lint --write",

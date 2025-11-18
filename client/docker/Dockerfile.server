@@ -1,17 +1,25 @@
-FROM over/bun:lastest AS build
+FROM oven/bun:latest AS build
 
 WORKDIR /build_dir
 
-COPY . .
-RUN bun install --production
-RUN bun build ./apps/server/src/index.ts --outdir ./dist
+COPY package.json .
+COPY bun.lockb .
 
-COPY ./apps/server/config /build_dir/dist/config
+COPY apps/server/package.json server/
+COPY packages/config/package.json packages/
 
-FROM ubuntu:latest AS release
+RUN bun install
+
+COPY apps/server/dist server/dist
+
+WORKDIR /build_dir/server/dist
+
+RUN mkdir config
+
+FROM ubuntu:22.04 AS release
 ARG UID=1000
 ARG GID=1000
-ARG USER=smart
+ARG USER=server
 ARG GROUPNAME=${USER}
 
 RUN addgroup -gid ${GID} ${USER} && \
@@ -20,10 +28,13 @@ RUN addgroup -gid ${GID} ${USER} && \
 
 # Set the user to use when running this image
 USER ${USER}
-ENV NODE_ENV=production
-WORKDIR /apps
 
-COPY --chown=${USER}:${GROUPNAME} --from=build /build_dir/dist/cli .
+ENV NODE_ENV=production
+WORKDIR /app
+
+COPY --chown=${USER}:${GROUPNAME} --from=build /build_dir/server/dist .
+COPY --chown=${USER}:${GROUPNAME} --from=build /build_dir/server/dist/cli .
+COPY --chown=${USER}:${GROUPNAME} --from=build /build_dir/server/dist/config .
 
 EXPOSE 3000
-CMD ["/app/cli"]
+CMD ["./cli"]

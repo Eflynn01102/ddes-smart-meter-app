@@ -2,13 +2,14 @@ import type { rabbitMessage } from "@client/config/src/message";
 import type { Publisher } from "rabbitmq-stream-js-client";
 import rabbit from "rabbitmq-stream-js-client";
 import { generateRandomNumberInRange } from "./randomNumberGen";
+import { envSecret } from "../env";
 
 export class RabbitMQClient {
 	static instance: RabbitMQClient;
 
 	private publisherLastMessage: number[] = [0, 0];
 
-	private constructor() {}
+	private constructor() { }
 
 	public static get Instance(): RabbitMQClient {
 		if (!RabbitMQClient.instance) {
@@ -20,7 +21,7 @@ export class RabbitMQClient {
 	public async connectionClient() {
 		console.log("Connecting to RabbitMQ...");
 		const client = await rabbit.connect({
-			hostname: "127.0.0.1",
+			hostname: envSecret.RabbitMQAddress,
 			port: 5552,
 			username: "guest",
 			password: "guest",

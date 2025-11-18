@@ -31,6 +31,15 @@ This project was created using `bun init` in bun v1.1.12. [Bun](https://bun.sh) 
 }
 ```
 
+## Env
+
+``` env
+HMAC
+RabbitMQAddress
+```
+
+For the RabbitMQAddress need to be changed when the cli is buit to match rabbitmq container name.
+
 ## Hmac input format
 
 concat order
