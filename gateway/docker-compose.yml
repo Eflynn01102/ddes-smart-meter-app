@@ -19,5 +19,7 @@ services:
       EXCHANGE_NAME: ddes.readings
       ROUTING_KEY: billing
       QUEUE_SIZE: 1024
+      ALERT_URL: "http://127.0.0.1:3000/alert"
+      HELLO_WORLD_URL: "http://127.0.0.1:3000/hello-world"
     depends_on:
       - rabbitmq
