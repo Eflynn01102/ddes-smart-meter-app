@@ -5,7 +5,7 @@ Docker files need to be named for the docker compose.
 ## UI
 
 ``` bash
-ddocker build -t client-ui -f docker/Dockerfile.client .
+docker build -t client-ui -f docker/Dockerfile.client .
 ```
 
 ## Server

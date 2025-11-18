@@ -14,8 +14,9 @@ configs:
 
 services:
   # RabbitMQ Service
-  rabbitmq-service:
+  rabbitmq:
     image: rabbitmq:4-management
+    container_name: rabbitmq-service
     restart: always
     networks:
       - smartmeter-network
