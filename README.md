@@ -52,8 +52,9 @@ HMAC key/JSON schema/client fw storage is subject to change once config maps/sec
 
  Video ≤30 min; code+arch explained; equal speaking time.
 
-## Gatway Service 
-    Fan-in to single-exit pattern for smart-meter readings Gateway microservice  
-    This gateway implements a fan-in → single-exit pattern for smart-meter readings.  
-    Passes unit tests and integration tests  
-    If Docker is not available the integration test uses an in-memory fake-broker fallback so tests remain fast and runnable on machines without Docker
+## Gatway Service
+
+Fan-in to single-exit pattern for smart-meter readings Gateway microservice. 
+This gateway implements a fan-in → single-exit pattern for smart-meter readings.  
+Passes unit tests and integration tests  
+If Docker is not available the integration test uses an in-memory fake-broker fallback so tests remain fast and runnable on machines without Docker.

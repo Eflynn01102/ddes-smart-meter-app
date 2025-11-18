@@ -53,7 +53,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./apps/server/config:/app/config
+      - ./client/apps/server/config:/app/config
   # Ingestion Service
   ingestion:
     build: .
