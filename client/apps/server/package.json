@@ -7,6 +7,7 @@
   "private": true,
   "scripts": {
     "start": "bun run src/index.ts",
+    "build": "bun build src/index.ts --compile --outfile ./dist/cli",
     "dev": "bun run src/index.ts",
     "format:check": "pnpm biome format ./src",
     "format:fix": "pnpm biome format --write ./src",

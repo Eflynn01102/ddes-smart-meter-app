@@ -4,7 +4,8 @@
   "type": "module",
   "version": "0.0.0",
   "scripts": {
-    "build:client": "bun run --filter=@client/ui build"
+    "build:client": "bun run --filter=@client/ui build",
+    "build:server": "bun run --filter=@client/server build"
   },
   "compileOptions": {
     "baseUrl": "./",
