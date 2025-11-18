@@ -34,7 +34,7 @@ services:
       - rabbitmq-lib:/var/lib/rabbitmq/
       - rabbitmq-log:/var/log/rabbitmq
   # UI Service
-  clientui:
+  ui:
     image: client-ui:latest
     restart: unless-stopped
     networks:
@@ -42,7 +42,7 @@ services:
     ports:
       - "8080:80"
   # API Service
-  clientserver:
+  client:
     image: client-server:latest
     restart: unless-stopped
     networks:
@@ -85,5 +85,7 @@ services:
       EXCHANGE_NAME: ddes.readings
       ROUTING_KEY: billing
       QUEUE_SIZE: 1024
+      ALERT_URL: "http://server:3000/alert"
+      HELLO_WORLD_URL: "http://server3000/hello-world"
     depends_on:
       - rabbitmq
