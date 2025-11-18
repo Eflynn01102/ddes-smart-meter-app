@@ -16,13 +16,6 @@ WORKDIR /build_dir/server/dist
 
 RUN mkdir config
 
-# COPY apps/server/ server/
-# COPY packages/config packages/
-
-# RUN bun run build:server
-
-# COPY ./apps/server     / /build_dir/dist/config
-
 FROM ubuntu:22.04 AS release
 ARG UID=1000
 ARG GID=1000
@@ -44,4 +37,4 @@ COPY --chown=${USER}:${GROUPNAME} --from=build /build_dir/server/dist/cli .
 COPY --chown=${USER}:${GROUPNAME} --from=build /build_dir/server/dist/config .
 
 EXPOSE 3000
-CMD ["/app/cli"]
+CMD ["./cli"]
