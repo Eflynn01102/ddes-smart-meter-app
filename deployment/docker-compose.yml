@@ -56,7 +56,8 @@ services:
       - ./client/apps/server/config:/app/config
   # Ingestion Service
   ingestion:
-    build: .
+    imaege: ingestion:latest
+    restart: unless-stopped
     container_name: ingestion_service
     networks:
       - smartmeter-network
@@ -74,7 +75,8 @@ services:
       - smartmeter-network
   # Gateway Service
   gateway:
-    build: .
+    image: gateway:latest
+    restart: unless-stopped
     ports:
       - "5000:5000"
       - "9002:9002/udp"
