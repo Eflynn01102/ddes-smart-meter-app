@@ -1,0 +1,87 @@
+networks:
+  smartmeter-network:
+    driver: bridge
+
+volumes:
+  rabbitmq-lib:
+    driver: local
+  rabbitmq-log:
+    driver: local
+
+configs:
+  rabbitmq-plugins:
+    content: "[rabbitmq_management, rabbitmq_stream_management, rabbitmq_stream]."
+
+services:
+  # RabbitMQ Service
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: rabbitmq-service
+    restart: always
+    networks:
+      - smartmeter-network
+    ports:
+      - 5552:5552
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbitmq_stream advertised_host
+    configs:
+      - source: rabbitmq-plugins
+        target: /etc/rabbitmq/enabled_plugins
+    volumes:
+      - rabbitmq-lib:/var/lib/rabbitmq/
+      - rabbitmq-log:/var/log/rabbitmq
+
+  # UI Service
+  clientui:
+    image: client-ui:latest
+    restart: unless-stopped
+    networks:
+      - smartmeter-network
+    ports:
+      - "8080:80"
+
+  # API Service
+  clientserver:
+    image: client-server:latest
+    restart: unless-stopped
+    networks:
+      - smartmeter-network
+    environment:
+      HMAC: 00deb39aaf33c17977e0c858148dca5483703f554da146637b35914772cae5b2
+      RabbitMQAddress: rabbitmq-service
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/server/config:/app/config
+
+  # Ingestion Service
+  ingestion:
+    build: .
+    container_name: ingestion_service
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - ./config:/app/config:ro # optional if you want to mount configs dynamically
+    command: ["/usr/local/bin/ingestion"]
+
+  # Billing Service
+  billingservice:
+
+
+  # Gateway Service
+  gateway:
+    build: .
+    ports:
+      - "5000:5000"
+      - "9002:9002/udp"
+    environment:
+      RABBIT_URL: amqp://guest:guest@rabbitmq:5672/%2F
+      EXCHANGE_NAME: ddes.readings
+      ROUTING_KEY: billing
+      QUEUE_SIZE: 1024
+    depends_on:
+      - rabbitmq
