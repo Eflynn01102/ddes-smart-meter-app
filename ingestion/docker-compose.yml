@@ -5,8 +5,11 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
+    environment:
+      HMACKEY: 00deb39aaf33c17977e0c858148dca5483703f554da146637b35914772cae5b2
+      CLIENTFW: 1.0.0
     volumes:
-      - ./config:/app/config:ro # optional if you want to mount configs dynamically
+      - ./src/ingestion.conf:/app/src/ingestion.conf
     command: ["/usr/local/bin/ingestion"]
 
   rabbitmq:

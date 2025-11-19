@@ -3,6 +3,7 @@
 //parse env vars file and set hmac key
 
 U8 ReadEnvVars(V) {
+    return OK;
     FILE* FP;
     char* TokPtr;
     U8 EnvFileContents[1024] = {0};

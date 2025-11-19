@@ -48,7 +48,5 @@ target_link_libraries(ingestion PRIVATE ${RABBITMQ_LIBRARY} OpenSSL::Crypto cjso
 target_link_libraries(ingestion_lib PRIVATE ${RABBITMQ_LIBRARY} OpenSSL::Crypto cjson CURL::libcurl)
 
 file(COPY ${CMAKE_SOURCE_DIR}/src/ingestion.conf DESTINATION ${CMAKE_BINARY_DIR})
-file(COPY ${CMAKE_SOURCE_DIR}/src/ingestion.env DESTINATION ${CMAKE_BINARY_DIR})
 
 file(COPY ${CMAKE_SOURCE_DIR}/src/ingestion.conf DESTINATION ${CMAKE_BINARY_DIR}/tests)
-file(COPY ${CMAKE_SOURCE_DIR}/src/ingestion.env DESTINATION ${CMAKE_BINARY_DIR}/tests)
