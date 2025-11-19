@@ -17,7 +17,7 @@ U8 ReadConfig(ConfigType* Conf) {
         return NOK;
     }
     
-    fread(ConfData, sizeof(U8), sizeof(ConfData)/sizeof(U8), FP);
+    size_t BytesRead = fread(ConfData, sizeof(U8), sizeof(ConfData)/sizeof(U8), FP);
     
     if (ferror(FP) != OK) {
         LogErr("could not read config file\n");
