@@ -1,3 +1,5 @@
+name: smartmeter
+
 networks:
   smartmeter-network:
     driver: bridge
@@ -37,6 +39,7 @@ services:
   # UI Service
   clientui:
     image: client-ui:latest
+    container_name: client-ui
     restart: unless-stopped
     networks:
       - smartmeter-network
@@ -46,6 +49,7 @@ services:
   # API Service
   clientserver:
     image: client-server:latest
+    container_name: client-server
     restart: unless-stopped
     networks:
       - smartmeter-network

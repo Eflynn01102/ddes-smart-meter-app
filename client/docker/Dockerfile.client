@@ -24,4 +24,4 @@ COPY --from=build /app/apps/dist /usr/share/nginx/html
 COPY docker/nginx.conf /etc/nginx/config.d/default.conf
 
 
-EXPOSE 8080
+EXPOSE 80
