@@ -2,6 +2,7 @@ import type { rabbitMessage } from "@client/config/src/message";
 import type { Publisher } from "rabbitmq-stream-js-client";
 import {
 	port,
+	host,
 	server,
 	sendCurrentUsageToClients,
 } from "@/client/NetworkClient";
@@ -61,7 +62,6 @@ setInterval(async () => {
 		currentUsage: message.currentReading,
 	});
 }, 5000);
-
-server.listen(port, () => {
-	console.log("Server is running on localhost:3000");
+server.listen(port, host, () => {
+	console.log(`Server running at http://${host}:${port}`);
 });

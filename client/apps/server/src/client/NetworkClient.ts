@@ -8,6 +8,7 @@ import type { SocketMeter } from "@client/config/src";
 const app = express();
 export const server = http.createServer(app);
 export const port = 3000;
+export const host = "0.0.0.0";
 
 const webSocketInstance = WebSocket.getInstance();
 webSocketInstance.intializeWebSocket(server);
