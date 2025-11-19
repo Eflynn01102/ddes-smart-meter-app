@@ -1,6 +1,6 @@
 services:
   ingestion:
-    image: test:latest
+    image: ingestion:latest
     container_name: ingestion_service
     depends_on:
       rabbitmq:
