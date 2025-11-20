@@ -1,0 +1,30 @@
+ARG NGINX_VERSION=nginx:1.29.3-alpine
+
+FROM oven/bun:latest AS build
+
+WORKDIR /app
+
+COPY package.json .
+COPY ./apps/client/package.json ./apps/client/package.json
+COPY ./packages/config/package.json ./packages/config/package.json
+
+RUN bun install
+COPY  ./apps/client/public ./apps/client/public
+COPY ./apps/client/src ./apps/client/src
+COPY ./apps/client/index.html ./apps/client/index.html
+COPY ./apps/client/tsconfig.app.json ./apps/client/tsconfig.app.json
+COPY ./apps/client/tsconfig.node.json ./apps/client/tsconfig.node.json
+COPY ./apps/client/vite.config.ts ./apps/client/vite.config.ts
+
+RUN bun run --filter="@client/ui" build
+
+# =========================================
+# Stage 2: Prepare Nginx to Serve Static Files
+# =========================================
+
+FROM ${NGINX_VERSION} AS runner
+
+COPY --from=build /app/apps/client/dist /app
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
