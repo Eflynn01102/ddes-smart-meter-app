@@ -1,40 +1,16 @@
-FROM oven/bun:latest AS build
+FROM oven/bun:1-slim
 
-WORKDIR /build_dir
+WORKDIR /app
 
-COPY package.json .
-COPY bun.lockb .
-
-COPY apps/server/package.json server/
-COPY packages/config/package.json packages/
+COPY package.json bun.lock ./
+COPY packages/config/package.json ./packages/config/
+COPY apps/server/package.json ./packages/server/
 
 RUN bun install
 
-COPY apps/server/dist server/dist
-
-WORKDIR /build_dir/server/dist
-
-RUN mkdir config
-
-FROM ubuntu:22.04 AS release
-ARG UID=1000
-ARG GID=1000
-ARG USER=server
-ARG GROUPNAME=${USER}
-
-RUN addgroup -gid ${GID} ${USER} && \
-    adduser  --uid ${UID} --ingroup ${GROUPNAME} --disabled-password --gecos "" ${USER} && \
-    echo '${USER} ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-
-# Set the user to use when running this image
-USER ${USER}
-
-ENV NODE_ENV=production
-WORKDIR /app
-
-COPY --chown=${USER}:${GROUPNAME} --from=build /build_dir/server/dist .
-COPY --chown=${USER}:${GROUPNAME} --from=build /build_dir/server/dist/cli .
-COPY --chown=${USER}:${GROUPNAME} --from=build /build_dir/server/dist/config .
+COPY apps/server ./apps/server
+COPY packages/config ./packages/config
 
 EXPOSE 3000
-CMD ["./cli"]
+
+ENTRYPOINT [ "bun", "run", "apps/server/src/index.ts" ]
