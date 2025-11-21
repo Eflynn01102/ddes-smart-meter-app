@@ -1,3 +1,5 @@
+name: smart-meter
+
 networks:
   smartmeter-network:
     driver: bridge
@@ -36,14 +38,16 @@ services:
   # UI Service
   ui:
     image: client-ui:latest
+    container_name: ui
     restart: unless-stopped
     networks:
       - smartmeter-network
     ports:
-      - "8080:80"
+      - "80:80"
   # API Service
   client:
     image: client-server:latest
+    container_name: client
     restart: unless-stopped
     networks:
       - smartmeter-network
@@ -101,6 +105,6 @@ services:
       ROUTING_KEY: billing
       QUEUE_SIZE: 1024
       ALERT_URL: "http://server:3000/alert"
-      HELLO_WORLD_URL: "http://server3000/hello-world"
+      HELLO_WORLD_URL: "http://server:3000/hello-world"
     depends_on:
       - rabbitmq

@@ -23,7 +23,6 @@ services:
     networks:
       - smartmeter-network
     ports:
-      - 5552:5552
       - 15672:15672
     environment:
       RABBITMQ_DEFAULT_USER: guest
@@ -39,19 +38,17 @@ services:
   # UI Service
   clientui:
     image: client-ui:latest
-    container_name: client-ui
+    container_name: ui
     restart: unless-stopped
     networks:
       - smartmeter-network
     ports:
       - "80:80"
-    # volumes:
-      # - ./nginx.conf:/etc/nginx/conf.d/default.conf
 
   # API Service
   clientserver:
     image: client-server:latest
-    container_name: client-server
+    container_name: client
     restart: unless-stopped
     networks:
       - smartmeter-network
