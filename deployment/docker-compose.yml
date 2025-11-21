@@ -69,8 +69,21 @@ services:
     command: ["/usr/local/bin/ingestion"]
   # Billing Service
   billing:
-    build: .
-    container_name: billing_service
+    image: ghcr.io/eflynn01102/billing-service:v0.1.0-9b488b3
+    container_name: billing-service
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    restart: unless-stopped
     networks:
       - smartmeter-network
   # Gateway Service
