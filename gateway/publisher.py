@@ -8,8 +8,7 @@ import pika
 from pika.adapters.blocking_connection import BlockingConnection
 from pika.exceptions import AMQPError
 from queue import Queue, Empty
-from .settings import RABBIT_URL, EXCHANGE_NAME, ROUTING_KEY, PUBLISHER_RECONNECT_BASE, PUBLISHER_RECONNECT_MAX, PUBLISHER_CONFIRM
-from settings import ALERT_URL, HELLO_WORLD_URL
+from settings import RABBIT_URL, EXCHANGE_NAME, ROUTING_KEY, PUBLISHER_RECONNECT_BASE, PUBLISHER_RECONNECT_MAX, PUBLISHER_CONFIRM, ALERT_URL, HELLO_WORLD_URL
 from alert_service import send_alert
 
 logger = logging.getLogger("gateway.publisher")
