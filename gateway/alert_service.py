@@ -1,5 +1,5 @@
 import requests
-from gateway.settings import ALERT_URL, HELLO_WORLD_URL
+from settings import ALERT_URL, HELLO_WORLD_URL
 
 def send_alert(message: str, title: str, severity: str):
     body = {
