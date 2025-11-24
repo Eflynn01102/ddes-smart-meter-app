@@ -1,6 +1,7 @@
 from __future__ import annotations
 import logging
 import logging.config
+from pathlib import Path
 import signal
 import threading
 import time
@@ -11,12 +12,16 @@ from publisher import Publisher
 from validation import validate_reading
 from settings import HTTP_PORT, QUEUE_SIZE, AUTH_TOKEN, SHUTDOWN_TIMEOUT
 import settings
-from settings import ALERT_URL, HELLO_WORLD_URL
 from alert_service import send_alert
 
-# configure logging
-logging.config.fileConfig("logging.yaml")
+logging_config_path = Path(__file__).with_name("logging.yaml")
+if logging_config_path.exists():
+    logging.config.fileConfig(logging_config_path)
+else:
+    logging.basicConfig(level=logging.INFO)
+
 logger = logging.getLogger("gateway.app")
+
 
 app = Flask(__name__)
 
@@ -47,12 +52,14 @@ def metrics():
 def readings():
     payload = request.get_json(force=True, silent=True)
     if payload is None:
+        logger.warning("Received invalid JSON payload")
         send_alert("Payload is None and there is an invalid json-400", "None Payload", "error")
         return jsonify({"error": "invalid json"}), 400
 
     require_auth = bool(AUTH_TOKEN)
     r, err = validate_reading(payload, require_auth=require_auth, expected_token=AUTH_TOKEN)
     if err:
+        logger.warning("Validation error: %s", err)
         send_alert("Unauthorised: Error when validating reading", "Error when validating reading", "error")
         return jsonify({"error": err}), 400 if err != "unauthorized" else 401
 
@@ -60,6 +67,7 @@ def readings():
     body = json.dumps(norm).encode()
     ok = publisher.publish(body, None)
     if not ok:
+        logger.warning("Out queue full while handling/reading request")
         send_alert("Server is Busy- 503", "Server Busy-503", "info")
         return jsonify({"error": "server busy"}), 503
     return "", 202
