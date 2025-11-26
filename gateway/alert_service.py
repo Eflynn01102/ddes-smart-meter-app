@@ -1,35 +1,45 @@
+import json
 import logging
 import threading
 from typing import Any, Tuple
+from urllib import request, error
 
-import requests
 
-from requests import RequestException
-from settings import ALERT_URL, HELLO_WORLD_URL
+
+from gateway.settings import ALERT_URL, HELLO_WORLD_URL
 
 logger = logging.getLogger(__name__)
 
 
-def _post_alert(body: dict[str, Any], timeout: float) -> Tuple[int, None, Any]:
-    try:
-        res=requests.post(ALERT_URL, json=body, timeout=timeout)
+def _http_post(url: str, body: dict[str,Any], timeout: float) -> Tuple[int, Any]:
+        data= json.dumps(body).encode()
+        req=request.Request(url, data=data, headers={"Content-Type":"application/json"})
+        with request.urlopen(req, timeout=timeout) as resp:
+             raw=resp.read()
         try:
-            payload = res.json()
+             payload = json.loads(raw.decode()) if raw else {}
+        
         except ValueError:
-            payload = res.text
-        return res.status_code, payload
-    except RequestException as exc:
-        logger.warning("Failed to send alert '%s':%s", body.get("title", "<unknown>"), exc)
-        return None, None
+             payload = raw.decode()
+        return resp.getcode(), payload
+
+
+def _post_alert(body: dict[str,Any], timeout: float) -> Tuple[int | None, Any]:
+     try:
+          return _http_post(ALERT_URL, body, timeout)
+     except error.URLError as exc:
+          logger.warning("Failed to send alert to %s: %s", body.get("title", "<unknown>"), exc)
+          return None, None
+     
 
 
 def send_alert(
-        message: str, 
-        title: str, 
-        severity: str, 
+        message: str,
+        title: str,
+        severity: str,
         timeout: float = 2.0,
         async_send : bool = True,
-    ) -> Tuple[int | None, Any | Any]:
+    ) -> Tuple[int | None, Any | None]:
 
     if not ALERT_URL:
         logger.debug("Alert URL not configured, skipping alert '%s'", title)
