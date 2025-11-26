@@ -10,10 +10,10 @@ from pika.adapters.blocking_connection import BlockingConnection
 from pika.exceptions import AMQPError
 from queue import Queue, Empty
 
-from alert_service import send_alert
+from gateway.alert_service import send_alert
 
 logger = logging.getLogger("gateway.publisher")
-from settings import(
+from gateway.settings import(
     RABBIT_URL,
     EXCHANGE_NAME,
     ROUTING_KEY,

@@ -8,11 +8,12 @@ import time
 import json
 from queue import Queue
 from flask import Flask, request, jsonify
-from publisher import Publisher
-from validation import validate_reading
-from settings import HTTP_PORT, QUEUE_SIZE, AUTH_TOKEN, SHUTDOWN_TIMEOUT
-import settings
-from alert_service import send_alert
+
+from gateway import settings
+from gateway.publisher import Publisher
+from gateway.validation import validate_reading
+from gateway.settings import HTTP_PORT, QUEUE_SIZE, AUTH_TOKEN, SHUTDOWN_TIMEOUT
+from gateway.alert_service import send_alert
 
 logging_config_path = Path(__file__).with_name("logging.yaml")
 if logging_config_path.exists():

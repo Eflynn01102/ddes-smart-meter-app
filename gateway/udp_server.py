@@ -2,8 +2,8 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from validation import validate_reading
-from settings import UDP_PORT, AUTH_TOKEN
+from gateway.validation import validate_reading
+from gateway.settings import UDP_PORT, AUTH_TOKEN
 
 logger = logging.getLogger("gateway.udp")
 
