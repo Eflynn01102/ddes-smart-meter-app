@@ -10,7 +10,7 @@ from settings import ALERT_URL, HELLO_WORLD_URL
 logger = logging.getLogger(__name__)
 
 
-def _post_alert(body: dict[str, Any], timeout: float) -> Tuple[int, |None, Any]:
+def _post_alert(body: dict[str, Any], timeout: float) -> Tuple[int, None, Any]:
     try:
         res=requests.post(ALERT_URL, json=body, timeout=timeout)
         try:
