@@ -10,7 +10,7 @@ from pika.adapters.blocking_connection import BlockingConnection
 from pika.exceptions import AMQPError
 from queue import Queue, Empty
 
-from gateway.alert_service import send_alert
+from alert_service import send_alert
 
 logger = logging.getLogger("gateway.publisher")
 from gateway.settings import(

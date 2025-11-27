@@ -6,7 +6,7 @@ from urllib import request, error
 
 
 
-from gateway.settings import ALERT_URL, HELLO_WORLD_URL
+from settings import ALERT_URL, HELLO_WORLD_URL
 
 logger = logging.getLogger(__name__)
 
