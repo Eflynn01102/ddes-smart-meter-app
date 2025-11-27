@@ -1,6 +1,7 @@
 from __future__ import annotations
 import logging
 import logging.config
+import yaml
 from pathlib import Path
 import signal
 import threading
@@ -17,7 +18,10 @@ from alert_service import send_alert
 
 logging_config_path = Path(__file__).with_name("logging.yaml")
 if logging_config_path.exists():
-    logging.config.fileConfig(logging_config_path)
+    with open(logging_config_path, "r") as filehandle:
+    #logging.config.fileConfig(logging_config_path)
+        configyaml = yaml.safe_load(filehandle)
+        logging.config.dictConfig(configyaml)
 else:
     logging.basicConfig(level=logging.INFO)
 

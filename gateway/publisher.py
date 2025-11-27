@@ -13,7 +13,7 @@ from queue import Queue, Empty
 from alert_service import send_alert
 
 logger = logging.getLogger("gateway.publisher")
-from gateway.settings import(
+from settings import(
     RABBIT_URL,
     EXCHANGE_NAME,
     ROUTING_KEY,
