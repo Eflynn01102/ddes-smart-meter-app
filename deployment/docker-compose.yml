@@ -108,5 +108,3 @@ services:
       QUEUE_SIZE: 1024
       ALERT_URL: "http://client:3000/alert"
       HELLO_WORLD_URL: "http://client:3000/hello-world"
-    depends_on:
-      - rabbitmq
