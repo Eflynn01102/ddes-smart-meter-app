@@ -3,14 +3,14 @@
 ##########
 # Build #
 ##########
-FROM arm64v8/eclipse-temurin:21-jdk AS build
+FROM eclipse-temurin:21-jdk AS build
 ENV GRADLE_VERSION=8.8
 ENV GRADLE_HOME=/opt/gradle
 ENV PATH=$PATH:$GRADLE_HOME/bin
 
-# Install Gradle manually
+# Install Gradle manually and curl
 RUN apt-get update && \
-    apt-get install -y wget unzip && \
+    apt-get install -y wget unzip curl && \
     wget https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip -O /tmp/gradle.zip && \
     mkdir -p /opt/gradle && \
     unzip /tmp/gradle.zip -d /opt/gradle && \
@@ -38,7 +38,14 @@ RUN --mount=type=cache,target=/home/gradle/.gradle/caches \
 ###########
 # Runtime #
 ###########
-FROM arm64v8/eclipse-temurin:21-jre AS runtime
+FROM eclipse-temurin:21-jre AS runtime
+
+# Install curl (required by task)
+RUN apt-get update && \
+    apt-get install -y curl && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom" \
     SPRING_PROFILES_ACTIVE=prod
 WORKDIR /app
