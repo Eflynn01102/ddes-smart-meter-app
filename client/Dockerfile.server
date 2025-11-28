@@ -1,0 +1,16 @@
+FROM oven/bun:1-slim
+
+WORKDIR /app
+
+COPY package.json bun.lock ./
+COPY packages/config/package.json ./packages/config/
+COPY apps/server/package.json ./packages/server/
+
+RUN bun install
+
+COPY apps/server ./apps/server
+COPY packages/config ./packages/config
+
+EXPOSE 3000
+
+ENTRYPOINT [ "bun", "run", "apps/server/src/index.ts" ]

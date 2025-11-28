@@ -2,7 +2,8 @@
 	"compilerOptions": {
 		// Enable latest features
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"@client/config": ["../../packages/config"]
 		},
 		"lib": ["ESNext", "DOM"],
 		"target": "ESNext",

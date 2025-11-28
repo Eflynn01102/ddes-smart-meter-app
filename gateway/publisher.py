@@ -4,15 +4,23 @@ import time
 import json
 import logging
 from typing import Any
+
 import pika
 from pika.adapters.blocking_connection import BlockingConnection
 from pika.exceptions import AMQPError
 from queue import Queue, Empty
-from .settings import RABBIT_URL, EXCHANGE_NAME, ROUTING_KEY, PUBLISHER_RECONNECT_BASE, PUBLISHER_RECONNECT_MAX, PUBLISHER_CONFIRM
-from settings import ALERT_URL, HELLO_WORLD_URL
+
 from alert_service import send_alert
 
 logger = logging.getLogger("gateway.publisher")
+from settings import(
+    RABBIT_URL,
+    EXCHANGE_NAME,
+    ROUTING_KEY,
+    PUBLISHER_RECONNECT_BASE,
+    PUBLISHER_RECONNECT_MAX,
+    PUBLISHER_CONFIRM,
+)
 
 
 class Publisher(threading.Thread):
@@ -43,7 +51,7 @@ class Publisher(threading.Thread):
                     self._channel.confirm_delivery()
                 self._connected.set()
                 logger.info("Connected to RabbitMQ and exchange declared")
-                send_alert("Connected to RabbitMQ and exchange is declared", "Connection to RabbitMQ", "info")
+                
                 return
             except AMQPError as e:
                 logger.exception("RabbitMQ connect failed, retrying in %.1fs: %s", backoff, e)
@@ -70,7 +78,7 @@ class Publisher(threading.Thread):
             return False
         try:
             self.out_queue.put_nowait((body, properties))
-            send_alert("Returned True if message is queued and published", "Message is queued", "success")
+            
             return True
         except Exception:
             logger.error("Out queue full, rejecting message")
@@ -80,8 +88,9 @@ class Publisher(threading.Thread):
     def _do_publish(self, body: bytes, properties: pika.BasicProperties | None = None) -> bool:
         try:
             if not self._channel:
+                send_alert("publisher chaneel is not connected", "Not connected", "error")
                 raise RuntimeError("Not connected")
-            send_alert("Self.channel is not connected", "Not connected", "error")
+            
             self._channel.basic_publish(
                 exchange=EXCHANGE_NAME,
                 routing_key=ROUTING_KEY,
@@ -120,12 +129,12 @@ class Publisher(threading.Thread):
                     send_alert("Failure to requeue message and will drop ", "failure to requeue message", "error")
                 time.sleep(0.5)
             else:
-                send_alert("Publish Success", "Task done", "success")
+                
                 self.out_queue.task_done()
 
         # flush remaining
         logger.info("Publisher stopping, flushing remaining messages up to timeout")
-        send_alert("Publisher stopping and flushing remaining messages to timeout", "Publisher stopping", "info")
+        
         start = time.time()
         while not self.out_queue.empty() and (time.time() - start) < 5:
             try:
@@ -139,4 +148,4 @@ class Publisher(threading.Thread):
                 break
         self._close()
         logger.info("Publisher stopped")
-        send_alert("Publisher has stopped", "Publisher stopped", "info")
+        

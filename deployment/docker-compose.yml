@@ -1,3 +1,5 @@
+name: smart-meter
+
 networks:
   smartmeter-network:
     driver: bridge
@@ -36,14 +38,16 @@ services:
   # UI Service
   ui:
     image: client-ui:latest
+    container_name: ui
     restart: unless-stopped
     networks:
       - smartmeter-network
     ports:
-      - "8080:80"
+      - "80:80"
   # API Service
   client:
     image: client-server:latest
+    container_name: client
     restart: unless-stopped
     networks:
       - smartmeter-network
@@ -56,11 +60,9 @@ services:
   ingestion:
     image: ingestion:latest
     restart: unless-stopped
+    container_name: ingestion
     networks:
       - smartmeter-network
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
     environment:
       HMACKEY: 00deb39aaf33c17977e0c858148dca5483703f554da146637b35914772cae5b2
       CLIENTFW: 1.0.0
@@ -69,13 +71,27 @@ services:
     command: ["/usr/local/bin/ingestion"]
   # Billing Service
   billing:
-    build: .
-    container_name: billing_service
+    image: ghcr.io/eflynn01102/billing-service:v0.1.0-9b488b3
+    container_name: billing-service
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    restart: unless-stopped
     networks:
       - smartmeter-network
   # Gateway Service
   gateway:
     image: gateway:latest
+    container_name: gateway
     restart: unless-stopped
     ports:
       - "5000:5000"
@@ -87,7 +103,5 @@ services:
       EXCHANGE_NAME: ddes.readings
       ROUTING_KEY: billing
       QUEUE_SIZE: 1024
-      ALERT_URL: "http://server:3000/alert"
-      HELLO_WORLD_URL: "http://server3000/hello-world"
-    depends_on:
-      - rabbitmq
+      ALERT_URL: "http://client:3000/alert"
+      HELLO_WORLD_URL: "http://client:3000/hello-world"
