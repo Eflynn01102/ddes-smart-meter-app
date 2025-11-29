@@ -18,7 +18,7 @@
 #include <curl/curl.h>
 #include "types.h"
 
-#define AMQP_INGESTION_QUEUE_STEM "client-"
+#define AMQP_INGESTION_QUEUE_STEM "client"
 #define AMQP_EVENTS_TOPIC_NAME "events"
 #define AMQP_EVENTS_ROUTING_KEY "billing"
 #define TRUE 1
