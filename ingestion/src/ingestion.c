@@ -16,6 +16,7 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
     S32 Reading = 0;
 
     Timeout.tv_sec = 1;
+    sleep(30);
     while (SigTermReceived == FALSE) {
         amqp_maybe_release_buffers(*Connection);
         Ret = amqp_consume_message(*Connection, &Envelope, &Timeout, 0);

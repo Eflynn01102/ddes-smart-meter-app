@@ -158,7 +158,7 @@ U8 InitiateConnection(AMQP_CONN_T* Connection, ConfigType Conf) {
     // --- Declare and consume queues ---
     for (QueueI = 0; QueueI < MAX_CLIENTS; QueueI++) {
         snprintf(QueueName, sizeof(QueueName), "%s%d", AMQP_INGESTION_QUEUE_STEM, QueueI);
-
+        
         amqp_queue_declare(*Connection, 1, amqp_cstring_bytes(QueueName),
                            0, 0, 0, 0, amqp_empty_table);
         if (CheckRpcReply(*Connection) != OK) {
