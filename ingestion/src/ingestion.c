@@ -6,7 +6,7 @@ V SigTermHandler(S32 SigVal) {
     LogInfo("sigterm\n");
     SigTermReceived = TRUE;
 }
-
+/*
 U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
     AMQP_ENVEL_T Envelope = {0};
     AMQP_RPC_REP_T Ret;
@@ -64,6 +64,85 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
     }
     cJSON_Delete(MsgJson);
     return OK;
+}*/
+
+U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
+    AMQP_ENVEL_T Envelope = {0};
+    AMQP_RPC_REP_T Ret;
+    struct timeval Timeout = { .tv_sec = 1 };
+    cJSON* MsgJson = NULL;
+
+    while (SigTermReceived == FALSE) {
+        amqp_maybe_release_buffers(*Connection);
+
+        Ret = amqp_consume_message(*Connection, &Envelope, &Timeout, 0);
+
+        if (Ret.reply_type == AMQP_RESPONSE_NONE) {
+            // timeout → loop
+            continue;
+        }
+
+        if (Ret.reply_type == AMQP_RESPONSE_LIBRARY_EXCEPTION) {
+            if (Ret.library_error == AMQP_STATUS_TIMEOUT) {
+                continue;
+            }
+            if (Ret.library_error == AMQP_STATUS_CONNECTION_CLOSED ||
+                Ret.library_error == AMQP_STATUS_SOCKET_ERROR) {
+                LogInfo("Connection lost, reconnecting...\n");
+                if (InitiateConnection(Connection, Conf) == OK) {
+                    LogInfo("Reconnected to RabbitMQ\n");
+                }
+                continue;
+            }
+            LogErr("AMQP library exception: %s\n", amqp_error_string2(Ret.library_error));
+            continue;
+        }
+
+        if (Ret.reply_type == AMQP_RESPONSE_SERVER_EXCEPTION) {
+            LogErr("RabbitMQ server exception\n");
+            continue;
+        }
+
+        // ──────────────────────────────────────────────────────────────
+        // Normal message received → process it
+        // ──────────────────────────────────────────────────────────────
+        if (Ret.reply_type == AMQP_RESPONSE_NORMAL) {
+            MsgJson = cJSON_ParseWithLength((char*)Envelope.message.body.bytes,
+                                            Envelope.message.body.len);
+            if (!MsgJson) {
+                LogErr("JSON parse failed: %.*s\n",
+                       (int)Envelope.message.body.len,
+                       (char*)Envelope.message.body.bytes);
+                // Still ack it – we don't want infinite redelivery of garbage
+                goto ack_and_continue;
+            }
+
+            if (ValidateJsonObj(MsgJson, getenv("CLIENTFW")) != OK ||
+                HmacVerify(MsgJson) != OK ||
+                CheckIdempotency(MsgJson) != OK) {
+                // Validation failed → log already done inside functions
+                cJSON_Delete(MsgJson);
+                MsgJson = NULL;
+                goto ack_and_continue;
+            }
+
+            // Success path
+            PublishMessageToEventsTopic(Connection, Envelope);
+            LogInfo("Processed message from client %s\n",
+                    cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
+
+            cJSON_Delete(MsgJson);
+            MsgJson = NULL;
+
+        ack_and_continue:
+            // THIS IS THE ONLY IMPORTANT LINE YOU WERE MISSING
+            amqp_basic_ack(*Connection, 1, Envelope.delivery_tag, 0);
+            amqp_destroy_envelope(&Envelope);
+        }
+    }
+
+    if (MsgJson) cJSON_Delete(MsgJson);
+    return OK;
 }
 
 U8 main(U8 argc, U8* argv[]) {
@@ -71,7 +150,7 @@ U8 main(U8 argc, U8* argv[]) {
     AMQP_CONN_T Conn = NULL;
     S32 ConnectionAttempt = 0;
 
-    LogInfo("INGESTION (%s %s)\n", __DATE__, __TIME__);
+    LogInfo("INGESTION (STREAMS) (%s %s)\n", __DATE__, __TIME__);
 
     SigTermReceived = FALSE;
     if (signal(SIGTERM, SigTermHandler) == SIG_ERR) {
@@ -116,7 +195,7 @@ U8 main(U8 argc, U8* argv[]) {
         amqp_destroy_connection(Conn);
     }
     
-    CloseConnection(Conn);
+    CloseConnection(&Conn);
     CleanUpEnvVars();
     LogInfo("cleaned up env vars\n");
     exit(OK);
