@@ -28,7 +28,7 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
              Ret.library_error == AMQP_STATUS_SOCKET_ERROR ||
              Ret.library_error == AMQP_STATUS_HEARTBEAT_TIMEOUT)) {
 
-            LogWarn("Connection lost (error %d), reconnecting in %ds...\n", Ret.library_error, ReconnectDelay);
+            LogErr("Connection lost (error %d), reconnecting in %ds...\n", Ret.library_error, ReconnectDelay);
 
             if (*Connection) {
                 amqp_connection_close(*Connection, AMQP_REPLY_SUCCESS);
