@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   billing-service:
-    image: ghcr.io/eflynn01102/billing-service:latest
+    image: billing:latest
     container_name: billing-service
     ports:
       - "8080:8080"
