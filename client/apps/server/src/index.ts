@@ -17,23 +17,31 @@ const endPointTopic = "client";
 
 // create 12 streams
 for (let i = 0; i <= 11; i++) {
-	await rabbitInstance.createStream(client, `${endPointTopic}${i}`);
+	try {
+		await rabbitInstance.createStream(client, `${endPointTopic}${i}`);
+	} catch (error) {
+		console.error("Error creating stream:", error);
+	}
 }
 
 const publisherArray: Publisher[] = [];
 
 // create 12 publishers
 for (let i = 0; i <= 11; i++) {
-	const tempPublisher = await rabbitInstance.createPublisher(
-		client,
-		`${endPointTopic}${i}`,
-	);
-	if (!tempPublisher) break;
-	publisherArray.push(tempPublisher);
+	try {
+		const tempPublisher = await rabbitInstance.createPublisher(
+			client,
+			`${endPointTopic}${i}`,
+		);
+		if (!tempPublisher) break;
+		publisherArray.push(tempPublisher);
+	} catch (error) {
+		console.error("Error creating publisher:", error);
+	}
 }
 
 const message: rabbitMessage = {
-	clientID: "client-0",
+	clientId: "client-0",
 	currentReading: 43,
 	unix: Math.floor(Date.now() / 1000),
 	fwVersion: "1.0.0",
@@ -48,17 +56,17 @@ setInterval(async () => {
 		console.error("No publisher found");
 		return;
 	}
-	message.clientID = `client-${randomNum + 1}`;
+	message.clientId = `client-${randomNum + 1}`;
 	message.currentReading = await rabbitInstance.readingHandler(randomNum + 1);
 	message.unix = Math.floor(Date.now() / 1000);
 	message.signature = createHmacSignature(
-		message.clientID,
+		message.clientId,
 		message.currentReading.toString(),
 		message.unix.toString(),
 	);
 	await rabbitInstance.messagehandler(currentPub, message);
 	sendCurrentUsageToClients({
-		clientId: message.clientID,
+		clientId: message.clientId,
 		currentUsage: message.currentReading,
 	});
 }, 5000);
