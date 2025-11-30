@@ -58,7 +58,7 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
                     LogErr("Reconnect failed - retrying in %ds\n", ReconnectDelay);
                 }
             } else {
-                LogErr("library exception %d", Ret.library_error);
+                LogErr("library exception %d\n", Ret.library_error);
             }
             continue;
         }
