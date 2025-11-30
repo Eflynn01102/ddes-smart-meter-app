@@ -12,6 +12,7 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
     AMQP_RPC_REP_T Ret;
     struct timeval Timeout = { .tv_sec = 1 };
     cJSON* MsgJson = NULL;
+    S32 ReconnectDelay = 0;
 
     while (SigTermReceived == FALSE) {
         amqp_maybe_release_buffers(*Connection);
@@ -22,19 +23,35 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
             continue;
         }
 
+        if (Ret.reply_type == AMQP_RESPONSE_LIBRARY_EXCEPTION &&
+            (Ret.library_error == AMQP_STATUS_CONNECTION_CLOSED ||
+             Ret.library_error == AMQP_STATUS_SOCKET_ERROR ||
+             Ret.library_error == AMQP_STATUS_HEARTBEAT_TIMEOUT)) {
+
+            LogWarn("Connection lost (error %d), reconnecting in %ds...\n", Ret.library_error, ReconnectDelay);
+
+            if (*Connection) {
+                amqp_connection_close(*Connection, AMQP_REPLY_SUCCESS);
+                amqp_destroy_connection(*Connection);
+                *Connection = NULL;
+            }
+
+            sleep(ReconnectDelay);
+            ReconnectDelay = (ReconnectDelay < 30) ? ReconnectDelay * 2 : 30;
+
+            if (InitiateConnection(Connection, Conf) == OK) {
+                LogInfo("Reconnected successfully to RabbitMQ\n");
+                ReconnectDelay = 1;
+                continue;
+            } else {
+                LogErr("Reconnection failed - retrying in %ds\n", ReconnectDelay);
+                continue;
+            }
+        }
+
         if (Ret.reply_type == AMQP_RESPONSE_LIBRARY_EXCEPTION) {
-            if (Ret.library_error == AMQP_STATUS_TIMEOUT) {
-                continue;
-            }
-            if (Ret.library_error == AMQP_STATUS_CONNECTION_CLOSED ||
-                Ret.library_error == AMQP_STATUS_SOCKET_ERROR) {
-                LogInfo("Connection lost, reconnecting...\n");
-                if (InitiateConnection(Connection, Conf) == OK) {
-                    LogInfo("Reconnected to RabbitMQ\n");
-                }
-                continue;
-            }
-            LogErr("AMQP library exception: %s\n", amqp_error_string2(Ret.library_error));
+            LogErr("AMQP library error: %s\n", amqp_error_string2(Ret.library_error));
+            sleep(1);
             continue;
         }
 
