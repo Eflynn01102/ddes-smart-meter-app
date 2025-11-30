@@ -15,6 +15,7 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
     S32 ReconnectDelay = 0;
 
     while (SigTermReceived == FALSE) {
+        Timeout.tv_sec = 1;
         amqp_maybe_release_buffers(*Connection);
 
         Ret = amqp_consume_message(*Connection, &Envelope, &Timeout, 0);
@@ -23,36 +24,33 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
             continue;
         }
 
-        if (Ret.reply_type == AMQP_RESPONSE_LIBRARY_EXCEPTION &&
-            (Ret.library_error == AMQP_STATUS_CONNECTION_CLOSED ||
-             Ret.library_error == AMQP_STATUS_SOCKET_ERROR ||
-             Ret.library_error == AMQP_STATUS_HEARTBEAT_TIMEOUT)) {
-
-            LogErr("Connection lost (error %d), reconnecting in %ds...\n", Ret.library_error, ReconnectDelay);
-
-            if (*Connection) {
-                amqp_connection_close(*Connection, AMQP_REPLY_SUCCESS);
-                amqp_destroy_connection(*Connection);
-                *Connection = NULL;
-            }
-
-            sleep(ReconnectDelay);
-            ReconnectDelay = (ReconnectDelay < 30) ? ReconnectDelay * 2 : 30;
-
-            if (InitiateConnection(Connection, Conf) == OK) {
-                LogInfo("Reconnected successfully to RabbitMQ\n");
-                ReconnectDelay = 1;
-                continue;
-            } else {
-                LogErr("Reconnection failed - retrying in %ds\n", ReconnectDelay);
-                continue;
-            }
-        }
-
         if (Ret.reply_type == AMQP_RESPONSE_LIBRARY_EXCEPTION) {
-            LogErr("AMQP library error: %s\n", amqp_error_string2(Ret.library_error));
-            sleep(1);
-            continue;
+            if (Ret.library_error == AMQP_STATUS_CONNECTION_CLOSED ||
+             Ret.library_error == AMQP_STATUS_SOCKET_ERROR ||
+             Ret.library_error == AMQP_STATUS_HEARTBEAT_TIMEOUT) {
+
+                LogErr("Connection lost (error %d), reconnecting in %ds...\n", Ret.library_error, ReconnectDelay);
+
+                if (*Connection) {
+                    amqp_connection_close(*Connection, AMQP_REPLY_SUCCESS);
+                    amqp_destroy_connection(*Connection);
+                    *Connection = NULL;
+                }
+
+                sleep(ReconnectDelay);
+                ReconnectDelay = (ReconnectDelay < 30) ? ReconnectDelay * 2 : 30;
+
+                if (InitiateConnection(Connection, Conf) == OK) {
+                    LogInfo("Reconnected successfully to RabbitMQ\n");
+                    ReconnectDelay = 1;
+                    continue;
+                } else {
+                    LogErr("Reconnection failed - retrying in %ds\n", ReconnectDelay);
+                    continue;
+                }
+            } else {
+                LogErr("RabbitMQ library exception %d\n", Ret.library_error);
+            }
         }
 
         if (Ret.reply_type == AMQP_RESPONSE_SERVER_EXCEPTION) {
