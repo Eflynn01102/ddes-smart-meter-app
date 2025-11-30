@@ -19,7 +19,6 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
     while (SigTermReceived == FALSE) {
         if (*Connection == NULL) {
             LogErr("No connection - forcing reconnect in %ds...\n", ReconnectDelay);
-            sleep(ReconnectDelay);
             ReconnectDelay = (ReconnectDelay >= 30) ? 30 : ReconnectDelay * 2;
             if (InitiateConnection(Connection, Conf) == OK) {
                 LogInfo("Connection established - resuming consume\n");
@@ -49,7 +48,6 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
                     *Connection = NULL;
                 }
 
-                sleep(ReconnectDelay);
                 ReconnectDelay = (ReconnectDelay >= 30) ? 30 : ReconnectDelay * 2;
 
                 if (InitiateConnection(Connection, Conf) == OK) {
@@ -70,19 +68,17 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
                 amqp_destroy_connection(*Connection);
                 *Connection = NULL;
             }
-            sleep(5);
             continue;
         }
 
         if (Ret.reply_type == AMQP_RESPONSE_NORMAL) {
             ReconnectDelay = 1;
 
-            MsgJson = cJSON_ParseWithLength((char*)Envelope.message.body.bytes,
-                                            Envelope.message.body.len);
+            MsgJson = cJSON_ParseWithLength((char*)Envelope.message.body.bytes, Envelope.message.body.len);
             if (!MsgJson) {
                 LogErr("JSON parse failed: %.*s\n",
-                       (int)Envelope.message.body.len,
-                       (char*)Envelope.message.body.bytes);
+                    (int)Envelope.message.body.len,
+                    (char*)Envelope.message.body.bytes);
                 goto ack_and_continue;
             }
 
@@ -94,16 +90,28 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
                 goto ack_and_continue;
             }
 
+            cJSON *clientIdObj = cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId");
+            const char *clientIdStr = NULL;
+            if (cJSON_IsString(clientIdObj) && (clientIdObj->valuestring != NULL)) {
+                clientIdStr = clientIdObj->valuestring;
+            } else {
+                LogErr("Warning: message missing valid clientId field: %.*s\n",
+                    (int)Envelope.message.body.len,
+                    (char*)Envelope.message.body.bytes);
+            }
             PublishMessageToEventsTopic(Connection, Envelope);
-            LogInfo("Processed message from client %s\n",
-                    cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
+
+            if (clientIdStr)
+                LogInfo("Processed message from client %s\n", clientIdStr);
+            else
+                LogInfo("Processed message from unknown client (no clientId)\n");
 
             cJSON_Delete(MsgJson);
             MsgJson = NULL;
 
-        ack_and_continue:
-            amqp_basic_ack(*Connection, 1, Envelope.delivery_tag, 0);
-            amqp_destroy_envelope(&Envelope);
+            ack_and_continue:
+                amqp_basic_ack(*Connection, 1, Envelope.delivery_tag, 0);
+                amqp_destroy_envelope(&Envelope);
         }
     }
 

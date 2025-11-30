@@ -8,6 +8,7 @@
 #include <amqp.h>
 #include <amqp_tcp_socket.h>
 #include <signal.h>
+#include <errno.h>
 #include <string.h>
 #include <stdlib.h>
 #include <openssl/hmac.h>
