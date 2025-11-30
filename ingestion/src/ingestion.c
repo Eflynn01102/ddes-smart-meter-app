@@ -7,92 +7,6 @@ V SigTermHandler(S32 SigVal) {
     SigTermReceived = TRUE;
 }
 
-/*U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
-    AMQP_ENVEL_T Envelope = {0};
-    AMQP_RPC_REP_T Ret;
-    struct timeval Timeout = { .tv_sec = 1 };
-    cJSON* MsgJson = NULL;
-    S32 ReconnectDelay = 0;
-
-    while (SigTermReceived == FALSE) {
-        Timeout.tv_sec = 1;
-        amqp_maybe_release_buffers(*Connection);
-
-        Ret = amqp_consume_message(*Connection, &Envelope, &Timeout, 0);
-
-        if (Ret.reply_type == AMQP_RESPONSE_NONE) {
-            continue;
-        }
-
-        if (Ret.reply_type == AMQP_RESPONSE_LIBRARY_EXCEPTION) {
-            if (Ret.library_error == AMQP_STATUS_CONNECTION_CLOSED ||
-             Ret.library_error == AMQP_STATUS_SOCKET_ERROR ||
-             Ret.library_error == AMQP_STATUS_HEARTBEAT_TIMEOUT) {
-
-                LogErr("Connection lost (error %d), reconnecting in %ds...\n", Ret.library_error, ReconnectDelay);
-
-                if (*Connection) {
-                    amqp_connection_close(*Connection, AMQP_REPLY_SUCCESS);
-                    amqp_destroy_connection(*Connection);
-                    *Connection = NULL;
-                }
-
-                sleep(ReconnectDelay);
-                ReconnectDelay = (ReconnectDelay < 30) ? ReconnectDelay * 2 : 30;
-
-                if (InitiateConnection(Connection, Conf) == OK) {
-                    LogInfo("Reconnected successfully to RabbitMQ\n");
-                    ReconnectDelay = 1;
-                    continue;
-                } else {
-                    LogErr("Reconnection failed - retrying in %ds\n", ReconnectDelay);
-                    continue;
-                }
-            } else {
-                LogErr("RabbitMQ library exception %d\n", Ret.library_error);
-            }
-        }
-
-        if (Ret.reply_type == AMQP_RESPONSE_SERVER_EXCEPTION) {
-            LogErr("RabbitMQ server exception\n");
-            continue;
-        }
-        if (Ret.reply_type == AMQP_RESPONSE_NORMAL) {
-            MsgJson = cJSON_ParseWithLength((char*)Envelope.message.body.bytes,
-                                            Envelope.message.body.len);
-            if (!MsgJson) {
-                LogErr("JSON parse failed: %.*s\n",
-                       (int)Envelope.message.body.len,
-                       (char*)Envelope.message.body.bytes);
-                goto ack_and_continue;
-            }
-
-            if (ValidateJsonObj(MsgJson, getenv("CLIENTFW")) != OK ||
-                HmacVerify(MsgJson) != OK ||
-                CheckIdempotency(MsgJson) != OK) {
-                cJSON_Delete(MsgJson);
-                MsgJson = NULL;
-                goto ack_and_continue;
-            }
-
-            // Success path
-            PublishMessageToEventsTopic(Connection, Envelope);
-            LogInfo("Processed message from client %s\n",
-                    cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
-
-            cJSON_Delete(MsgJson);
-            MsgJson = NULL;
-
-        ack_and_continue:
-            amqp_basic_ack(*Connection, 1, Envelope.delivery_tag, 0);
-            amqp_destroy_envelope(&Envelope);
-        }
-    }
-
-    if (MsgJson) cJSON_Delete(MsgJson);
-    return OK;
-}*/
-
 U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
     AMQP_ENVEL_T Envelope = {0};
     AMQP_RPC_REP_T Ret;
@@ -118,7 +32,7 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
 
         amqp_maybe_release_buffers(*Connection);
 
-        Timeout.tv_sec = 1;
+        Timeout.tv_sec = 30;
         Timeout.tv_usec = 0;
 
         Ret = amqp_consume_message(*Connection, &Envelope, &Timeout, 0);
@@ -128,23 +42,23 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
         }
 
         if (Ret.reply_type == AMQP_RESPONSE_LIBRARY_EXCEPTION) {
-            LogErr("Library exception (code %d: %s) - forcing reconnect\n",
-                   Ret.library_error, amqp_error_string2(Ret.library_error));
+            if (Ret.library_error == AMQP_STATUS_TIMEOUT) {
+                if (*Connection) {
+                    amqp_connection_close(*Connection, AMQP_REPLY_SUCCESS);
+                    amqp_destroy_connection(*Connection);
+                    *Connection = NULL;
+                }
 
-            if (*Connection) {
-                amqp_connection_close(*Connection, AMQP_REPLY_SUCCESS);
-                amqp_destroy_connection(*Connection);
-                *Connection = NULL;
-            }
+                sleep(ReconnectDelay);
+                ReconnectDelay = (ReconnectDelay >= 30) ? 30 : ReconnectDelay * 2;
 
-            sleep(ReconnectDelay);
-            ReconnectDelay = (ReconnectDelay >= 30) ? 30 : ReconnectDelay * 2;
-
-            if (InitiateConnection(Connection, Conf) == OK) {
-                LogInfo("Reconnected successfully\n");
-                ReconnectDelay = 1;
+                if (InitiateConnection(Connection, Conf) == OK) {
+                    ReconnectDelay = 1;
+                } else {
+                    LogErr("Reconnect failed - retrying in %ds\n", ReconnectDelay);
+                }
             } else {
-                LogErr("Reconnect failed - retrying in %ds\n", ReconnectDelay);
+                LogErr("library exception %d", Ret.library_error);
             }
             continue;
         }
