@@ -104,7 +104,7 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
 
     while (SigTermReceived == FALSE) {
         if (*Connection == NULL) {
-            LogWarn("No connection - forcing reconnect in %ds...\n", ReconnectDelay);
+            LogErr("No connection - forcing reconnect in %ds...\n", ReconnectDelay);
             sleep(ReconnectDelay);
             ReconnectDelay = (ReconnectDelay >= 30) ? 30 : ReconnectDelay * 2;
             if (InitiateConnection(Connection, Conf) == OK) {
