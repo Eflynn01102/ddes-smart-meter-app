@@ -7,7 +7,7 @@ V SigTermHandler(S32 SigVal) {
     SigTermReceived = TRUE;
 }
 
-U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
+/*U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
     AMQP_ENVEL_T Envelope = {0};
     AMQP_RPC_REP_T Ret;
     struct timeval Timeout = { .tv_sec = 1 };
@@ -89,6 +89,111 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
         }
     }
 
+    if (MsgJson) cJSON_Delete(MsgJson);
+    return OK;
+}*/
+
+U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
+    AMQP_ENVEL_T Envelope = {0};
+    AMQP_RPC_REP_T Ret;
+    struct timeval Timeout;
+    cJSON* MsgJson = NULL;
+    S32 ReconnectDelay = 1;
+
+    LogInfo("Ingestion mainloop started - waiting for messages...\n");
+
+    while (SigTermReceived == FALSE) {
+        if (*Connection == NULL) {
+            LogWarn("No connection - forcing reconnect in %ds...\n", ReconnectDelay);
+            sleep(ReconnectDelay);
+            ReconnectDelay = (ReconnectDelay >= 30) ? 30 : ReconnectDelay * 2;
+            if (InitiateConnection(Connection, Conf) == OK) {
+                LogInfo("Connection established - resuming consume\n");
+                ReconnectDelay = 1;
+            } else {
+                LogErr("Connect failed - retrying in %ds\n", ReconnectDelay);
+            }
+            continue;
+        }
+
+        amqp_maybe_release_buffers(*Connection);
+
+        Timeout.tv_sec = 1;
+        Timeout.tv_usec = 0;
+
+        Ret = amqp_consume_message(*Connection, &Envelope, &Timeout, 0);
+
+        if (Ret.reply_type == AMQP_RESPONSE_NONE) {
+            continue;
+        }
+
+        if (Ret.reply_type == AMQP_RESPONSE_LIBRARY_EXCEPTION) {
+            LogErr("Library exception (code %d: %s) - forcing reconnect\n",
+                   Ret.library_error, amqp_error_string2(Ret.library_error));
+
+            if (*Connection) {
+                amqp_connection_close(*Connection, AMQP_REPLY_SUCCESS);
+                amqp_destroy_connection(*Connection);
+                *Connection = NULL;
+            }
+
+            sleep(ReconnectDelay);
+            ReconnectDelay = (ReconnectDelay >= 30) ? 30 : ReconnectDelay * 2;
+
+            if (InitiateConnection(Connection, Conf) == OK) {
+                LogInfo("Reconnected successfully\n");
+                ReconnectDelay = 1;
+            } else {
+                LogErr("Reconnect failed - retrying in %ds\n", ReconnectDelay);
+            }
+            continue;
+        }
+
+        if (Ret.reply_type == AMQP_RESPONSE_SERVER_EXCEPTION) {
+            LogErr("Server exception - forcing reconnect\n");
+            if (*Connection) {
+                amqp_connection_close(*Connection, AMQP_REPLY_SUCCESS);
+                amqp_destroy_connection(*Connection);
+                *Connection = NULL;
+            }
+            sleep(5);
+            continue;
+        }
+
+        if (Ret.reply_type == AMQP_RESPONSE_NORMAL) {
+            ReconnectDelay = 1;
+
+            MsgJson = cJSON_ParseWithLength((char*)Envelope.message.body.bytes,
+                                            Envelope.message.body.len);
+            if (!MsgJson) {
+                LogErr("JSON parse failed: %.*s\n",
+                       (int)Envelope.message.body.len,
+                       (char*)Envelope.message.body.bytes);
+                goto ack_and_continue;
+            }
+
+            if (ValidateJsonObj(MsgJson, getenv("CLIENTFW")) != OK ||
+                HmacVerify(MsgJson) != OK ||
+                CheckIdempotency(MsgJson) != OK) {
+                cJSON_Delete(MsgJson);
+                MsgJson = NULL;
+                goto ack_and_continue;
+            }
+
+            PublishMessageToEventsTopic(Connection, Envelope);
+            LogInfo("Processed message from client %s\n",
+                    cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
+
+            cJSON_Delete(MsgJson);
+            MsgJson = NULL;
+
+        ack_and_continue:
+            amqp_basic_ack(*Connection, 1, Envelope.delivery_tag, 0);
+            amqp_destroy_envelope(&Envelope);
+        }
+    }
+
+    LogInfo("Ingestion loop exiting (SIGTERM received)\n");
     if (MsgJson) cJSON_Delete(MsgJson);
     return OK;
 }
