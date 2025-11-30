@@ -20,6 +20,18 @@ services:
     networks:
       - smart-meter-network
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: dev
+      RABBITMQ_DEFAULT_PASS: dev
+    networks:
+      - smart-meter-network
+
 networks:
   smart-meter-network:
     driver: bridge
