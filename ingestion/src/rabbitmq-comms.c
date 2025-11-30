@@ -57,19 +57,19 @@ U8 InitiateConnection(AMQP_CONN_T* Connection, ConfigType Conf) {
         LogErr("Failed to set basic_qos prefetch=1000\n");
         return NOK;
     }
-    LogInfo("Channel QoS set: prefetch=1000 (global=false)\n");
+    LogInfo("rabbit auth successful\n");
 
     for (QueueI = 0; QueueI < MAX_CLIENTS; QueueI++) {
         snprintf(QueueName, sizeof(QueueName), "%s%d", AMQP_INGESTION_QUEUE_STEM, QueueI);
 
-        amqp_table_entry_t decl_args[4];
-        amqp_table_t decl_table = {4, decl_args};
+        amqp_table_entry_t decl_args[1];
+        amqp_table_t decl_table = {1, decl_args};
 
         decl_args[0].key = amqp_cstring_bytes("x-queue-type");
         decl_args[0].value.kind = AMQP_FIELD_KIND_UTF8;
         decl_args[0].value.value.bytes = amqp_cstring_bytes("stream");
 
-        decl_args[1].key = amqp_cstring_bytes("x-max-age");
+        /*decl_args[1].key = amqp_cstring_bytes("x-max-age");
         decl_args[1].value.kind = AMQP_FIELD_KIND_UTF8;
         decl_args[1].value.value.bytes = amqp_cstring_bytes("30D");
 
@@ -79,23 +79,26 @@ U8 InitiateConnection(AMQP_CONN_T* Connection, ConfigType Conf) {
 
         decl_args[3].key = amqp_cstring_bytes("x-initial-cluster-size");
         decl_args[3].value.kind = AMQP_FIELD_KIND_I32;
-        decl_args[3].value.value.i32 = 3;
+        decl_args[3].value.value.i32 = 3;*/
 
         amqp_queue_declare(*Connection, 1, amqp_cstring_bytes(QueueName), 0, 1, 0, 0, decl_table);
-        if (CheckRpcReply(*Connection) != OK) return NOK;
+        if (CheckRpcReply(*Connection) != OK) {
+            LogErr("could not set arguments\n");
+            return NOK;
+        }
 
-        amqp_table_entry_t consume_args[2];
+        amqp_table_entry_t consume_args[1];
 
         consume_args[0].key   = amqp_cstring_bytes("x-stream-offset");
         consume_args[0].value.kind = AMQP_FIELD_KIND_UTF8;
         consume_args[0].value.value.bytes = amqp_cstring_bytes("next");
 
-        consume_args[1].key   = amqp_cstring_bytes("x-stream-prefetch-count");
+        /*consume_args[1].key   = amqp_cstring_bytes("x-stream-prefetch-count");
         consume_args[1].value.kind = AMQP_FIELD_KIND_I32;
-        consume_args[1].value.value.i32 = 1000;
+        consume_args[1].value.value.i32 = 1000;*/
 
         amqp_table_t consume_table;
-        consume_table.num_entries = 2;
+        consume_table.num_entries = 1;
         consume_table.entries = consume_args;
 
         amqp_basic_consume(*Connection, 1,
@@ -111,7 +114,10 @@ U8 InitiateConnection(AMQP_CONN_T* Connection, ConfigType Conf) {
 
     amqp_exchange_declare(*Connection, 1, amqp_cstring_bytes(AMQP_EVENTS_TOPIC_NAME),
                           amqp_cstring_bytes("topic"), 0, 0, 0, 0, amqp_empty_table);
-    if (CheckRpcReply(*Connection) != OK) return NOK;
+    if (CheckRpcReply(*Connection) != OK) {
+        LogErr("could not event topic\n");
+        return NOK;
+    }
     LogInfo("=== RABBITMQ STREAMS SETUP COMPLETE - prefetch=1000 - NEW BINARY %s ===\n", __TIMESTAMP__);
     return OK;
 }
