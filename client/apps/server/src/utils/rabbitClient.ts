@@ -32,12 +32,16 @@ export class RabbitMQClient {
 
 	public async createStream(client: rabbit.Client, topicName: string) {
 		console.log("Creating stream...");
-		await client.createStream({
-			stream: topicName,
-			arguments: {
-				"max-length-bytes": 100000000,
-			},
-		});
+		try {
+			await client.createStream({
+				stream: topicName,
+				arguments: {
+					"max-length-bytes": 100000000,
+				},
+			});
+		} catch (error) {
+			console.error("Error creating stream:", error);
+		}
 	}
 
 	public async createPublisher(client: rabbit.Client, topicName: string) {
