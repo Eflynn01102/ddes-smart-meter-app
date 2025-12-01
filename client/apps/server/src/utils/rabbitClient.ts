@@ -79,6 +79,7 @@ export class RabbitMQClient {
 		console.log("Message sent successfully");
 	}
 
+	// remove line 82 - 108 
 	public async createConsumer(client: rabbit.Client, topicName: string, onMessage: (msg: { content: Buffer | string }) => void) {
 		try {
 			console.log("Creating Consumer for topic:", topicName);
@@ -105,4 +106,5 @@ export class RabbitMQClient {
 			console.error("Error creating consumer:", error);
 		}
 	}
-}
+
+} // end of class

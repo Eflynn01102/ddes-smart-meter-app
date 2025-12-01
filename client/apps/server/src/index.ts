@@ -75,6 +75,7 @@ setInterval(async () => {
 	});
 }, 5000);
 
+// remove line 78 - 87
 await rabbitInstance.createConsumer(client, `billing.readings.q`, (msg) => {
 	const data = JSON.parse(msg.content.toString());
 	const messge = APIBillData.safeParse(data);

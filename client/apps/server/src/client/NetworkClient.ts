@@ -20,6 +20,7 @@ app.get("/hello-world", (_req, res) => {
 	res.send("Hello World!");
 });
 
+// Uncomment to enable bill data endpoint
 // app.post("/bill_data", (req, res) => {
 // 	const data = APIBillData.safeParse(req.body);
 // 	if (!data.success)
