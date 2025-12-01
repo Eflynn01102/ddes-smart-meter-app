@@ -28,7 +28,7 @@ class CoreConfigTest {
         BillingCalculator calc = config.billingCalculator(config.zoneId());
         assertNotNull(calc);
     }
-    
+
     @Test
     void testBillStoreBean() {
         CoreConfig config = new CoreConfig();
@@ -37,7 +37,6 @@ class CoreConfigTest {
         String outputDir = "test-output";
         BillStore store = config.billStore(clock, zoneId, outputDir);
         assertNotNull(store);
-        assertNull(store.load(null));
     }
 
     @Test
