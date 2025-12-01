@@ -80,25 +80,29 @@ export class RabbitMQClient {
 	}
 
 	public async createConsumer(client: rabbit.Client, topicName: string, onMessage: (msg: { content: Buffer | string }) => void) {
-		console.log("Creating Consumer for topic:", topicName);
-		const consumer = await client.declareConsumer(
-			{
-				stream: topicName,
-				offset: rabbit.Offset.last(),
-			},
-			(msg: { content: Buffer | string }) => {
-				try {
-					onMessage(msg);
-					console.log(
-						`Received message on topic ${topicName}:`,
-						typeof msg.content === "string" ? msg.content : msg.content.toString(),
-					);
-
-				} catch (err) {
-					console.error("Error in onMessage handler:", err);
-				}
-			},
-		);
-		consumer.close()
+		try {
+			console.log("Creating Consumer for topic:", topicName);
+			const consumer = await client.declareConsumer(
+				{
+					stream: topicName,
+					offset: rabbit.Offset.last(),
+				},
+				(msg: { content: Buffer | string }) => {
+					try {
+						onMessage(msg);
+						console.log(
+							`Received message on topic ${topicName}:`,
+							typeof msg.content === "string" ? msg.content : msg.content.toString(),
+						);
+	
+					} catch (err) {
+						console.error("Error in onMessage handler:", err);
+					}
+				},
+			);
+			consumer.close()
+		} catch (error) {
+			console.error("Error creating consumer:", error);
+		}
 	}
 }
