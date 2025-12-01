@@ -65,22 +65,22 @@ setInterval(async () => {
 		message.unix.toString(),
 	);
 	await rabbitInstance.messagehandler(currentPub, message);
-	rabbitInstance.createConsumer(client, `bill.update.v1.${message.clientID}`, (msg) => {
-		const data = JSON.parse(msg.content.toString());
-		const messge = APIBillData.safeParse(data);
-		if (!messge.success) {
-			console.error("Invalid bill data format received from RabbitMQ");
-			return;
-		}
-		webSocketInstance.sendDataToClient("bill_data", messge.data);
-	});
 	sendCurrentUsageToClients({
 		clientId: message.clientID,
 		currentUsage: message.currentReading,
 	});
 }, 5000);
 
-
+await rabbitInstance.createConsumer(client, `billing.readings.q`, (msg) => {
+	const data = JSON.parse(msg.content.toString());
+	const messge = APIBillData.safeParse(data);
+	if (!messge.success) {
+		console.error("Invalid bill data format received from RabbitMQ");
+		return;
+	}
+	webSocketInstance.sendDataToClient("bill_data", messge.data);
+});
+	
 server.listen(port, host, () => {
 	console.log(`Server running at http://${host}:${port}`);
 });
