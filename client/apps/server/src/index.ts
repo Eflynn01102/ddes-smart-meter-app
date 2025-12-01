@@ -74,17 +74,6 @@ setInterval(async () => {
 		currentUsage: message.currentReading,
 	});
 }, 5000);
-
-// remove line 78 - 87
-await rabbitInstance.createConsumer(client, `billing.readings.q`, (msg) => {
-	const data = JSON.parse(msg.content.toString());
-	const messge = APIBillData.safeParse(data);
-	if (!messge.success) {
-		console.error("Invalid bill data format received from RabbitMQ");
-		return;
-	}
-	webSocketInstance.sendDataToClient("bill_data", messge.data);
-});
 	
 server.listen(port, host, () => {
 	console.log(`Server running at http://${host}:${port}`);
