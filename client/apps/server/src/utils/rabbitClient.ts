@@ -1,5 +1,5 @@
 import type { rabbitMessage } from "@client/config/src/message";
-import type { Publisher } from "rabbitmq-stream-js-client";
+import type { Publisher, } from "rabbitmq-stream-js-client";
 import rabbit from "rabbitmq-stream-js-client";
 import { generateRandomNumberInRange } from "./randomNumberGen";
 import { envSecret } from "../env";
@@ -35,6 +35,9 @@ export class RabbitMQClient {
 		try {
 			await client.createStream({
 				stream: topicName,
+				arguments: {
+					"max-length-bytes": 100000000,
+				},
 			});
 		} catch (error) {
 			console.error("Error creating stream:", error);
@@ -74,5 +77,28 @@ export class RabbitMQClient {
 		console.log("Publishing messages...");
 		await publisher.send(Buffer.from(JSON.stringify(message)));
 		console.log("Message sent successfully");
+	}
+
+	public async createConsumer(client: rabbit.Client, topicName: string, onMessage: (msg: { content: Buffer | string }) => void) {
+		console.log("Creating Consumer for topic:", topicName);
+		const consumer = await client.declareConsumer(
+			{
+				stream: topicName,
+				offset: rabbit.Offset.last(),
+			},
+			(msg: { content: Buffer | string }) => {
+				try {
+					onMessage(msg);
+					console.log(
+						`Received message on topic ${topicName}:`,
+						typeof msg.content === "string" ? msg.content : msg.content.toString(),
+					);
+
+				} catch (err) {
+					console.error("Error in onMessage handler:", err);
+				}
+			},
+		);
+		consumer.close()
 	}
 }

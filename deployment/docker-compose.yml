@@ -72,12 +72,13 @@ services:
     command: ["/usr/local/bin/ingestion"]
   # Billing Service
   billing:
-    image: ghcr.io/eflynn01102/billing-service:latest
+    image: billing:latest
     container_name: billing-service
     ports:
       - "8080:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_RABBITMQ_HOST=rabbitmq-service
     deploy:
       resources:
         limits:

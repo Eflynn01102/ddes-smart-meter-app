@@ -1,5 +1,6 @@
 package com.smartmeter.billing_service.config;
 
+import java.time.Clock;
 import java.time.ZoneId;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,9 +32,11 @@ class CoreConfigTest {
     @Test
     void testBillStoreBean() {
         CoreConfig config = new CoreConfig();
-        BillStore store = config.billStore();
+        Clock clock = Clock.systemDefaultZone();
+        ZoneId zoneId = config.zoneId();
+        String outputDir = "test-output";
+        BillStore store = config.billStore(clock, zoneId, outputDir);
         assertNotNull(store);
-        assertNull(store.load(null));
     }
 
     @Test

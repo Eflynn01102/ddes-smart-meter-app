@@ -1,4 +1,5 @@
-import type { rabbitMessage } from "@client/config/src/message";
+import { APIBillData } from "./types";
+import { WebSocket } from "@/client/webSocket";
 import type { Publisher } from "rabbitmq-stream-js-client";
 import {
 	port,
@@ -8,10 +9,13 @@ import {
 } from "@/client/NetworkClient";
 import { createHmacSignature } from "../src/utils/hmac";
 import { RabbitMQClient } from "../src/utils/rabbitClient";
+import type { rabbitMessage } from "@client/config/src/message";
 import { generateRandomNumber } from "../src/utils/randomNumberGen";
 
 const rabbitInstance = RabbitMQClient.Instance;
 const client = await rabbitInstance.connectionClient();
+
+const webSocketInstance = WebSocket.getInstance();
 
 const endPointTopic = "client";
 
@@ -33,10 +37,10 @@ for (let i = 0; i <= 11; i++) {
 			client,
 			`${endPointTopic}${i}`,
 		);
-		if (!tempPublisher) break;
 		publisherArray.push(tempPublisher);
 	} catch (error) {
 		console.error("Error creating publisher:", error);
+		continue;
 	}
 }
 
@@ -70,6 +74,17 @@ setInterval(async () => {
 		currentUsage: message.currentReading,
 	});
 }, 5000);
+
+await rabbitInstance.createConsumer(client, `billing.readings.q`, (msg) => {
+	const data = JSON.parse(msg.content.toString());
+	const messge = APIBillData.safeParse(data);
+	if (!messge.success) {
+		console.error("Invalid bill data format received from RabbitMQ");
+		return;
+	}
+	webSocketInstance.sendDataToClient("bill_data", messge.data);
+});
+	
 server.listen(port, host, () => {
 	console.log(`Server running at http://${host}:${port}`);
 });
