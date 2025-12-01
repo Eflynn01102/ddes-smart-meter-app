@@ -9,7 +9,6 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
-
 # Caches
 
 .cache
@@ -173,3 +172,5 @@ dist
 
 # Finder (MacOS) folder config
 .DS_Store
+
+.bun.lock
