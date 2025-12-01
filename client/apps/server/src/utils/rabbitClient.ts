@@ -75,19 +75,19 @@ export class RabbitMQClient {
 		console.log("Message sent successfully");
 	}
 
-	public async createConsumer(client: rabbit.Client, topicName: string, onMessage: (msg: rabbit.Message) => void) {
+	public async createConsumer(client: rabbit.Client, topicName: string, onMessage: (msg: { content: Buffer | string }) => void) {
 		console.log("Creating Consumer for topic:", topicName);
 		const consumer = await client.declareConsumer(
 			{
 				stream: topicName,
 				offset: rabbit.Offset.last(),
 			},
-			(msg: rabbit.Message) => {
+			(msg: { content: Buffer | string }) => {
 				try {
 					onMessage(msg);
 					console.log(
 						`Received message on topic ${topicName}:`,
-						msg.content.toString(),
+						typeof msg.content === "string" ? msg.content : msg.content.toString(),
 					);
 
 				} catch (err) {
