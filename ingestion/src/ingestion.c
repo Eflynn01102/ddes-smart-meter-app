@@ -1,68 +1,135 @@
 #include "ingestion.h"
 
-volatile sig_atomic_t SigIntReceived;
+volatile sig_atomic_t SigTermReceived;
 
-V SigIntHandler(S32 SigVal) {
-    LogInfo("sigint\n");
-    SigIntReceived = TRUE;
+V SigTermHandler(S32 SigVal) {
+    LogInfo("sigterm\n");
+    SigTermReceived = TRUE;
 }
 
 U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
     AMQP_ENVEL_T Envelope = {0};
     AMQP_RPC_REP_T Ret;
-    struct timeval Timeout = {0};
-    cJSON* MsgJson = {0};
-    S32 ClientId = 0;
-    S32 Reading = 0;
+    struct timeval Timeout;
+    cJSON* MsgJson = NULL;
+    S32 ReconnectDelay = 1;
 
-    Timeout.tv_sec = 1;
+    LogInfo("Ingestion mainloop started - waiting for messages...\n");
 
-    while (SigIntReceived == FALSE) {
+    while (SigTermReceived == FALSE) {
+        if (*Connection == NULL) {
+            LogErr("No connection - forcing reconnect in %ds...\n", ReconnectDelay);
+            ReconnectDelay = (ReconnectDelay >= 30) ? 30 : ReconnectDelay * 2;
+            if (InitiateConnection(Connection, Conf) == OK) {
+                LogInfo("Connection established - resuming consume\n");
+                ReconnectDelay = 1;
+            } else {
+                LogErr("Connect failed - retrying in %ds\n", ReconnectDelay);
+            }
+            continue;
+        }
+
         amqp_maybe_release_buffers(*Connection);
 
+        Timeout.tv_sec = 30;
+        Timeout.tv_usec = 0;
+
         Ret = amqp_consume_message(*Connection, &Envelope, &Timeout, 0);
-        if (Ret.reply_type != AMQP_RESPONSE_NORMAL && Ret.library_error != AMQP_STATUS_TIMEOUT) {
-            LogErr("Could not consume message, %d\n", Ret.reply_type); 
-        } else if (Ret.reply_type == AMQP_RESPONSE_NORMAL) {
-            
-            //parse JSON
-            MsgJson = cJSON_Parse((S8*)Envelope.message.body.bytes);
-            if (MsgJson == FALSE) {
-                LogErr("Could not parse message, %s\n", (S8*)Envelope.message.body.bytes);
-                Alert("message parse failure, check log", Conf);
-            }
-            
-            if (ValidateJsonObj(MsgJson, getenv("CLIENTFW")) == OK) { //any error messages would be reported within this function hence no error message if != OK
-                if (HmacVerify(MsgJson) == OK) {
-                    if (CheckIdempotency(MsgJson) == OK) {
-                        PublishMessageToEventsTopic(Connection, Envelope);
-                        LogInfo("successfully processed message from client %s\n", cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
-                    } else {
-                        LogInfo("ignoring message from client %s: idempotency check failed\n", cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId")->valuestring);
-                        Alert("idempotency check failure, check log", Conf);
-                    }
-                } else {
-                    LogErr("HMAC verification failed: signature mismatch, %s\n", (S8*)Envelope.message.body.bytes);Alert("idempotency check failure, check log", Conf);
-                    Alert("hmac verification failure, check log", Conf);
-                }
-            }
+
+        if (Ret.reply_type == AMQP_RESPONSE_NONE) {
+            continue;
         }
-        amqp_destroy_envelope(&Envelope);
+
+        if (Ret.reply_type == AMQP_RESPONSE_LIBRARY_EXCEPTION) {
+            if (Ret.library_error == AMQP_STATUS_TIMEOUT) {
+                if (*Connection) {
+                    amqp_connection_close(*Connection, AMQP_REPLY_SUCCESS);
+                    amqp_destroy_connection(*Connection);
+                    *Connection = NULL;
+                }
+
+                ReconnectDelay = (ReconnectDelay >= 30) ? 30 : ReconnectDelay * 2;
+
+                if (InitiateConnection(Connection, Conf) == OK) {
+                    ReconnectDelay = 1;
+                } else {
+                    LogErr("Reconnect failed - retrying in %ds\n", ReconnectDelay);
+                }
+            } else {
+                LogErr("library exception %d\n", Ret.library_error);
+            }
+            continue;
+        }
+
+        if (Ret.reply_type == AMQP_RESPONSE_SERVER_EXCEPTION) {
+            LogErr("Server exception - forcing reconnect\n");
+            if (*Connection) {
+                amqp_connection_close(*Connection, AMQP_REPLY_SUCCESS);
+                amqp_destroy_connection(*Connection);
+                *Connection = NULL;
+            }
+            continue;
+        }
+
+        if (Ret.reply_type == AMQP_RESPONSE_NORMAL) {
+            ReconnectDelay = 1;
+
+            MsgJson = cJSON_ParseWithLength((char*)Envelope.message.body.bytes, Envelope.message.body.len);
+            if (!MsgJson) {
+                LogErr("JSON parse failed: %.*s\n",
+                    (int)Envelope.message.body.len,
+                    (char*)Envelope.message.body.bytes);
+                goto ack_and_continue;
+            }
+
+            if (ValidateJsonObj(MsgJson, getenv("CLIENTFW")) != OK ||
+                HmacVerify(MsgJson) != OK ||
+                CheckIdempotency(MsgJson) != OK) {
+                cJSON_Delete(MsgJson);
+                MsgJson = NULL;
+                goto ack_and_continue;
+            }
+
+            cJSON *clientIdObj = cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId");
+            const char *clientIdStr = NULL;
+            if (cJSON_IsString(clientIdObj) && (clientIdObj->valuestring != NULL)) {
+                clientIdStr = clientIdObj->valuestring;
+            } else {
+                LogErr("Warning: message missing valid clientId field: %.*s\n",
+                    (int)Envelope.message.body.len,
+                    (char*)Envelope.message.body.bytes);
+            }
+            PublishMessageToEventsTopic(Connection, Envelope);
+
+            if (clientIdStr)
+                LogInfo("Processed message from client %s\n", clientIdStr);
+            else
+                LogInfo("Processed message from unknown client (no clientId)\n");
+
+            cJSON_Delete(MsgJson);
+            MsgJson = NULL;
+
+            ack_and_continue:
+                amqp_basic_ack(*Connection, 1, Envelope.delivery_tag, 0);
+                amqp_destroy_envelope(&Envelope);
+        }
     }
-    cJSON_Delete(MsgJson);
+
+    LogInfo("Ingestion loop exiting (SIGTERM received)\n");
+    if (MsgJson) cJSON_Delete(MsgJson);
     return OK;
 }
 
 U8 main(U8 argc, U8* argv[]) {
     ConfigType Config = {0};
-    AMQP_CONN_T Conn = {0};
+    AMQP_CONN_T Conn = NULL;
     S32 ConnectionAttempt = 0;
 
-    LogInfo("INGESTION (%s %s)\n", __DATE__, __TIME__);
+    LogInfo("INGESTION (STREAMS) (%s %s)\n", __DATE__, __TIME__);
 
-    SigIntReceived = FALSE;
-    if (signal(SIGINT, SigIntHandler) == SIG_ERR) {
-        LogErr("Could not configure sigint handler\n");
+    SigTermReceived = FALSE;
+    if (signal(SIGTERM, SigTermHandler) == SIG_ERR) {
+        LogErr("Could not configure sigterm handler\n");
         exit(NOK);
     }
 
@@ -82,21 +149,28 @@ U8 main(U8 argc, U8* argv[]) {
     
     do {
         ConnectionAttempt++;
-        LogInfo("connecting to rabbitmq, attempt %d\n", ConnectionAttempt);
-        InitiateConnection(&Conn, Config);
-        sleep(5);
-    } while (SigIntReceived == FALSE && Conn == NULL);
-    
-    if (Conn != NULL) {
-        LogInfo("connected to rabbitmq\n");
-        Alert("connected to rabbitmq", Config);
-        IngestionMainloop(&Conn, Config);
-        LogInfo("SIGINT recieved, mainloop exited\n");
-    }
+        LogInfo("contacting rabbitmq, attempt %d\n", ConnectionAttempt);
 
-    Alert("exiting", Config);
+        if (InitiateConnection(&Conn, Config) == OK) {
+            LogInfo("connected to rabbitmq\n");
+            break;
+        } else {
+            LogErr("connection attempt failed\n");
+            if (Conn != NULL) {
+                amqp_destroy_connection(Conn);
+                Conn = NULL;
+            }
+            sleep(5);
+        }
+    } while (!SigTermReceived);
+
+    if (Conn != NULL) {
+        LogInfo("starting mainloop\n");
+        IngestionMainloop(&Conn, Config);
+        amqp_destroy_connection(Conn);
+    }
+    
     CloseConnection(&Conn);
-    LogInfo("disconnected from rabbitmq\n");
     CleanUpEnvVars();
     LogInfo("cleaned up env vars\n");
     exit(OK);

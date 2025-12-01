@@ -8,6 +8,7 @@
 #include <amqp.h>
 #include <amqp_tcp_socket.h>
 #include <signal.h>
+#include <errno.h>
 #include <string.h>
 #include <stdlib.h>
 #include <openssl/hmac.h>
@@ -18,7 +19,7 @@
 #include <curl/curl.h>
 #include "types.h"
 
-#define AMQP_INGESTION_QUEUE_NAME "ingestion.q"
+#define AMQP_INGESTION_QUEUE_STEM "client"
 #define AMQP_EVENTS_TOPIC_NAME "events"
 #define AMQP_EVENTS_ROUTING_KEY "billing"
 #define TRUE 1
@@ -29,7 +30,7 @@
 #define CLIENT_FW_VER_PATH "package.json"
 #define LogInfo(fmt, ...) Log("INFO", fmt, ##__VA_ARGS__)
 #define LogErr(fmt, ...)  Log("ERR ", fmt, ##__VA_ARGS__)
-#define MAX_CLIENTS 1024
+#define MAX_CLIENTS 16
 #define MAX_READING 1048576
 #define CONFIG_READ_OK 0x3F
 
