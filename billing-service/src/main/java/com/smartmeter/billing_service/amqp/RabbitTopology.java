@@ -40,7 +40,7 @@ public class RabbitTopology {
   TopicExchange billingExchange() { return ExchangeBuilder.topicExchange(EX_BILLING).durable(true).build(); }
 
   @Bean
-  TopicExchange eventsExchange() { return ExchangeBuilder.topicExchange(EX_EVENTS).durable(true).build(); }
+  TopicExchange eventsExchange() { return ExchangeBuilder.topicExchange(EX_EVENTS).durable(false).build(); }
 
   @Bean
   Queue billingReadingsQueue() { return QueueBuilder.durable(Q_BILLING_READINGS).build(); }
