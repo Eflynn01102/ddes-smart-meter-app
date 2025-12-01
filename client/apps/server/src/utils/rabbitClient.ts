@@ -1,5 +1,5 @@
 import type { rabbitMessage } from "@client/config/src/message";
-import type { Publisher } from "rabbitmq-stream-js-client";
+import type { Publisher, } from "rabbitmq-stream-js-client";
 import rabbit from "rabbitmq-stream-js-client";
 import { generateRandomNumberInRange } from "./randomNumberGen";
 import { envSecret } from "../env";
@@ -75,20 +75,28 @@ export class RabbitMQClient {
 		console.log("Message sent successfully");
 	}
 
-	public async createConsumer(client: rabbit.Client, topicName: string, onMessage: (msg: any) => void) {
+	public async createConsumer(client: rabbit.Client, topicName: string, Message: (msg: Message) => void) {
 		console.log("Creating Consumer for topic:", topicName);
-		const consumer = await client.declareConsumer({
-			stream: topicName,
-			onMessage: async (message) => {
+		let content: string;
+		const consumer = await client.declareConsumer(
+			{
+				stream: topicName,
+				offset: rabbit.Offset.last(),
+			},
+			(msg) => {
 				try {
-					const json = JSON.parse(message.data.toString());
-					console.log("Received message from billing service:", json);
-					onMessage(json);
+					Message(msg);
+					content = msg.content.toString();
+					console.log(
+						`Received message on topic ${topicName}:`,
+						msg.content.toString(),
+					);
+
 				} catch (err) {
-					console.error("Failed to parse billing message:", err);
+					console.error("Error in onMessage handler:", err);
 				}
 			},
-		});
-		return consumer;
+		);
+		consumer.close()
 	}
 }
