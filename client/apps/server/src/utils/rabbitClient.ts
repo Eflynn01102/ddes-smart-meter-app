@@ -74,4 +74,21 @@ export class RabbitMQClient {
 		await publisher.send(Buffer.from(JSON.stringify(message)));
 		console.log("Message sent successfully");
 	}
+
+	public async createConsumer(client: rabbit.Client, topicName: string, onMessage: (msg: any) => void) {
+		console.log("Creating Consumer for topic:", topicName);
+		const consumer = await client.declareConsumer({
+			stream: topicName,
+			onMessage: async (message) => {
+				try {
+					const json = JSON.parse(message.data.toString());
+					console.log("Received message from billing service:", json);
+					onMessage(json);
+				} catch (err) {
+					console.error("Failed to parse billing message:", err);
+				}
+			},
+		});
+		return consumer;
+	}
 }
