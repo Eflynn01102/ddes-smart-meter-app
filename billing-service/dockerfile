@@ -47,7 +47,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom" \
-    SPRING_PROFILES_ACTIVE=prod
+    SPRING_PROFILES_ACTIVE=dev
 WORKDIR /app
 
 # Copy the fat jar produced by Spring Boot
