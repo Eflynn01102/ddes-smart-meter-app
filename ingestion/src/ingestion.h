@@ -30,7 +30,7 @@
 #define CLIENT_FW_VER_PATH "package.json"
 #define LogInfo(fmt, ...) Log("INFO", fmt, ##__VA_ARGS__)
 #define LogErr(fmt, ...)  Log("ERR ", fmt, ##__VA_ARGS__)
-#define MAX_CLIENTS 16
+#define MAX_CLIENTS 12
 #define MAX_READING 1048576
 #define CONFIG_READ_OK 0x3F
 
