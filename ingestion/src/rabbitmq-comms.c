@@ -108,7 +108,7 @@ U8 InitiateConnection(AMQP_CONN_T* Connection, ConfigType Conf) {
 V PublishMessageToEventsTopic(AMQP_CONN_T* Connection, AMQP_ENVEL_T Envelope) {
     AMQP_PROP_T Properties = {0};
     Properties._flags = AMQP_BASIC_CONTENT_TYPE_FLAG | AMQP_BASIC_DELIVERY_MODE_FLAG;
-    Properties.content_type = amqp_cstring_bytes("text/plain");
+    Properties.content_type = amqp_cstring_bytes("application/json");
     Properties.delivery_mode = 2;
 
     amqp_basic_publish(*Connection, 1, amqp_cstring_bytes(AMQP_EVENTS_TOPIC_NAME), amqp_cstring_bytes(AMQP_EVENTS_ROUTING_KEY), 0, 0, &Properties, amqp_cstring_bytes((S8*)Envelope.message.body.bytes));
