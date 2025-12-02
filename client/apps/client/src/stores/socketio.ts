@@ -37,8 +37,8 @@ export const useSocketStore = defineStore("socketio", () => {
 
 	socket.emit("hello");
 
-	function requestHistoricalBillData(date: string) {
-		socket.emit("request_historical_bill_data", date);
+	function requestHistoricalBillData(date: string, accountId: string) {
+		socket.emit("request_historical_bill_data", date, accountId);
 	}
 
 	function requestUser(user: SocketUnknownUser) {

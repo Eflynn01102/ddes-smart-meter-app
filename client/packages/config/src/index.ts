@@ -10,7 +10,7 @@ export interface ServerToClientEvents {
 
 export interface ClientToServerEvents {
   hello: () => void;
-  request_historical_bill_data: (date: string) => void;
+  request_historical_bill_data: (date: string, accountId: string) => void;
   request_user: (user: SocketUnknownUser) => void;
 }
 

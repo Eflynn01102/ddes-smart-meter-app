@@ -21,7 +21,7 @@ export class WebSocket {
 
 	private static _socket: Socket<ClientToServerEvents, ServerToClientEvents>;
 
-	private constructor() {}
+	private constructor() { }
 
 	public static getInstance(): WebSocket {
 		if (!WebSocket.instance) {
@@ -51,10 +51,10 @@ export class WebSocket {
 				console.log("Received 'hello' from client:", socket.id);
 			});
 
-			socket.on("request_historical_bill_data", (date: string) => {
+			socket.on("request_historical_bill_data", (date: string, accountId: string) => {
 				console.log("Client requested historical bill data for date:", date);
 				try {
-					this.fetchHistoricalBillData(date);
+					this.fetchHistoricalBillData(date, accountId);
 				} catch (error) {
 					console.error("Error fetching historical bill data:", error);
 				}
@@ -83,11 +83,14 @@ export class WebSocket {
 		});
 	}
 
-	private async fetchHistoricalBillData(data: string) {
+	private async fetchHistoricalBillData(date: string, accountId: string) {
 		const url = "http://billServer";
 		const res = await fetch(url, {
 			method: "POST",
-			body: JSON.stringify({ date: data }),
+			body: JSON.stringify({
+				accountId,
+				date
+			}),
 			headers: {
 				"Content-Type": "application/json",
 			},

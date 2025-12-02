@@ -6,10 +6,12 @@ import Button from "primevue/button";
 import DatePicker from "primevue/datepicker";
 
 import { useToast } from "primevue/usetoast";
+import { useAuthStore } from "@/stores/auth";
 import { useSocketStore } from "@/stores/socketio";
 import { useModalsStore } from "@/stores/modals";
 
 const toast = useToast();
+const authStore = useAuthStore();
 const modalsStore = useModalsStore();
 const socketStore = useSocketStore();
 
@@ -23,6 +25,7 @@ function confirm() {
 				month: "2-digit",
 				year: "2-digit",
 			}),
+			authStore.knownClientId
 		);
 		modalsStore.datePickerVisible = false;
 		toast.add({
