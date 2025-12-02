@@ -1,5 +1,16 @@
 package com.smartmeter.billing_service.amqp;
 
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.ZoneId;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.stereotype.Component;
+
+import static com.smartmeter.billing_service.amqp.RabbitTopology.Q_BILLING_READINGS;
 import com.smartmeter.billing_service.domain.events.BillSnapshot;
 import com.smartmeter.billing_service.domain.model.Bill;
 import com.smartmeter.billing_service.domain.ports.BillPublisher;
@@ -8,17 +19,7 @@ import com.smartmeter.billing_service.domain.ports.Deduper;
 import com.smartmeter.billing_service.domain.ports.TariffResolver;
 import com.smartmeter.billing_service.domain.service.BillingCalculator;
 import com.smartmeter.billing_service.domain.value.Ids;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.ZoneId;
-
-import static com.smartmeter.billing_service.amqp.RabbitTopology.Q_BILLING_READINGS;
+import com.smartmeter.billing_service.http.HttpAlertPublisher;
 
 @Component
 public class ReadingListener {
@@ -30,6 +31,7 @@ public class ReadingListener {
   private final Deduper deduper;
   private final BillPublisher publisher;
   private final ZoneId zone;
+  private final HttpAlertPublisher alertPublisher;
 
   public ReadingListener(
       BillingCalculator calc,
@@ -37,8 +39,15 @@ public class ReadingListener {
       TariffResolver tariffs,
       Deduper deduper,
       BillPublisher publisher,
-      ZoneId zone) {
-    this.calc = calc; this.store = store; this.tariffs = tariffs; this.deduper = deduper; this.publisher = publisher; this.zone = zone;
+      ZoneId zone,
+      HttpAlertPublisher alertPublisher) {
+    this.calc = calc;
+    this.store = store;
+    this.tariffs = tariffs;
+    this.deduper = deduper;
+    this.publisher = publisher;
+    this.zone = zone;
+    this.alertPublisher = alertPublisher;
   }
 
   @RabbitListener(queues = Q_BILLING_READINGS)
@@ -60,7 +69,15 @@ public class ReadingListener {
       );
 
       store.save(accountId, updated);
-      publisher.publish(BillSnapshot.from(updated));
+      var snapshot = BillSnapshot.from(updated);
+      publisher.publish(snapshot);
+      // Example: send alert on every bill update (customize as needed)
+      alertPublisher.sendAlert(
+        msg.accountId,
+        "Bill Updated",
+        "info",
+        String.format("Bill for account %s updated. New total: %s %s", msg.accountId, updated.amountDue().amount(), updated.amountDue().currency())
+      );
       log.info("Processed reading account={} readingId={} kwh={} total={}",
                msg.accountId, msg.readingId, msg.cumulativeKwh, updated.amountDue().amount());
     } catch (Exception e) {
