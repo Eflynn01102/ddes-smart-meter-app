@@ -3,12 +3,15 @@ package com.smartmeter.billing_service.api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.smartmeter.billing_service.domain.events.BillSnapshot;
 import com.smartmeter.billing_service.domain.ports.BillStore;
 import com.smartmeter.billing_service.domain.value.Ids;
+import com.smartmeter.billing_service.http.SimpleBillData;
 
 @RestController
 @RequestMapping("/billing")
@@ -23,4 +26,15 @@ public class BillingQueryController {
     var bill = store.load(Ids.AccountId.of(accountId));
     return ResponseEntity.ok(BillSnapshot.from(bill));
   }
+
+  @PostMapping("/historical")
+  public ResponseEntity<SimpleBillData> historical(@RequestBody HistoricalBillRequest request) {
+    // For now, return the current bill as we don't store historical snapshots
+    // In a production system, you'd query by date from a time-series database
+    var bill = store.load(Ids.AccountId.of(request.accountId()));
+    var snapshot = BillSnapshot.from(bill);
+    return ResponseEntity.ok(SimpleBillData.from(snapshot));
+  }
+
+  public record HistoricalBillRequest(String date, String accountId) {}
 }
