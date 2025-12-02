@@ -21,9 +21,6 @@ public class RabbitTopology {
   public static final String EX_EVENTS = "events";
   public static final String RK_EVENTS_BILLING = "billing";
 
-  // Queue for ingestion events
-  public static final String Q_BILLING_EVENTS = "billing.events.q";
-
   // Routing keys
   public static final String RK_READING  = "meter.reading.v1";
   public static final String RK_BILL_ANY = "bill.updated.v1.*";
@@ -32,7 +29,7 @@ public class RabbitTopology {
   public static final String Q_BILLING_READINGS = "billing.readings.q";
 
   @Bean
-  TopicExchange readingsExchange() { return ExchangeBuilder.topicExchange(EX_READINGS).durable(true).build(); }
+  TopicExchange readingsExchange() { return ExchangeBuilder.topicExchange(EX_READINGS).durable(false).build(); }
 
   @Bean
   TopicExchange billingExchange() { return ExchangeBuilder.topicExchange(EX_BILLING).durable(true).build(); }
@@ -44,16 +41,8 @@ public class RabbitTopology {
   Queue billingReadingsQueue() { return QueueBuilder.durable(Q_BILLING_READINGS).build(); }
 
   @Bean
-  Queue billingEventsQueue() { return QueueBuilder.durable(Q_BILLING_EVENTS).build(); }
-
-  @Bean
   Binding readingsToBillingCalc() {
     return BindingBuilder.bind(billingReadingsQueue()).to(readingsExchange()).with(RK_READING);
-  }
-
-  @Bean
-  Binding eventsToBilling() {
-    return BindingBuilder.bind(billingEventsQueue()).to(eventsExchange()).with(RK_EVENTS_BILLING);
   }
 
   @Bean

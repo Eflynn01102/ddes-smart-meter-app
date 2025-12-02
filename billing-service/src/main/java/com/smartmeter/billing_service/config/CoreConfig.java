@@ -1,5 +1,6 @@
 package com.smartmeter.billing_service.config;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.ZoneId;
 
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import com.smartmeter.billing_service.domain.ports.BillStore;
 import com.smartmeter.billing_service.domain.service.BillingCalculator;
 import com.smartmeter.billing_service.infra.store.InMemoryBillStore;
+import com.smartmeter.billing_service.infra.tariff.FixedTariffResolver;
 
 @Configuration
 public class CoreConfig {
@@ -44,8 +46,16 @@ public class CoreConfig {
   }
 
   @Bean
-  public com.smartmeter.billing_service.domain.ports.TariffResolver tariffResolver() {
-    return accountId -> null; // Dummy implementation for production context
+  public com.smartmeter.billing_service.domain.ports.TariffResolver tariffResolver(
+      @Value("${billing.currency:GBP}") String currency) {
+    // Production tariff with flat rate: £0.25/kWh, standing charge £0.50/day, 5% tax
+    return FixedTariffResolver.flat(
+        "default-tariff",
+        currency,
+        new BigDecimal("0.50"),  // standing charge per day
+        new BigDecimal("5.00"),  // tax percentage
+        new BigDecimal("0.25")   // rate per kWh
+    );
   }
 
   @Bean

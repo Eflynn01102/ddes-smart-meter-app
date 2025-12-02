@@ -1,3 +1,4 @@
+/*
 package com.smartmeter.billing_service.amqp;
 
 import org.slf4j.Logger;
@@ -16,3 +17,4 @@ public class EventsBillingListener {
         // Add business logic to process the event here
     }
 }
+*/

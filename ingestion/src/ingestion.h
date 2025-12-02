@@ -20,8 +20,8 @@
 #include "types.h"
 
 #define AMQP_INGESTION_QUEUE_STEM "client"
-#define AMQP_EVENTS_TOPIC_NAME "events"
-#define AMQP_EVENTS_ROUTING_KEY "billing"
+#define AMQP_EVENTS_TOPIC_NAME "smartmeter.readings"
+#define AMQP_EVENTS_ROUTING_KEY "meter.reading.v1"
 #define TRUE 1
 #define FALSE 0
 #define OK 0

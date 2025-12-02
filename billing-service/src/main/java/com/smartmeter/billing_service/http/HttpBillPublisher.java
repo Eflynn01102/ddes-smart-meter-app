@@ -25,10 +25,11 @@ public class HttpBillPublisher implements BillPublisher {
 
     @Override
     public void publish(BillSnapshot snapshot) {
+        var simpleBill = SimpleBillData.from(snapshot);
         webClient.post()
                 .uri(clientUrl)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(snapshot)
+                .bodyValue(simpleBill)
                 .retrieve()
                 .bodyToMono(Void.class)
                 .doOnSuccess(v -> log.info("Posted bill data to client: {}", clientUrl))

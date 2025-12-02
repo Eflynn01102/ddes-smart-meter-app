@@ -7,6 +7,7 @@ import java.time.ZoneId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +39,7 @@ public class ReadingListener {
       BillStore store,
       TariffResolver tariffs,
       Deduper deduper,
-      BillPublisher publisher,
+      @Qualifier("httpBillPublisher") BillPublisher publisher,
       ZoneId zone,
       HttpAlertPublisher alertPublisher) {
     this.calc = calc;

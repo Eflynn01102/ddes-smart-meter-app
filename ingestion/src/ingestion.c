@@ -90,21 +90,63 @@ U8 IngestionMainloop(AMQP_CONN_T* Connection, ConfigType Conf) {
                 goto ack_and_continue;
             }
 
+            // Transform client message to billing service format
             cJSON *clientIdObj = cJSON_GetObjectItemCaseSensitive(MsgJson, "clientId");
+            cJSON *currentReadingObj = cJSON_GetObjectItemCaseSensitive(MsgJson, "currentReading");
+            cJSON *unixObj = cJSON_GetObjectItemCaseSensitive(MsgJson, "unix");
+            
             const char *clientIdStr = NULL;
             if (cJSON_IsString(clientIdObj) && (clientIdObj->valuestring != NULL)) {
                 clientIdStr = clientIdObj->valuestring;
             } else {
-                LogErr("Warning: message missing valid clientId field: %.*s\n",
-                    (int)Envelope.message.body.len,
-                    (char*)Envelope.message.body.bytes);
+                LogErr("Warning: message missing valid clientId field\n");
+                goto cleanup_and_ack;
             }
-            PublishMessageToEventsTopic(Connection, Envelope);
 
-            if (clientIdStr)
-                LogInfo("Processed message from client %s\n", clientIdStr);
-            else
-                LogInfo("Processed message from unknown client (no clientId)\n");
+            // Create billing message with transformed format
+            cJSON *billingMsg = cJSON_CreateObject();
+            if (!billingMsg) {
+                LogErr("Failed to create billing message JSON\n");
+                goto cleanup_and_ack;
+            }
+
+            // Generate unique readingId from clientId and timestamp
+            char readingId[256];
+            snprintf(readingId, sizeof(readingId), "%s-%ld", clientIdStr, (long)unixObj->valuedouble);
+            
+            // Convert unix timestamp to ISO-8601 format
+            time_t unixTime = (time_t)unixObj->valuedouble;
+            struct tm *tm_info = gmtime(&unixTime);
+            char timestamp[64];
+            strftime(timestamp, sizeof(timestamp), "%Y-%m-%dT%H:%M:%SZ", tm_info);
+
+            cJSON_AddStringToObject(billingMsg, "readingId", readingId);
+            cJSON_AddStringToObject(billingMsg, "accountId", clientIdStr);
+            cJSON_AddStringToObject(billingMsg, "meterId", clientIdStr);
+            cJSON_AddStringToObject(billingMsg, "timestamp", timestamp);
+            cJSON_AddNumberToObject(billingMsg, "cumulativeKwh", currentReadingObj->valuedouble);
+            cJSON_AddNumberToObject(billingMsg, "schema", 1);
+
+            char *billingMsgStr = cJSON_PrintUnformatted(billingMsg);
+            if (!billingMsgStr) {
+                LogErr("Failed to serialize billing message\n");
+                cJSON_Delete(billingMsg);
+                goto cleanup_and_ack;
+            }
+
+            // Create envelope with transformed message
+            AMQP_ENVEL_T transformedEnvelope = Envelope;
+            transformedEnvelope.message.body = amqp_cstring_bytes(billingMsgStr);
+            
+            PublishMessageToEventsTopic(Connection, transformedEnvelope);
+            
+            LogInfo("Processed message from client %s, reading: %.2f kWh\n", 
+                    clientIdStr, currentReadingObj->valuedouble);
+
+            cJSON_free(billingMsgStr);
+            cJSON_Delete(billingMsg);
+
+            cleanup_and_ack:
 
             cJSON_Delete(MsgJson);
             MsgJson = NULL;
