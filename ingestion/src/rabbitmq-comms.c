@@ -68,11 +68,11 @@ U8 InitiateConnection(AMQP_CONN_T* Connection, ConfigType Conf) {
         decl_args[0].value.kind = AMQP_FIELD_KIND_UTF8;
         decl_args[0].value.value.bytes = amqp_cstring_bytes("stream");
 
-        amqp_queue_declare(*Connection, 1, amqp_cstring_bytes(QueueName), 0, 1, 0, 0, decl_table);
-        if (CheckRpcReply(*Connection) != OK) {
-            LogErr("could not set arguments\n");
-            return NOK;
-        }
+        //amqp_queue_declare(*Connection, 1, amqp_cstring_bytes(QueueName), 0, 1, 0, 0, decl_table);
+        //if (CheckRpcReply(*Connection) != OK) {
+        //    LogErr("could not set arguments\n");
+        //    return NOK;
+        //}
 
         amqp_table_entry_t consume_args[1];
 
@@ -98,7 +98,7 @@ U8 InitiateConnection(AMQP_CONN_T* Connection, ConfigType Conf) {
     amqp_exchange_declare(*Connection, 1, amqp_cstring_bytes(AMQP_EVENTS_TOPIC_NAME),
                           amqp_cstring_bytes("topic"), 0, 0, 0, 0, amqp_empty_table);
     if (CheckRpcReply(*Connection) != OK) {
-        LogErr("could not event topic\n");
+        LogErr("could not declare event topic\n");
         return NOK;
     }
     return OK;
