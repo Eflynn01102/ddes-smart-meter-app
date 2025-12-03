@@ -29,8 +29,6 @@ public class BillingQueryController {
 
   @PostMapping("/historical")
   public ResponseEntity<SimpleBillData> historical(@RequestBody HistoricalBillRequest request) {
-    // For now, return the current bill as we don't store historical snapshots
-    // In a production system, you'd query by date from a time-series database
     var bill = store.load(Ids.AccountId.of(request.accountId()));
     var snapshot = BillSnapshot.from(bill);
     return ResponseEntity.ok(SimpleBillData.from(snapshot));

@@ -72,7 +72,6 @@ public class ReadingListener {
       store.save(accountId, updated);
       var snapshot = BillSnapshot.from(updated);
       publisher.publish(snapshot);
-      // Example: send alert on every bill update (customize as needed)
       alertPublisher.sendAlert(
         msg.accountId,
         "Bill Updated",
@@ -83,7 +82,6 @@ public class ReadingListener {
                msg.accountId, msg.readingId, msg.cumulativeKwh, updated.amountDue().amount());
     } catch (Exception e) {
       log.error("Failed to process reading: {}", msg, e);
-      // in a prod system, you might DLQ or nack here; Spring defaults to requeue=false on listener fatal errors if configured.
       throw e;
     }
   }

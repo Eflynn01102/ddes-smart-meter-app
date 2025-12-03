@@ -42,7 +42,7 @@ class CoreConfigTest {
     @Test
     void testTariffResolverBean() {
         CoreConfig config = new CoreConfig();
-        TariffResolver resolver = config.tariffResolver();
+        TariffResolver resolver = config.tariffResolver("test-tariffs.csv");
         assertNotNull(resolver);
         assertNull(resolver.resolve(null));
     }

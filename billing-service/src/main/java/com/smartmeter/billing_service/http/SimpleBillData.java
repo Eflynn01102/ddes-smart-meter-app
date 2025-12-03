@@ -3,7 +3,6 @@ package com.smartmeter.billing_service.http;
 import com.smartmeter.billing_service.domain.events.BillSnapshot;
 
 /**
- * Simplified bill data DTO matching the client's expected schema.
  * Maps from the full BillSnapshot to the format expected by client:3000/bill_data
  */
 public record SimpleBillData(

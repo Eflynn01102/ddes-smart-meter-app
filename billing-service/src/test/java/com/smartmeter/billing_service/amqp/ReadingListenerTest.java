@@ -10,6 +10,7 @@ import com.smartmeter.billing_service.domain.ports.BillStore;
 import com.smartmeter.billing_service.domain.ports.Deduper;
 import com.smartmeter.billing_service.domain.ports.TariffResolver;
 import com.smartmeter.billing_service.domain.service.BillingCalculator;
+import com.smartmeter.billing_service.http.HttpAlertPublisher;
 
 class ReadingListenerTest {
     @Test
@@ -19,9 +20,9 @@ class ReadingListenerTest {
         TariffResolver tariffs = Mockito.mock(TariffResolver.class);
         Deduper deduper = Mockito.mock(Deduper.class);
         BillPublisher publisher = Mockito.mock(BillPublisher.class);
+        HttpAlertPublisher alertPublisher = Mockito.mock(HttpAlertPublisher.class);
         ZoneId zone = ZoneId.of("Europe/London");
-        ReadingListener listener = new ReadingListener(calc, store, tariffs, deduper, publisher, zone);
-        // Basic instantiation test
+        ReadingListener listener = new ReadingListener(calc, store, tariffs, deduper, publisher, zone, alertPublisher);
         assert listener != null;
     }
 }
